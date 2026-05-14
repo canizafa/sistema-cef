@@ -1,3 +1,0 @@
-//no funciona en zed
-curl http://localhost:8081/
-Content-Type: aplication/JSON
