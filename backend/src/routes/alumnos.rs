@@ -1,21 +1,12 @@
+use crate::app::alumno::Alumno;
 use axum::{
     Json, Router,
     extract::Path,
     response::IntoResponse,
     routing::{get, post},
 };
-use serde::Deserialize;
 
-#[derive(Deserialize)]
-pub struct Alumno {
-    //1 alumno
-    nombre: String,
-    apellido: String,
-    dni: String,
-    mail: String,
-    //planilla deberia ser otra entidad
-}
-pub fn router() -> Router {
+pub fn alumnos_router() -> Router {
     Router::new()
         .route("/api/users/{id}", axum::routing::get(leer_alumno))
         .route("/alumnos", post(crear_alumno)) //GET

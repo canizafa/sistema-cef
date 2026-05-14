@@ -1,4 +1,6 @@
 //pense el main para levantar el servidor nomas, las otras responsabilidades las delego a otros archivos
+mod app;
+mod repository;
 mod routes;
 
 use std::net::SocketAddr;
@@ -12,7 +14,7 @@ async fn main() {
         .unwrap_or_else(|e| {
             panic!("fallo la conetsion de la dir {}:{}", dir, e);
         });
-    let router = routes::root::router().merge(routes::users::alumnos::router());
+    let router = routes::root::router().merge(routes::root::router());
 
     axum::serve(listener, router).await.unwrap_or_else(|e| {
         //esto levanta el servidor
