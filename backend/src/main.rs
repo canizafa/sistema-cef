@@ -14,7 +14,7 @@ async fn main() {
         .unwrap_or_else(|e| {
             panic!("fallo la conetsion de la dir {}:{}", dir, e);
         });
-    let router = routes::root::router().merge(routes::root::router());
+    let router = routes::root::router();
 
     axum::serve(listener, router).await.unwrap_or_else(|e| {
         //esto levanta el servidor
