@@ -16,3 +16,9 @@ frontend/lerna-debug.log*
 # General
 .env
 .DS_Store
+
+# Archivos personales (facu-l)
+.superpowers/
+docs/
+guia-repositorio.md
+manual-de-estilo.md

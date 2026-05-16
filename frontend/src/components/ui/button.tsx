@@ -1,3 +1,6 @@
+// Componente Button generado por shadcn/ui. No modificar.
+// Soporta variantes (default, outline, ghost, destructive) y tamaños (sm, default, lg, icon).
+// El color del variant "default" lo controla --primary en index.css.
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
