@@ -1,5 +1,7 @@
 //pense el main para levantar el servidor nomas, las otras responsabilidades las delego a otros archivos
-mod app;
+mod config;
+mod handlers;
+mod models;
 mod repository;
 mod routes;
 
