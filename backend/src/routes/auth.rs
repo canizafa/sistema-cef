@@ -5,7 +5,7 @@ use crate::models::alumno::CrearAlumno;
 pub fn auth_router() -> Router {
     Router::new()
         .route("/register", axum::routing::post(registrar_usuario))
-        .route("/login", axum::routing::post(login_usuario))
+        .route("/login/{id}", axum::routing::post(login_usuario))
 }
 
 pub async fn registrar_usuario(Json(usuario): Json<CrearAlumno>) -> impl IntoResponse {
