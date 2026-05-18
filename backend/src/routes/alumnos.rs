@@ -1,4 +1,4 @@
-use crate::app::alumno::*;
+use crate::models::alumno::*;
 
 use axum::{Json, Router, extract::Path, response::IntoResponse, routing::post};
 

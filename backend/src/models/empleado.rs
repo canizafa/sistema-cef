@@ -2,8 +2,8 @@ use crate::models::traits::Usuario;
 use serde::Deserialize;
 
 //La creación del alumno no tiene ID
-#[derive(Deserialize, Debug)]
-pub struct CrearAlumno {
+#[derive(Deserialize)]
+pub struct CrearEmpleado {
     //1 alumno
     pub nombre: String,
     pub apellido: String,
@@ -13,8 +13,8 @@ pub struct CrearAlumno {
 }
 
 // la respuesta del alumno tiene ID cuando viene de la base de datos
-#[derive(Deserialize, Debug)]
-pub struct Alumno {
+#[derive(Deserialize)]
+pub struct Empleado {
     pub id: u64,
     pub nombre: String,
     pub apellido: String,
@@ -23,4 +23,4 @@ pub struct Alumno {
     //planilla deberia ser otra entidad
 }
 
-impl Usuario for CrearAlumno {}
+impl Usuario for CrearEmpleado {}
