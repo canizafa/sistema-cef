@@ -48,5 +48,5 @@ pub async fn ver_clases(State(pool): State<SqlitePool>) -> axum::Json<Vec<Clase>
         .fetch_all(&pool)
         .await
         .unwrap();
-    axum::Json(clases)
+    axum::Json(clases) // cambiar a rutas
 }
