@@ -1,4 +1,3 @@
-use crate::models::traits::Usuario;
 use serde::Deserialize;
 
 //La creación del alumno no tiene ID
@@ -22,5 +21,3 @@ pub struct Empleado {
     pub mail: String,
     //planilla deberia ser otra entidad
 }
-
-impl Usuario for CrearEmpleado {}
