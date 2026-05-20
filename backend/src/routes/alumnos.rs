@@ -1,8 +1,9 @@
 use crate::models::alumno::*;
 
 use axum::{Json, Router, extract::Path, response::IntoResponse, routing::post};
+use sqlx::SqlitePool;
 
-pub fn alumnos_router() -> Router {
+pub fn alumnos_router() -> Router<SqlitePool> {
     Router::new()
         .route("/api/users/{id}", axum::routing::get(leer_alumno))
         .route("/alumnos", post(crear_alumno)) //GET
