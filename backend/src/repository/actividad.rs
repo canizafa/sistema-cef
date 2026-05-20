@@ -1,14 +1,7 @@
+use crate::models::actividad::Actividad;
+use crate::models::actividad::CrearActividad;
 use axum::{Json, extract::State};
 use sqlx::SqlitePool;
-
-use crate::models::actividad::CrearActividad;
-//estos structs los genero para que la funcion no me de error
-// y pueda probar en bruno
-// pero al final deberian ir en routes tambien asi que no andan igual
-// podes copiarlo, son los atributos que tienen las tablas
-// ES IMPORTANTE RESPETAR LOS ID DE CADA TABLA, ya que eso diferencia un objeto de otro
-// te dejo los structs armados
-
 pub async fn crear_actividad(
     State(pool): State<SqlitePool>,
     Json(actividad): Json<CrearActividad>,
@@ -24,4 +17,14 @@ pub async fn crear_actividad(
     .await
     .unwrap();
     "actividad creada".to_string()
+}
+pub async fn mostrar_actividades(State(pool): State<SqlitePool>) -> Json<Vec<Actividad>> {
+    let actividades = sqlx::query_as::<_, Actividad>(
+        "SELECT id, nombre, descripcion
+         FROM Actividad",
+    )
+    .fetch_all(&pool) //TRAE TODAS LAS ACTIVIDADES, tal vez te conviene dejarlo asi, se arma solo el vector sin nada raro
+    .await //ACTIVIDAD HACE REFERENCIA A POR EJEMPLO YOGA, PILATES, FUNCIONAL
+    .unwrap(); //NO HACE REFERENCIA A LA CLASE CON DIA Y HORARIO
+    Json(actividades)
 }

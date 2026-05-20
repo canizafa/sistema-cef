@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 
 #[derive(Serialize, Deserialize)]
 pub struct CrearActividad {
@@ -6,7 +7,7 @@ pub struct CrearActividad {
     pub descripcion: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct Actividad {
     pub id: i32,
     pub nombre: String,
