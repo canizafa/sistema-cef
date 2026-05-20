@@ -1,18 +1,11 @@
 use axum::{Json, extract::State};
-use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 
-#[derive(Deserialize, Serialize)]
-pub struct NuevaReserva {
-    pub fecha: String,
-    pub estado: String,
-    pub dniCliente: i32,
-    pub idClase: i32,
-}
+use crate::models::reserva::CrearReserva;
 
 pub async fn crear_reserva(
     State(pool): State<SqlitePool>,
-    Json(reserva): Json<NuevaReserva>,
+    Json(reserva): Json<CrearReserva>,
 ) -> String {
     sqlx::query(
         "INSERT INTO Reserva
@@ -21,8 +14,8 @@ pub async fn crear_reserva(
     )
     .bind(&reserva.fecha)
     .bind(&reserva.estado)
-    .bind(reserva.dniCliente)
-    .bind(reserva.idClase)
+    .bind(reserva.dni_cliente)
+    .bind(reserva.id_clase)
     .execute(&pool)
     .await
     .unwrap();

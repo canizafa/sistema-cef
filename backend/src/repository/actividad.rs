@@ -1,5 +1,7 @@
 use axum::{Json, extract::State};
 use sqlx::SqlitePool;
+
+use crate::models::actividad::CrearActividad;
 //estos structs los genero para que la funcion no me de error
 // y pueda probar en bruno
 // pero al final deberian ir en routes tambien asi que no andan igual
@@ -9,7 +11,7 @@ use sqlx::SqlitePool;
 
 pub async fn crear_actividad(
     State(pool): State<SqlitePool>,
-    Json(actividad): Json<NuevaActividad>,
+    Json(actividad): Json<CrearActividad>,
 ) -> String {
     sqlx::query(
         "INSERT INTO Actividad

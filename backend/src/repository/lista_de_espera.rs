@@ -1,27 +1,20 @@
 use axum::{Json, extract::State};
-use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 
-#[derive(Deserialize, Serialize)]
-pub struct NuevaListaEspera {
-    pub idLista: i32,
-    pub dniCliente: i32,
-    pub idClase: i32,
-    pub fecha: String,
-}
+use crate::models::lista_espera::CrearListaEspera;
 
 pub async fn agregar_lista_espera(
     State(pool): State<SqlitePool>,
-    Json(lista): Json<NuevaListaEspera>,
+    Json(lista): Json<CrearListaEspera>,
 ) -> String {
     sqlx::query(
         "INSERT INTO ListaEspera
         (idCLiente,dniCliente, idClase, fecha)
         VALUES (?,?, ?, ?)",
     )
-    .bind(lista.idLista)
-    .bind(lista.dniCliente)
-    .bind(lista.idClase)
+    .bind(lista.id_espera)
+    .bind(lista.dni_cliente)
+    .bind(lista.id_clase)
     .bind(&lista.fecha)
     .execute(&pool)
     .await
