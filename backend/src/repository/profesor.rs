@@ -1,19 +1,9 @@
 use axum::{Json, extract::State};
-use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-#[derive(Deserialize, Serialize)]
-pub struct NuevoProfesor {
-    pub dni: i32,
-    pub nombre: String,
-    pub pellido: String,
-    pub genero: String,
-    pub estado: bool,
-}
 
-pub async fn crear_profesor(
-    State(pool): State<SqlitePool>,
-    Json(profesor): Json<NuevoProfesor>,
-) -> String {
+use crate::models::profesor::CrearProfesor;
+
+pub async fn crear_profesor(State(pool): State<SqlitePool>, Json(profesor): Json<CrearProfesor>) {
     sqlx::query(
         "INSERT INTO Profesor
         (DNI, nombre,pellido, genero, estado)
@@ -27,5 +17,4 @@ pub async fn crear_profesor(
     .execute(&pool)
     .await
     .unwrap();
-    "profe creado".to_string()
 }
