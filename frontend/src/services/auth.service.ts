@@ -9,12 +9,21 @@ export interface LoginData {
     password: string;
 }
 
+// Campos que acepta CrearAlumno en el backend
 export interface RegisterData {
     nombre: string;
     apellido: string;
     dni: string;
     mail: string;
     password: string;
+    fecha_nacimiento: string; // formato "YYYY-MM-DD"
+    telefono: string;
+    estado: string;
+    ficha_medica: {
+        enfermedades: boolean;
+        operaciones_quirurgicas: boolean;
+        detalles: string;
+    };
 }
 
 export interface AuthResponse {
@@ -22,19 +31,17 @@ export interface AuthResponse {
     user: User;
 }
 
-export const authService = { 
-    async login(data: LoginData): Promise<AuthResponse>{
+export const authService = {
+    async login(data: LoginData): Promise<AuthResponse> {
         const response = await api.post<AuthResponse>('/auth/login', data);
-        localStorage.setItem('token', response.data.token);
         return response.data;
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('alumnos', data);
+        await api.post('/auth/register', data);
     },
-    
+
     logout(): void {
         localStorage.removeItem('token');
     },
-
 };
