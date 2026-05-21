@@ -9,22 +9,17 @@ export interface LoginData {
     password: string;
 }
 
-// Campos que acepta CrearAlumno en el backend
+// Campos que acepta el modelo Cliente en el backend
 export interface RegisterData {
     nombre: string;
-    apellido: string;
-    dni: string;
-    mail: string;
-    password: string;
-    fecha_nacimiento: string; // formato "YYYY-MM-DD"
+    email: string;
+    dni: number;
     telefono: string;
+    fecha_nacimiento: string;
     estado: string;
-    ficha_medica: {
-        enfermedades: boolean;
-        operaciones_quirurgicas: boolean;
-        detalles: string;
-    };
+    ficha: string;
 }
+
 
 export interface AuthResponse {
     token: string;
@@ -38,7 +33,7 @@ export const authService = {
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('/auth/register', data);
+        await api.post('/clientes', data);
     },
 
     logout(): void {
