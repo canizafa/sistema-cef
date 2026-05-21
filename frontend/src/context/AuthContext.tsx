@@ -10,8 +10,7 @@ export type Rol = 'dueno' | 'recepcionista' | 'cliente';
 export type User = {
     id: number;
     nombre: string;
-    apellido: string;
-    mail: string;
+    email: string;
     rol: Rol;
 };
 
