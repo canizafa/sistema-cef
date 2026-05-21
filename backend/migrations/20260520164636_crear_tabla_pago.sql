@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS pagos (
     id_membresia INTEGER,
     reserva_paga INTEGER,
     FOREIGN KEY (id_membresia) REFERENCES membresia(id_membresia),
-    FOREIGN KEY (reserva_paga) REFERENCES reserva(id_reserva),
+    FOREIGN KEY (reserva_paga) REFERENCES reserva(id_reserva)
 )

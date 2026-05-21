@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS membresias (
     tipo VARCHAR(50) NOT NULL,
     estado VARCHAR(30) NOT NULL,
     fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NULL,
+    fecha_fin DATE NULL
 )

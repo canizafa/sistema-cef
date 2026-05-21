@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS clase (
     dni_profesor integer,
     FOREIGN KEY (id_actividad) REFERENCES actividad(id_actividad),
     FOREIGN KEY (id_sala) REFERENCES reserva(id_sala),
-    foreign key (dni_profesor) REFERENCES profesor(dni_profesor),
+    foreign key (dni_profesor) REFERENCES profesor(dni_profesor)
 )
