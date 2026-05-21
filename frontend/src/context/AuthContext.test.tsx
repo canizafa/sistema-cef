@@ -8,7 +8,7 @@ const initialState = { user: null, token: null };
 
 describe('authReducer', () => {
     it('LOGIN guarda el usuario y el token en el estado', () => {
-        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const };
+        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const }; // 'as const' le dice a TypeScript que 'cliente' es un valor exacto, no un string genérico.
         const newState = authReducer(initialState,{
             type: 'LOGIN',
             payload: { user, token: 'abc123' },
