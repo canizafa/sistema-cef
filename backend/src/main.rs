@@ -11,6 +11,8 @@ use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
+
     let puerto = 8081;
     let dir = SocketAddr::from(([0, 0, 0, 0], puerto));
     let listener = tokio::net::TcpListener::bind(dir)

@@ -5,7 +5,7 @@ use crate::models::cliente::Cliente;
 pub async fn crear_cliente(pool: &SqlitePool, cliente: Cliente) -> Result<Cliente, sqlx::Error> {
     sqlx::query(
         "INSERT INTO Cliente
-        (DNI, nombre,apellido, email, telefono, fechaNacimiento, estado, Ficha)
+        (dni, nombre, apellido, email, telefono, fecha_nacimiento, estado, ficha)
         VALUES (?,?,?,?,?,?, ?,?)",
     )
     .bind(cliente.dni)
