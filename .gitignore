@@ -14,7 +14,7 @@ frontend/pnpm-debug.log*
 frontend/lerna-debug.log*
 
 # Database creada localmente
-backend/database.db
+backend/database.db*
 
 # General
 .env
