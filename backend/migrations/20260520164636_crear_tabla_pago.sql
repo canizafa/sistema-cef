@@ -1,7 +1,7 @@
 -- Add migration script here
 CREATE TABLE IF NOT EXISTS pagos (
     id_pago INTEGER PRIMARY KEY AUTOINCREMENT,
-    monto double NOT NULL monto > 0,
+    monto REAL NOT NULL CHECK(monto > 0),
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
     sena BOOLEAN,
