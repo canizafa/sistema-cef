@@ -9,32 +9,34 @@ export interface LoginData {
     password: string;
 }
 
+// Campos que acepta el modelo Cliente en el backend
 export interface RegisterData {
     nombre: string;
-    apellido: string;
-    dni: string;
-    mail: string;
-    password: string;
+    email: string;
+    dni: number;
+    telefono: string;
+    fecha_nacimiento: string;
+    estado: string;
+    ficha: string;
 }
+
 
 export interface AuthResponse {
     token: string;
     user: User;
 }
 
-export const authService = { 
-    async login(data: LoginData): Promise<AuthResponse>{
+export const authService = {
+    async login(data: LoginData): Promise<AuthResponse> {
         const response = await api.post<AuthResponse>('/auth/login', data);
-        localStorage.setItem('token', response.data.token);
         return response.data;
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('alumnos', data);
+        await api.post('/clientes', data);
     },
-    
+
     logout(): void {
         localStorage.removeItem('token');
     },
-
 };

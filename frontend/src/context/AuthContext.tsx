@@ -8,9 +8,9 @@ import { createContext, useContext, useReducer, type ReactNode } from 'react';
 export type Rol = 'dueno' | 'recepcionista' | 'cliente';
 
 export type User = {
-    id:number;
-    nombre:string;
-    email:string;
+    id: number;
+    nombre: string;
+    email: string;
     rol: Rol;
 };
 
