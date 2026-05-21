@@ -23,8 +23,5 @@ pub async fn registrar_cliente(
     State(pool): State<SqlitePool>,
     Json(cliente): Json<Cliente>,
 ) -> impl IntoResponse {
-    match crear_cliente(&pool, cliente).await {
-        Ok(c) => (StatusCode::CREATED, Json(c)).into_response(),
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-    }
+    StatusCode::ACCEPTED.into_response()
 }

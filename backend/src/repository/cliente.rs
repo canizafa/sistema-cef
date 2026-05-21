@@ -1,12 +1,13 @@
+use axum::{Json, extract::State};
 use sqlx::SqlitePool;
 
 use crate::models::cliente::Cliente;
 
-pub async fn crear_cliente(pool: &SqlitePool, cliente: Cliente) -> Result<Cliente, sqlx::Error> {
+pub async fn crear_cliente(pool: &SqlitePool, cliente: Cliente) -> String {
     sqlx::query(
         "INSERT INTO Cliente
-        (dni, nombre, apellido, email, telefono, fecha_nacimiento, estado, ficha)
-        VALUES (?,?,?,?,?,?, ?,?)",
+        (dni, nombre, email, telefono, fecha_nacimiento, estado, ficha)
+        VALUES (?,?,?,?,?, ?,?)",
     )
     .bind(cliente.dni)
     .bind(&cliente.nombre)
@@ -16,10 +17,7 @@ pub async fn crear_cliente(pool: &SqlitePool, cliente: Cliente) -> Result<Client
     .bind(&cliente.estado)
     .bind(&cliente.ficha)
     .execute(pool)
-    .await?;
-    let resultado =
-        sqlx::query_as::<_, Cliente>("SELECT * FROM clientes WHERE id = last_insert_rowid()")
-            .fetch_one(pool)
-            .await?;
-    Ok(resultado)
+    .await
+    .unwrap();
+    "cliente creado".to_string()
 }
