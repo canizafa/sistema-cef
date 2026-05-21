@@ -1,5 +1,4 @@
 pub mod actividad;
-pub mod alumno;
 pub mod clase;
 pub mod cliente;
 pub mod empleado;

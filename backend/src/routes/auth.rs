@@ -1,7 +1,7 @@
 use axum::{Json, Router, extract::Path, response::IntoResponse};
 use sqlx::SqlitePool;
 
-use crate::models::alumno::CrearAlumno;
+use crate::models::cliente::Cliente;
 
 pub fn auth_router() -> Router<SqlitePool> {
     Router::new()
@@ -9,7 +9,7 @@ pub fn auth_router() -> Router<SqlitePool> {
         .route("/login/{id}", axum::routing::post(login_usuario))
 }
 
-pub async fn registrar_usuario(Json(usuario): Json<CrearAlumno>) -> impl IntoResponse {
+pub async fn registrar_usuario(Json(usuario): Json<Cliente>) -> impl IntoResponse {
     format!("Se creo el usuario: {:?}", usuario)
 }
 
