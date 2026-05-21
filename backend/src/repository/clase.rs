@@ -25,8 +25,8 @@ pub async fn crear_clase(State(pool): State<SqlitePool>, Json(clase): Json<Crear
 }
 pub async fn ver_clases(State(pool): State<SqlitePool>) -> axum::Json<Vec<Clase>> {
     let clases = sqlx::query_as::<_, Clase>("SELECT dia, horario, cupoMaximo FROM Clase") //query_as ejecuta sql y convierte a struct
-        .fetch_all(&pool)
-        .await
+        .fetch_all(&pool) //trae todas las clases
+        .await //CLASE SERIA EXPLICITAMENTE DIA COMISION HORARIO Y CUPO
         .unwrap();
     axum::Json(clases) // cambiar a rutas
 }
