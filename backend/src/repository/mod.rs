@@ -1,5 +1,9 @@
+pub mod auth_repository;
 pub mod clase_repository;
 pub mod cliente_repository;
-pub mod lista_de_espera_repository; //en la tabla es "cliente-clase"
-pub mod login_repository;
+pub mod empleado_repository;
+pub mod ficha_medica_repository;
+pub mod lista_de_espera_repository;
+pub mod membresia_repository;
+pub mod pago_repository;
 pub mod reserva_repository;

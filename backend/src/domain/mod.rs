@@ -9,9 +9,11 @@ pub mod register;
 pub mod reserva;
 pub mod rol;
 
+pub use clase::Clase;
 pub use cliente::Cliente;
 pub use empleado::Empleado;
 pub use ficha_medica::FichaMedica;
+pub use membresia::Membresia;
 pub use reserva::Reserva;
 pub use rol::Estado;
 pub use rol::Rol;

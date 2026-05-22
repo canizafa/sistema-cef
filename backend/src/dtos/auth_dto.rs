@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-use crate::domain::rol::Rol;
+use crate::domain::Rol;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoginRequest {

@@ -1,8 +1,6 @@
 use axum::{Json, Router, extract::Path, response::IntoResponse};
 use sqlx::SqlitePool;
 
-use crate::models::cliente::Cliente;
-
 pub fn auth_router() -> Router<SqlitePool> {
     Router::new()
         .route("/register", axum::routing::post(registrar_usuario))
