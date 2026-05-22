@@ -5,12 +5,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext'; // Estado global de sesión (quién está logueado)
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'; // Guarda: solo usuarios logueados
 import { AdminRoute } from '@/components/auth/AdminRoute'; // Guarda: solo el dueño
-import { LandingPage } from '@/pages/LandingPage';
-import { LoginPage } from '@/pages/LoginPage';
-import { RegisterPage } from '@/pages/RegisterPage';
+import { LandingPage } from '@/pages/public/LandingPage';
+import { LoginPage } from '@/pages/public/LoginPage';
+import { RegisterPage } from '@/pages/public/RegisterPage';
 import { ClasesPage } from '@/pages/ClasesPage';
 import { PerfilPage } from '@/pages/PerfilPage';
-import { AdminPage } from '@/pages/AdminPage';
+import { AdminPage } from '@/pages/admin/AdminPage';
 import { Toaster } from '@/components/ui/sonner'; // Notificaciones emergentes globales
 
 export default function App() {
