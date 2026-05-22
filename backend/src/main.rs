@@ -1,5 +1,5 @@
 mod app_state;
-mod config;
+mod auth;
 mod domain;
 mod dtos;
 mod handlers;
