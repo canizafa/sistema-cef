@@ -1,5 +1,7 @@
-use axum::{Json, extract::State};
+use axum::extract::State;
 use sqlx::SqlitePool;
+
+use crate::domain::cliente::Cliente;
 
 pub struct ClienteRepository;
 

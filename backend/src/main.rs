@@ -2,6 +2,7 @@ mod app_state;
 mod auth;
 mod domain;
 mod dtos;
+mod errores;
 mod handlers;
 mod repository;
 mod routes;
