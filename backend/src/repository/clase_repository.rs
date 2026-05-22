@@ -1,8 +1,6 @@
 use axum::extract::State;
 use sqlx::SqlitePool;
 
-use crate::domain::clase::Clase;
-
 pub async fn create_clase(State(pool): State<SqlitePool>, clase: Clase) -> String {
     sqlx::query(
         "INSERT INTO Clase

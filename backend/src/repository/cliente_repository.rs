@@ -1,29 +1,14 @@
 use axum::extract::State;
 use sqlx::SqlitePool;
 
-use crate::domain::cliente::Cliente;
+use crate::domain::Cliente;
 
 pub struct ClienteRepository;
 
 impl ClienteRepository {
     pub fn create_cliente(State(pool): State<SqlitePool>, cliente: Cliente) {}
+    pub fn find_by_dni(State(pool): State<SqlitePool>, id: i32) {}
+    pub fn find_by_email(State(pool): State<SqlitePool>, email: String) {}
+    pub fn update_cliente(State(pool): State<SqlitePool>, cliente: Cliente) {}
+    pub fn delete_cliete(State(pool): State<SqlitePool>, cliente: Cliente) {}
 }
-
-// pub async fn crear_cliente(State(pool): State<SqlitePool>, Json(cliente): Json<Cliente>) -> String {
-//     sqlx::query(
-//         "INSERT INTO Cliente
-//         (DNI, nombre,apellido, email, telefono, fechaNacimiento, estado, Ficha)
-//         VALUES (?,?,?,?,?,?, ?,?)",
-//     )
-//     .bind(cliente.dni)
-//     .bind(&cliente.nombre)
-//     .bind(&cliente.email)
-//     .bind(&cliente.telefono)
-//     .bind(&cliente.fecha_nacimiento)
-//     .bind(&cliente.estado)
-//     .bind(&cliente.ficha)
-//     .execute(&pool)
-//     .await
-//     .unwrap();
-//     "cliente creado".to_string()
-// }
