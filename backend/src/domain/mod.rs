@@ -15,6 +15,7 @@ pub use empleado::Empleado;
 pub use ficha_medica::FichaMedica;
 pub use lista_de_espera::ListaEspera;
 pub use membresia::Membresia;
+pub use register::Register;
 pub use reserva::Reserva;
 pub use rol::Estado;
 pub use rol::Rol;
