@@ -9,7 +9,7 @@ impl AuthRepository {
         State(pool): State<SqlitePool>,
         email: String,
         password: String,
-    ) -> Result<(), ApiError> {
+    ) -> Result<Option, ApiError> {
         todo!()
     }
     pub async fn register(

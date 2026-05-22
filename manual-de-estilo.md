@@ -310,14 +310,18 @@ Usamos los breakpoints estándar de Tailwind. Para este proyecto, los relevantes
 src/
 ├── components/
 │   ├── ui/          ← Componentes de shadcn (no tocar)
+│   ├── layout/      ← AdminLayout, Header, Footer     
 │   └── shared/      ← Componentes propios reutilizables
-├── pages/           ← Una carpeta por vista principal
+├── pages/
+│   ├── admin/       ← Pantallas de recepcionista/dueño 
+│   ├── cliente/     ← Pantallas del usuario cliente     
+│   └── public/      ← Pantallas sin autenticación       
+├── context/         ← AuthContext y similares          
 ├── hooks/           ← Custom hooks
 ├── lib/             ← Utilidades, helpers
+├── routes/          ← Definición de rutas               
 └── styles/
     └── globals.css  ← Variables CSS y fuente
-```
-
 ---
 
 ## 8. Convenciones de código
