@@ -1,4 +1,3 @@
-pub mod auth;
 pub mod clase;
 pub mod cliente;
 pub mod empleado;
@@ -11,3 +10,8 @@ pub mod reserva;
 pub mod rol;
 
 pub use cliente::Cliente;
+pub use empleado::Empleado;
+pub use ficha_medica::FichaMedica;
+pub use reserva::Reserva;
+pub use rol::Estado;
+pub use rol::Rol;

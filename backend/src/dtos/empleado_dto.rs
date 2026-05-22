@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::domain::rol::Rol;
+use crate::domain::Rol;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateEmpleadoRequest {
