@@ -1,11 +1,10 @@
-use axum::{Router, routing::get};
+use axum::Router;
 use sqlx::SqlitePool;
 
-use crate::routes::{auth::auth_router, cliente::clientes_router, health_checker::health_checker};
-
 pub fn router() -> Router<SqlitePool> {
-    Router::new()
-        .route("/api", get(health_checker))
-        .nest("/api/clientes", clientes_router())
-        .nest("/api/auth", auth_router())
+    Router::new();
+    todo!()
+    // .route("/api", get(health_checker))
+    // .nest("/api/clientes", clientes_router())
+    // .nest("/api/auth", auth_router())
 }
