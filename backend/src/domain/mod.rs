@@ -13,6 +13,7 @@ pub use clase::Clase;
 pub use cliente::Cliente;
 pub use empleado::Empleado;
 pub use ficha_medica::FichaMedica;
+pub use lista_de_espera::ListaEspera;
 pub use membresia::Membresia;
 pub use reserva::Reserva;
 pub use rol::Estado;
