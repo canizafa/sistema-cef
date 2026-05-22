@@ -1,6 +1,8 @@
+mod app_state;
 mod config;
+mod domain;
+mod dtos;
 mod handlers;
-mod models;
 mod repository;
 mod routes;
 
@@ -27,7 +29,6 @@ async fn main() {
     let app = routes::root::router().with_state(pool);
 
     axum::serve(listener, app).await.unwrap_or_else(|e| {
-        //esto levanta el servidor
         panic!("fallo la conetsion con el servidor {}", e);
     });
 }
