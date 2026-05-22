@@ -1,7 +1,13 @@
+pub mod auth;
 pub mod clase;
 pub mod cliente;
 pub mod empleado;
 pub mod ficha_medica;
+pub mod lista_de_espera;
+pub mod membresia;
+pub mod pago;
+pub mod register;
+pub mod reserva;
 pub mod rol;
 
 pub use cliente::Cliente;
