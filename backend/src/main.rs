@@ -1,4 +1,3 @@
-//pense el main para levantar el servidor nomas, las otras responsabilidades las delego a otros archivos
 mod config;
 mod handlers;
 mod models;
@@ -11,8 +10,8 @@ use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
-    let puerto = 8081;
-    let dir = SocketAddr::from(([0, 0, 0, 0], puerto));
+    let port = 8081;
+    let dir = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
         .unwrap_or_else(|e| {
