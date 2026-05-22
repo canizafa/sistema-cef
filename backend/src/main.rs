@@ -1,7 +1,8 @@
-//pense el main para levantar el servidor nomas, las otras responsabilidades las delego a otros archivos
-mod config;
+mod app_state;
+mod auth;
+mod domain;
+mod dtos;
 mod handlers;
-mod models;
 mod repository;
 mod routes;
 
@@ -11,10 +12,8 @@ use sqlx::SqlitePool;
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().ok();
-
-    let puerto = 8081;
-    let dir = SocketAddr::from(([0, 0, 0, 0], puerto));
+    let port = 8081;
+    let dir = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
         .unwrap_or_else(|e| {
@@ -30,7 +29,6 @@ async fn main() {
     let app = routes::root::router().with_state(pool);
 
     axum::serve(listener, app).await.unwrap_or_else(|e| {
-        //esto levanta el servidor
         panic!("fallo la conetsion con el servidor {}", e);
     });
 }
