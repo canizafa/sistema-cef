@@ -15,3 +15,8 @@ pub struct AsistenciaResponse {
     metodo: String,
     id_reserva: i32,
 }
+
+#[derive(Debug, Serialize)]
+pub struct AsistenciaListResponse {
+    pub asistencias: Vec<AsistenciaResponse>,
+}

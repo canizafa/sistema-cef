@@ -21,3 +21,8 @@ pub struct EmpleadoResponse {
     pub estado: String,
     pub rol: Rol,
 }
+
+#[derive(Debug, Serialize)]
+pub struct EmpleadoListResponse {
+    pub empleados: Vec<EmpleadoResponse>,
+}
