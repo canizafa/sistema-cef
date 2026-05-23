@@ -4,7 +4,6 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { AdminRoute } from '@/components/auth/AdminRoute';
 
 // Públicas
 import { LandingPage } from '@/pages/public/LandingPage';
@@ -17,10 +16,9 @@ import { PerfilPage } from '@/pages/cliente/PerfilPage';
 
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import { AdminPage } from '@/pages/admin/AdminPage';
-
+import AdminPage from '@/pages/admin/AdminPage'
 // Admin - Clases
-import { ClasesPage as AdminClasesPage } from '@/pages/admin/clases/ClasesPage';
+import AdminClasesPage from '@/pages/admin/clases/ClasesPage';
 import { NuevaClasePage } from '@/pages/admin/clases/NuevaClasePage';
 import { EditarClasePage } from '@/pages/admin/clases/EditarClasePage';
 
@@ -51,7 +49,7 @@ export const AppRouter = () => {
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
 
             {/* Rutas de administración: requieren rol admin o dueño */}
-            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminPage />} />
 
                 {/* Clases */}
