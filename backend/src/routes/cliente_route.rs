@@ -1,27 +1,19 @@
 use axum::{
-    Json, Router,
-    extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
+    Router,
     routing::{get, post},
 };
 use sqlx::SqlitePool;
 
-use crate::{models::cliente::Cliente, repository::cliente::crear_cliente};
+use crate::handlers::{
+    create_cliente_handler, delete_cliente_handler, get_cliente_handler, get_clientes_handler,
+    update_cliente_handler,
+};
 
-pub fn clientes_router() -> Router<SqlitePool> {
+pub fn cliente_router() -> Router<SqlitePool> {
     Router::new()
-        .route("/{id}", get(leer_cliente))
-        .route("/", post(registrar_cliente))
-}
-pub async fn leer_cliente(
-    State(pool): State<SqlitePool>,
-    Path(cliente_id): Path<i32>,
-) -> impl IntoResponse {
-}
-pub async fn registrar_cliente(
-    State(pool): State<SqlitePool>,
-    Json(cliente): Json<Cliente>,
-) -> impl IntoResponse {
-    StatusCode::ACCEPTED.into_response()
+        .route("/create", post(create_cliente_handler()))
+        .route("/get-cliente", get(get_cliente_handler()))
+        .route("/update-cliente", post(update_cliente_handler()))
+        .route("/delete-cliente", post(delete_cliente_handler()))
+        .route("/get-all", get(get_clientes_handler()))
 }

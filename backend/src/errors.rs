@@ -8,6 +8,18 @@ use serde::Serialize;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+pub enum AppError {
+    #[error("api error")]
+    Api(ApiError),
+    #[error("internal server error")]
+    InternalServerError,
+    #[error("database error")]
+    DatabaseError(#[from] sqlx::Error),
+    #[error("migration error")]
+    MigrationError(#[from] sqlx::migrate::MigrateError),
+}
+
+#[derive(Debug, Error)]
 pub enum ApiError {
     // ========= AUTH =========
     #[error("credenciales inválidas")]
