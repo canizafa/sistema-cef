@@ -15,3 +15,8 @@ pub struct ListaEsperaResponse {
     pub id_clase: i32,
     pub fecha: NaiveDate,
 }
+
+#[derive(Debug, Serialize)]
+pub struct ListaEsperaListResponse {
+    pub lista_espera: Vec<ListaEsperaResponse>,
+}

@@ -21,3 +21,8 @@ pub struct ClaseResponse {
     pub horario: String,
     pub estado: Estado,
 }
+
+#[derive(Debug, Serialize)]
+pub struct ClaseListResponse {
+    pub clases: Vec<ClaseResponse>,
+}

@@ -23,3 +23,8 @@ pub struct ClienteResponse {
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
 }
+
+#[derive(Debug, Serialize)]
+pub struct ClienteListResponse {
+    pub clientes: Vec<ClienteResponse>,
+}

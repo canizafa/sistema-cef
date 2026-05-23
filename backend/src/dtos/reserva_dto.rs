@@ -18,3 +18,8 @@ pub struct ReservaResponse {
     pub dni_cliente: i32,
     pub id_clase: i32,
 }
+
+#[derive(Debug, Serialize)]
+pub struct ReservaListResponse {
+    pub reservas: Vec<ReservaResponse>,
+}
