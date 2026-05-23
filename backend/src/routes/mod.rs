@@ -6,5 +6,5 @@ pub mod empleado_route;
 pub mod health_checker_route;
 pub mod membresia_route;
 pub mod pago_route;
-pub mod reservar_route;
+pub mod reserva_route;
 pub mod root;
