@@ -64,7 +64,7 @@ pub enum ApiError {
 
     // ========= HASH =========
     #[error("error procesando contraseña")]
-    PasswordHashError,
+    PasswordHashError(#[from] argon2::password_hash::Error),
 }
 
 #[derive(Debug, Serialize)]

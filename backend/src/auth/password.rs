@@ -5,18 +5,21 @@ use argon2::{
 
 use rand::rngs::OsRng;
 
-pub fn hash_password(password: &str) -> Result<String, argon2::password_hash::Error> {
+use crate::errors::ApiError;
+
+pub fn hash_password(password: &str) -> Result<String, ApiError> {
     let salt = SaltString::generate(&mut OsRng);
 
     let password_hash = Argon2::default()
-        .hash_password(password.as_bytes(), &salt)?
+        .hash_password(password.as_bytes(), &salt)
+        .map_err(|e| ApiError::PasswordHashError(e))?
         .to_string();
 
     Ok(password_hash)
 }
 
-pub fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::password_hash::Error> {
-    let parsed_hash = PasswordHash::new(hash)?;
+pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
+    let parsed_hash = PasswordHash::new(hash).map_err(|e| ApiError::PasswordHashError(e))?;
 
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
