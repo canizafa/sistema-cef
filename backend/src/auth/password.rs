@@ -12,14 +12,14 @@ pub fn hash_password(password: &str) -> Result<String, ApiError> {
 
     let password_hash = Argon2::default()
         .hash_password(password.as_bytes(), &salt)
-        .map_err(|e| ApiError::PasswordHashError)?
+        .map_err(|_| ApiError::PasswordHashError)?
         .to_string();
 
     Ok(password_hash)
 }
 
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
-    let parsed_hash = PasswordHash::new(hash).map_err(|e| ApiError::PasswordHashError)?;
+    let parsed_hash = PasswordHash::new(hash).map_err(|_| ApiError::PasswordHashError)?;
 
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
