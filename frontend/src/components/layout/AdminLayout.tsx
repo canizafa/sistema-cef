@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import logo from '@/assets/Logo.png';
+
 const navItems = [
   { to: '/admin/clientes',    label: 'Clientes' },
   { to: '/admin/clases',      label: 'Clases' },
@@ -10,7 +11,7 @@ const navItems = [
 
 export function AdminLayout() {
   return (
-    <div className="flex min-h-screen bg-[#121212]">
+    <div className="flex min-h-screen bg-background">
 
       {/* ── Sidebar ── */}
       <aside className="w-52 shrink-0 flex flex-col bg-[#1A1A1A] border-r border-[#2A2A2A]">
@@ -54,7 +55,7 @@ export function AdminLayout() {
       </aside>
 
       {/* ── Contenido ── */}
-      <main className="flex-1 overflow-auto bg-[#121212]">
+      <main className="flex-1 overflow-auto bg-background">
         <Outlet />
       </main>
 
