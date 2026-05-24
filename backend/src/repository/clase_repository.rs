@@ -30,7 +30,7 @@ impl ClaseRepository {
             clase.get_horario(),
             clase.get_cupo_profe(),
             clase.get_cupo_maximo(),
-            clase.get_estado() as _,
+            clase.get_estado(),
             clase.get_descripcion(),
             clase.get_id_sala(),
             clase.get_dni_profesor()
@@ -120,7 +120,7 @@ impl ClaseRepository {
             clase.get_horario(),
             clase.get_cupo_profe(),
             clase.get_cupo_maximo(),
-            clase.get_estado() as _,
+            clase.get_estado(),
             clase.get_descripcion(),
             clase.get_id_sala(),
             clase.get_dni_profesor(),
