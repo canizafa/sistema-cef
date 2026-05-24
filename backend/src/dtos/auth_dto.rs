@@ -21,7 +21,7 @@ pub struct RegisterRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthResponse {
-    pub id_usuario: i32,
+    pub dni: String,
     pub email: String,
     pub access_token: String,
     pub rol: Rol,

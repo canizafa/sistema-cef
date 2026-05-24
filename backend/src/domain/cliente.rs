@@ -9,6 +9,7 @@ use crate::{
 pub struct Cliente {
     dni: String,
     nombre_apellido: String,
+    password: String,
     email: String,
     telefono: String,
     fecha_nacimiento: NaiveDate,
@@ -42,6 +43,9 @@ impl Cliente {
     pub fn get_rol(&self) -> Rol {
         self.rol.clone()
     }
+    pub fn get_password_hash(&self) -> String {
+        self.password.clone()
+    }
 }
 
 impl From<CreateClienteRequest> for Cliente {
@@ -49,6 +53,7 @@ impl From<CreateClienteRequest> for Cliente {
         Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
+            password: request.password,
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,

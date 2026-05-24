@@ -9,6 +9,7 @@ use crate::dtos::{CreateFichaMedicaRequest, FichaMedicaResponse};
 pub struct CreateClienteRequest {
     pub dni: String,
     pub nombre_apellido: String,
+    pub password: String,
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
