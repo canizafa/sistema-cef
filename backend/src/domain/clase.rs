@@ -8,6 +8,7 @@ pub struct Clase {
     id_clase: String,
     dia: NaiveDate,
     horario: String,
+    descripcion: String,
     cupo_profe: i32,
     cupo_maximo: i32,
     estado: Estado,
@@ -42,6 +43,9 @@ impl Clase {
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
+    pub fn get_descripcion(&self) -> String {
+        self.descripcion.clone()
+    }
 }
 
 impl From<CreateClaseRequest> for Clase {
@@ -51,6 +55,7 @@ impl From<CreateClaseRequest> for Clase {
             id_clase: id,
             dia: value.dia,
             horario: value.horario,
+            descripcion: value.descripcion,
             cupo_profe: value.cupo_profe,
             cupo_maximo: value.cupo_maximo,
             estado: value.estado,

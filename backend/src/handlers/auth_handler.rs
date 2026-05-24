@@ -60,7 +60,7 @@ pub async fn login_handler(
     }
 
     let token =
-        generar_token(&dni, rol.clone(), &state.jwt_secret).map_err(|_| ApiError::JwtTokenError)?;
+        generar_token(dni, rol.clone(), &state.jwt_secret).map_err(|_| ApiError::JwtTokenError)?;
 
     Ok(Json(AuthResponse {
         dni: dni.to_string(),
@@ -78,14 +78,14 @@ pub async fn register_cliente_handler(
     ClienteRepository::create_cliente(&state.db, &cliente).await?;
 
     let token = generar_token(
-        &cliente.get_dni(),
+        cliente.get_dni(),
         cliente.get_rol().clone(),
         &state.jwt_secret,
     )
     .map_err(|_| ApiError::InternalServerError)?;
 
     Ok(Json(AuthResponse {
-        dni: cliente.get_dni(),
+        dni: cliente.get_dni().to_string(),
         email: cliente.get_email(),
         access_token: token,
         rol: cliente.get_rol().clone(),
@@ -98,17 +98,17 @@ pub async fn reset_password_cliente_handler(
 ) -> Result<Json<AuthResponse>, ApiError> {
     let cliente = ClienteRepository::find_by_email(&state.db, &body.email).await?;
 
-    ClienteRepository::reset_password(&state.db, &cliente.get_dni(), &body.password).await?;
+    ClienteRepository::reset_password(&state.db, cliente.get_dni(), &body.password).await?;
 
     let token = generar_token(
-        &cliente.get_dni(),
+        cliente.get_dni(),
         cliente.get_rol().clone(),
         &state.jwt_secret,
     )
     .map_err(|_| ApiError::InternalServerError)?;
 
     Ok(Json(AuthResponse {
-        dni: cliente.get_dni(),
+        dni: cliente.get_dni().to_string(),
         email: cliente.get_email(),
         access_token: token,
         rol: cliente.get_rol().clone(),
@@ -123,14 +123,14 @@ pub async fn register_empleado_handler(
     EmpleadoRepository::create_empleado(&state.db, &empleado).await?;
 
     let token = generar_token(
-        &empleado.get_dni(),
+        empleado.get_dni(),
         empleado.get_rol().clone(),
         &state.jwt_secret,
     )
     .map_err(|_| ApiError::InternalServerError)?;
 
     Ok(Json(AuthResponse {
-        dni: empleado.get_dni(),
+        dni: empleado.get_dni().to_string(),
         email: empleado.get_mail(),
         access_token: token,
         rol: empleado.get_rol().clone(),
@@ -144,14 +144,14 @@ pub async fn login_empleado_handler(
     let empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await?;
 
     let token = generar_token(
-        &empleado.get_dni(),
+        empleado.get_dni(),
         empleado.get_rol().clone(),
         &state.jwt_secret,
     )
     .map_err(|_| ApiError::InternalServerError)?;
 
     Ok(Json(AuthResponse {
-        dni: empleado.get_dni(),
+        dni: empleado.get_dni().to_string(),
         email: empleado.get_mail(),
         access_token: token,
         rol: empleado.get_rol().clone(),
@@ -165,7 +165,7 @@ pub async fn reset_password_empleado_handler(
     let mut empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await?;
 
     let token = generar_token(
-        &empleado.get_dni(),
+        empleado.get_dni(),
         empleado.get_rol().clone(),
         &state.jwt_secret,
     )
@@ -174,7 +174,7 @@ pub async fn reset_password_empleado_handler(
     empleado.update_password(&body.password)?;
 
     Ok(Json(AuthResponse {
-        dni: empleado.get_dni(),
+        dni: empleado.get_dni().to_string(),
         email: empleado.get_mail(),
         access_token: token,
         rol: empleado.get_rol().clone(),

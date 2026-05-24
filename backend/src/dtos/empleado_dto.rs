@@ -4,7 +4,7 @@ use crate::domain::{Empleado, Rol};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateEmpleadoRequest {
-    pub dni: String,
+    pub dni: i64,
     pub nombre_apellido: String,
     pub password: String,
     pub mail: String,
@@ -15,7 +15,7 @@ pub struct CreateEmpleadoRequest {
 
 #[derive(Debug, Serialize)]
 pub struct EmpleadoResponse {
-    pub dni: String,
+    pub dni: i64,
     pub nombre_apellido: String,
     pub mail: String,
     pub genero: String,

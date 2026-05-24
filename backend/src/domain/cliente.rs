@@ -53,7 +53,7 @@ impl From<CreateClienteRequest> for Cliente {
     fn from(request: CreateClienteRequest) -> Self {
         let password_hash = hash_password(&request.password).expect("Contraseña no hasheada");
         Self {
-            dni: request.dni.parse::<i64>().expect("DNI inválido"),
+            dni: request.dni,
             nombre_apellido: request.nombre_apellido,
             password: password_hash,
             email: request.email,
