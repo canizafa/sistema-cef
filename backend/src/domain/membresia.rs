@@ -3,7 +3,7 @@ use chrono::NaiveDate;
 use crate::domain::Estado;
 
 pub struct Membresia {
-    id_membresia: i32,
+    id_membresia: String,
     tipo: String,
     estado: Estado,
     fecha_inicio: NaiveDate,
@@ -11,8 +11,8 @@ pub struct Membresia {
 }
 
 impl Membresia {
-    pub fn get_id_membresia(&self) -> i32 {
-        self.id_membresia
+    pub fn get_id_membresia(&self) -> &str {
+        &self.id_membresia
     }
     pub fn get_tipo(&self) -> &str {
         &self.tipo
