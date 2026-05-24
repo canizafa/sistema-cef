@@ -7,6 +7,7 @@ mod handlers;
 mod repository;
 mod routes;
 
+use crate::errors::ApiError;
 use crate::routes::root;
 use crate::{app_state::AppState, errors::AppError};
 use sqlx::SqlitePool;
@@ -26,14 +27,17 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::DatabaseError(e))?;
 
-    let app_state = AppState { db };
+    let app_state = AppState {
+        db,
+        jwt_secret: env::var("JWT_SECRET").map_err(|_| AppError::Api(ApiError::JwtTokenError))?,
+    };
 
     sqlx::migrate!("./migrations")
         .run(&app_state.db)
         .await
         .map_err(|e| AppError::MigrationError(e))?;
 
-    let app = root::router().with_state(app_state.db);
+    let app = root::router().with_state(app_state);
 
     axum::serve(listener, app)
         .await

@@ -1,4 +1,3 @@
-use axum::extract::State;
 use sqlx::SqlitePool;
 
 use crate::domain::Empleado;
@@ -8,39 +7,35 @@ pub struct EmpleadoRepository;
 
 impl EmpleadoRepository {
     pub async fn create_empleado(
-        State(pool): State<SqlitePool>,
-        empleado: Empleado,
-    ) -> Result<Option<Empleado>, ApiError> {
+        pool: &SqlitePool,
+        empleado: &Empleado,
+    ) -> Result<Empleado, ApiError> {
         todo!()
     }
-    pub async fn list_empleados(
-        State(pool): State<SqlitePool>,
-    ) -> Result<Option<Vec<Empleado>>, ApiError> {
+    pub async fn list_empleados(pool: &SqlitePool) -> Result<Vec<Empleado>, ApiError> {
         todo!()
     }
-    pub async fn get_by_email(
-        State(pool): State<SqlitePool>,
-        email: String,
-    ) -> Result<Option<Empleado>, ApiError> {
+    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Empleado, ApiError> {
         todo!()
     }
-    pub async fn get_by_dni(
-        State(pool): State<SqlitePool>,
-        dni: i32,
-    ) -> Result<Option<Empleado>, ApiError> {
+    pub async fn get_by_dni(pool: &SqlitePool, dni: &str) -> Result<Empleado, ApiError> {
         todo!()
     }
     pub async fn update_empleado(
-        State(pool): State<SqlitePool>,
-        dni: i32,
+        pool: &SqlitePool,
+        dni: &str,
         empleado: Empleado,
-    ) -> Result<Option<Empleado>, ApiError> {
+    ) -> Result<Empleado, ApiError> {
         todo!()
     }
-    pub async fn delete_empleado(
-        State(pool): State<SqlitePool>,
-        dni: i32,
-    ) -> Result<Option<Empleado>, ApiError> {
+    pub async fn delete_empleado(pool: &SqlitePool, dni: &str) -> Result<Empleado, ApiError> {
+        todo!()
+    }
+    pub async fn update_password(
+        pool: &SqlitePool,
+        dni: &str,
+        password_hash: &str,
+    ) -> Result<Empleado, ApiError> {
         todo!()
     }
 }

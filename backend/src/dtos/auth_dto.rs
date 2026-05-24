@@ -3,16 +3,24 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::Rol;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct LoginRequest {
+    pub email: String,
+    pub password: String,
+    pub rol: Rol,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ResetPasswordRequest {
     pub email: String,
     pub password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
-    pub dni: i32,
+    pub dni: String,
     pub nombre_apellido: String,
+    pub password: String,
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
@@ -20,7 +28,7 @@ pub struct RegisterRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthResponse {
-    pub id_usuario: i32,
+    pub dni: String,
     pub email: String,
     pub access_token: String,
     pub rol: Rol,

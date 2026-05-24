@@ -1,4 +1,3 @@
-use axum::extract::State;
 use sqlx::SqlitePool;
 
 use crate::domain::Membresia;
@@ -8,33 +7,25 @@ pub struct MembresiaRepository;
 
 impl MembresiaRepository {
     pub async fn create_membresia(
-        State(pool): State<SqlitePool>,
+        pool: &SqlitePool,
         membresia: Membresia,
     ) -> Result<Membresia, ApiError> {
         todo!()
     }
-    pub async fn list_membresias(
-        State(pool): State<SqlitePool>,
-    ) -> Result<Option<Vec<Membresia>>, ApiError> {
+    pub async fn list_membresias(pool: &SqlitePool) -> Result<Option<Vec<Membresia>>, ApiError> {
         todo!()
     }
-    pub async fn get_membresia(
-        State(pool): State<SqlitePool>,
-        id: i32,
-    ) -> Result<Option<Membresia>, ApiError> {
+    pub async fn get_membresia(pool: &SqlitePool, id: &str) -> Result<Option<Membresia>, ApiError> {
         todo!()
     }
     pub async fn update_membresia(
-        State(pool): State<SqlitePool>,
-        id: i32,
+        pool: &SqlitePool,
+        id: &str,
         membresia: Membresia,
     ) -> Result<Membresia, ApiError> {
         todo!()
     }
-    pub async fn delete_membresia(
-        State(pool): State<SqlitePool>,
-        id: i32,
-    ) -> Result<Membresia, ApiError> {
+    pub async fn delete_membresia(pool: &SqlitePool, id: &str) -> Result<Membresia, ApiError> {
         todo!()
     }
 }

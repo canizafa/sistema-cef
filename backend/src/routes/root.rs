@@ -1,12 +1,12 @@
 use axum::{Router, routing::get};
-use sqlx::SqlitePool;
 
+use crate::AppState;
 use crate::routes::{
     asistencia_router, auth_router, clase_router, cliente_router, empleado_router, health_checker,
     membresia_router, pago_router, reserva_router,
 };
 
-pub fn router() -> Router<SqlitePool> {
+pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/health", get(health_checker))
         .nest("/api/reservas", reserva_router())

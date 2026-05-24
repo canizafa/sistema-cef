@@ -1,5 +1,4 @@
 use crate::errors::ApiError;
-use axum::extract::State;
 use sqlx::SqlitePool;
 
 use crate::domain::Clase;
@@ -7,10 +6,7 @@ use crate::domain::Clase;
 pub struct ClaseRepository;
 
 impl ClaseRepository {
-    pub async fn create_clase(
-        State(pool): State<SqlitePool>,
-        clase: Clase,
-    ) -> Result<Option<Clase>, ApiError> {
+    pub async fn create_clase(pool: &SqlitePool, clase: Clase) -> Result<Clase, ApiError> {
         sqlx::query_as!(
             Clase,
             "INSERT INTO clase
@@ -40,9 +36,7 @@ impl ClaseRepository {
         .map_err(ApiError::DatabaseError)
     }
 
-    pub async fn list_clases(
-        State(pool): State<SqlitePool>,
-    ) -> Result<Option<Vec<Clase>>, ApiError> {
+    pub async fn list_clases(pool: &SqlitePool) -> Result<Vec<Clase>, ApiError> {
         sqlx::query_as!(
             Clase,
             "SELECT
@@ -63,10 +57,7 @@ impl ClaseRepository {
         .map(Some)
     }
 
-    pub async fn get_by_id(
-        State(pool): State<SqlitePool>,
-        id: i32,
-    ) -> Result<Option<Clase>, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         sqlx::query_as!(
             Clase,
             "SELECT
@@ -89,10 +80,10 @@ impl ClaseRepository {
     }
 
     pub async fn update_clase(
-        State(pool): State<SqlitePool>,
-        id: i32,
+        pool: &SqlitePool,
+        id: &str,
         clase: Clase,
-    ) -> Result<Option<Clase>, ApiError> {
+    ) -> Result<Clase, ApiError> {
         sqlx::query_as!(
             Clase,
             "UPDATE clase
@@ -131,10 +122,7 @@ impl ClaseRepository {
         .map_err(ApiError::DatabaseError)
     }
 
-    pub async fn delete_clase(
-        State(pool): State<SqlitePool>,
-        id: i32,
-    ) -> Result<Option<Clase>, ApiError> {
+    pub async fn delete_clase(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         sqlx::query_as!(
             Clase,
             "DELETE FROM clase

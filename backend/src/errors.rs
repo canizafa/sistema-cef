@@ -62,6 +62,9 @@ pub enum ApiError {
     #[error("error generando token")]
     JwtError(#[from] jsonwebtoken::errors::Error),
 
+    #[error("Error en el token generado")]
+    JwtTokenError,
+
     // ========= HASH =========
     #[error("error procesando contraseña")]
     PasswordHashError,
@@ -106,6 +109,8 @@ impl IntoResponse for ApiError {
 
             // ===== HASH =====
             ApiError::PasswordHashError => StatusCode::INTERNAL_SERVER_ERROR,
+
+            ApiError::JwtTokenError => StatusCode::UNAUTHORIZED,
         };
 
         let body = Json(ErrorResponse {
