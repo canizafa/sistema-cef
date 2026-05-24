@@ -1,15 +1,34 @@
-import { NavLink, Outlet } from 'react-router-dom'
+// Layout del panel de administración.
+// Muestra un sidebar con navegación filtrada según el rol del usuario logueado.
+// DUENO ve todo. RECEPCIONISTA ve todo menos Empleados. CLIENTE es redirigido al inicio.
+import { NavLink, Outlet, Navigate } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
 import logo from '@/assets/Logo.png';
 
-const navItems = [
-  { to: '/admin/clientes',    label: 'Clientes' },
-  { to: '/admin/clases',      label: 'Clases' },
-  { to: '/admin/empleados',   label: 'Empleados' },
-  { to: '/admin/asistencias', label: 'Asistencias' },
-  { to: '/admin/reportes',    label: 'Reportes' },
+const allNavItems = [
+  { to: '/admin/clientes',    label: 'Clientes',    roles: ['dueno', 'recepcionista'] },
+  { to: '/admin/clases',      label: 'Clases',      roles: ['dueno', 'recepcionista'] },
+  { to: '/admin/empleados',   label: 'Empleados',   roles: ['dueno'] },
+  { to: '/admin/asistencias', label: 'Asistencias', roles: ['dueno', 'recepcionista'] },
+  { to: '/admin/reportes',    label: 'Reportes',    roles: ['dueno', 'recepcionista'] },
 ]
 
 export function AdminLayout() {
+  const { user } = useAuth()
+  const rol = user?.rol
+
+  // Si no hay sesión o es cliente, redirigir al inicio
+  if (!rol || rol === 'cliente') return <Navigate to="/" />
+
+  // Filtrar nav según rol
+  const navItems = allNavItems.filter(item => item.roles.includes(rol))
+
+  // Inicial del nombre para el avatar
+  const inicial = user?.nombre?.[0]?.toUpperCase() ?? 'A'
+
+  // Etiqueta legible del rol
+  const rolLabel = rol === 'dueno' ? 'Administrador' : 'Recepcionista'
+
   return (
     <div className="flex min-h-screen bg-background">
 
@@ -45,11 +64,11 @@ export function AdminLayout() {
         {/* Usuario */}
         <div className="flex items-center gap-3 px-4 py-4 border-t border-[#2A2A2A]">
           <div className="w-8 h-8 rounded-full bg-[#163F7A] flex items-center justify-center text-white text-xs font-bold shrink-0">
-            A
+            {inicial}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-white truncate">Admin</p>
-            <p className="text-xs text-[#6B7280] truncate">Administrador</p>
+            <p className="text-sm font-medium text-white truncate">{user?.nombre}</p>
+            <p className="text-xs text-[#6B7280] truncate">{rolLabel}</p>
           </div>
         </div>
       </aside>
