@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS clase (
     cupo_profe integer,
     cupo_maximo integer not null,
     estado varchar(30),
+    descripcion varchar(255),
     id_actividad TEXT,
     id_sala TEXT,
     dni_profesor integer,
