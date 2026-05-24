@@ -8,7 +8,7 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct Cliente {
-    dni: String,
+    dni: i64,
     nombre_apellido: String,
     password: String,
     email: String,
@@ -20,8 +20,8 @@ pub struct Cliente {
 }
 
 impl Cliente {
-    pub fn get_dni(&self) -> String {
-        self.dni.clone()
+    pub fn get_dni(&self) -> i64 {
+        self.dni
     }
     pub fn get_nombre_apellido(&self) -> String {
         self.nombre_apellido.clone()
@@ -53,7 +53,7 @@ impl From<CreateClienteRequest> for Cliente {
     fn from(request: CreateClienteRequest) -> Self {
         let password_hash = hash_password(&request.password).expect("Contraseña no hasheada");
         Self {
-            dni: request.dni,
+            dni: request.dni.parse::<i64>().expect("DNI inválido"),
             nombre_apellido: request.nombre_apellido,
             password: password_hash,
             email: request.email,
