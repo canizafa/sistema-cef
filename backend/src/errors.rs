@@ -62,6 +62,9 @@ pub enum ApiError {
     #[error("error generando token")]
     JwtError(#[from] jsonwebtoken::errors::Error),
 
+    #[error("Error en el token generado")]
+    JwtTokenError,
+
     // ========= HASH =========
     #[error("error procesando contraseña")]
     PasswordHashError,

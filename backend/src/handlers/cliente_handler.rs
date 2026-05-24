@@ -17,3 +17,7 @@ pub async fn delete_cliente_handler() {
 pub async fn get_clientes_handler() {
     todo!()
 }
+
+pub async fn reset_password_handler() {
+    todo!()
+}

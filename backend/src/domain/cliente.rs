@@ -1,6 +1,7 @@
 use chrono::NaiveDate;
 
 use crate::{
+    auth::password::hash_password,
     domain::{Estado, FichaMedica, Rol},
     dtos::CreateClienteRequest,
 };
@@ -50,10 +51,11 @@ impl Cliente {
 
 impl From<CreateClienteRequest> for Cliente {
     fn from(request: CreateClienteRequest) -> Self {
+        let password_hash = hash_password(&request.password).expect("Contraseña no hasheada");
         Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password: request.password,
+            password: password_hash,
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,

@@ -6,34 +6,29 @@ use crate::errors::ApiError;
 pub struct ClienteRepository;
 
 impl ClienteRepository {
-    pub async fn create_cliente(
+    pub async fn create_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
+        todo!()
+    }
+    pub async fn list_clientes(pool: &SqlitePool) -> Result<Vec<Cliente>, ApiError> {
+        todo!()
+    }
+    pub async fn find_by_dni(pool: &SqlitePool, dni: &str) -> Result<Option<Cliente>, ApiError> {
+        todo!()
+    }
+    pub async fn find_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
+        todo!()
+    }
+    pub async fn reset_password(
         pool: &SqlitePool,
-        cliente: Cliente,
-    ) -> Result<Option<Cliente>, ApiError> {
+        dni: &str,
+        password: &str,
+    ) -> Result<Cliente, ApiError> {
         todo!()
     }
-    pub async fn list_clientes(pool: &SqlitePool) -> Result<Option<Vec<Cliente>>, ApiError> {
+    pub async fn update_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
         todo!()
     }
-    pub async fn find_by_dni(pool: &SqlitePool, id: i32) -> Result<Option<Cliente>, ApiError> {
-        todo!()
-    }
-    pub async fn find_by_email(
-        pool: &SqlitePool,
-        email: String,
-    ) -> Result<Option<Cliente>, ApiError> {
-        todo!()
-    }
-    pub async fn update_cliente(
-        pool: &SqlitePool,
-        cliente: Cliente,
-    ) -> Result<Option<Cliente>, ApiError> {
-        todo!()
-    }
-    pub async fn delete_cliete(
-        pool: &SqlitePool,
-        cliente: Cliente,
-    ) -> Result<Option<Cliente>, ApiError> {
+    pub async fn delete_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
         todo!()
     }
 }

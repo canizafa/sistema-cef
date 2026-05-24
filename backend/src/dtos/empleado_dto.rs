@@ -6,6 +6,7 @@ use crate::domain::{Empleado, Rol};
 pub struct CreateEmpleadoRequest {
     pub dni: String,
     pub nombre_apellido: String,
+    pub password: String,
     pub mail: String,
     pub genero: String,
     pub estado: String,
