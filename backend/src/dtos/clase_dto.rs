@@ -12,7 +12,7 @@ pub struct CreateClaseRequest {
     pub estado: Estado,
     pub id_actividad: String,
     pub id_sala: String,
-    pub dni_profesor: String,
+    pub dni_profesor: i32,
     pub descripcion: String,
 }
 

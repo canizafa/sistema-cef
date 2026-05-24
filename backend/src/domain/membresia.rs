@@ -8,7 +8,7 @@ pub struct Membresia {
     tipo: String,
     estado: Estado,
     fecha_inicio: NaiveDate,
-    fecha_fin: NaiveDate,
+    fecha_fin: Option<NaiveDate>,
 }
 
 impl Membresia {
@@ -24,8 +24,8 @@ impl Membresia {
     pub fn get_fecha_inicio(&self) -> NaiveDate {
         self.fecha_inicio.clone()
     }
-    pub fn get_fecha_fin(&self) -> NaiveDate {
-        self.fecha_fin.clone()
+    pub fn get_fecha_fin(&self) -> Option<NaiveDate> {
+        self.fecha_fin
     }
 }
 

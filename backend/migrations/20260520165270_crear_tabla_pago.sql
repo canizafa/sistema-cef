@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS pagos (
     monto REAL NOT NULL CHECK(monto > 0),
     fecha TEXT NOT NULL,
     hora TEXT NOT NULL,
-    sena BOOLEAN,
+    sena BOOLEAN DEFAULT FALSE,
     id_membresia TEXT,
     reserva_paga TEXT,
     FOREIGN KEY (id_membresia) REFERENCES membresias(id_membresia),

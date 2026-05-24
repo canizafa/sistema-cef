@@ -13,11 +13,37 @@ pub struct Clase {
     cupo_maximo: i32,
     estado: Estado,
     id_sala: String,
-    dni_profesor: String,
+    dni_profesor: i32,
     id_actividad: String,
 }
 
 impl Clase {
+    pub fn new(
+        id_clase: String,
+        dia: NaiveDate,
+        horario: String,
+        descripcion: String,
+        cupo_profe: i32,
+        cupo_maximo: i32,
+        estado: Estado,
+        id_sala: String,
+        dni_profesor: i32,
+        id_actividad: String,
+    ) -> Self {
+        Self {
+            id_clase,
+            dia,
+            horario,
+            descripcion,
+            cupo_profe,
+            cupo_maximo,
+            estado,
+            id_sala,
+            dni_profesor,
+            id_actividad,
+        }
+    }
+
     pub fn get_id(&self) -> &str {
         &self.id_clase
     }
@@ -49,6 +75,9 @@ impl Clase {
     }
     pub fn get_id_actividad(&self) -> String {
         self.id_actividad.clone()
+    }
+    pub fn get_dni_profesor(&self) -> i32 {
+        self.dni_profesor
     }
 }
 

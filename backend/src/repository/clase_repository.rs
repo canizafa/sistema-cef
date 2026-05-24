@@ -1,14 +1,12 @@
 use crate::errors::ApiError;
+use crate::domain::{Clase, Estado};
 use sqlx::SqlitePool;
-
-use crate::domain::Clase;
 
 pub struct ClaseRepository;
 
 impl ClaseRepository {
     pub async fn create_clase(pool: &SqlitePool, clase: Clase) -> Result<Clase, ApiError> {
-        sqlx::query_as!(
-            Clase,
+        sqlx::query!(
             "INSERT INTO clase
                (
                    id_clase,
@@ -22,20 +20,7 @@ impl ClaseRepository {
                    id_sala,
                    dni_profesor
                )
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-
-               RETURNING
-                   id_clase,
-                   dia,
-                   horario,
-                   cupo_profe,
-                   cupo_maximo,
-                   estado,
-                   descripcion,
-                   id_actividad,
-                   id_sala,
-                   dni_profesor
-               ",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             clase.get_id(),
             clase.get_dia(),
             clase.get_horario(),
@@ -47,14 +32,15 @@ impl ClaseRepository {
             clase.get_id_sala(),
             clase.get_dni_profesor()
         )
-        .fetch(pool)
+        .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::DatabaseError)?;
+        
+        Ok(clase)
     }
 
     pub async fn list_clases(pool: &SqlitePool) -> Result<Vec<Clase>, ApiError> {
-        sqlx::query_as!(
-            Clase,
+        let rows = sqlx::query!(
             "SELECT
                 id_clase,
                 dia,
@@ -63,46 +49,77 @@ impl ClaseRepository {
                 cupo_maximo,
                 estado,
                 descripcion,
+                id_actividad,
                 id_sala,
                 dni_profesor
             FROM clase"
         )
-        .fetch_all(&pool)
+        .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::DatabaseError)?;
+
+        let clases: Result<Vec<Clase>, ApiError> = rows.into_iter().map(|row| {
+            Ok(Clase::new(
+                row.id_clase,
+                row.dia,
+                row.horario,
+                row.descripcion,
+                row.cupo_profe,
+                row.cupo_maximo,
+                Estado::from(row.estado),
+                row.id_sala,
+                row.dni_profesor,
+                row.id_actividad,
+            ))
+        }).collect();
+
+        clases
     }
 
-    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
-        sqlx::query_as!(
-            Clase,
-            "
-                SELECT
-                    id_clase,
-                    dia,
-                    horario,
-                    cupo_profe,
-                    cupo_maximo,
-                    estado,
-                    id_actividad,
-                    id_sala,
-                    dni_profesor
-                FROM clase
-                WHERE id_clase = ?
-                ",
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Clase>, ApiError> {
+        let row = sqlx::query!(
+            "SELECT
+                id_clase,
+                dia,
+                horario,
+                cupo_profe,
+                cupo_maximo,
+                estado,
+                descripcion,
+                id_actividad,
+                id_sala,
+                dni_profesor
+            FROM clase
+            WHERE id_clase = ?",
             id
         )
-        .fetch_optional(&pool)
+        .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)
+        .map_err(ApiError::DatabaseError)?;
+
+        match row {
+            Some(row) => Ok(Some(Clase::new(
+                row.id_clase,
+                row.dia,
+                row.horario,
+                row.descripcion,
+                row.cupo_profe,
+                row.cupo_maximo,
+                Estado::from(row.estado),
+                row.id_sala,
+                row.dni_profesor,
+                row.id_actividad,
+            ))),
+            None => Ok(None),
+        }
     }
 
     pub async fn update_clase(
         pool: &SqlitePool,
         id: &str,
         clase: Clase,
-    ) -> Result<Clase, ApiError> {
-        sqlx::query_as!(
-            Clase,
+    ) -> Result<Option<Clase>, ApiError> {
+        sqlx::query!(
             "UPDATE clase
             SET
                 dia = ?,
@@ -113,17 +130,7 @@ impl ClaseRepository {
                 descripcion = ?,
                 id_sala = ?,
                 dni_profesor = ?
-            WHERE id_clase = ?
-            RETURNING
-                id_clase,
-                dia,
-                horario,
-                cupo_profe,
-                cupo_maximo,
-                estado,
-                descripcion,
-                id_sala,
-                dni_profesor",
+            WHERE id_clase = ?",
             clase.get_dia(),
             clase.get_horario(),
             clase.get_cupo_profe(),
@@ -134,30 +141,24 @@ impl ClaseRepository {
             clase.get_dni_profesor(),
             id
         )
-        .fetch_optional(&pool)
+        .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)
+        .map_err(ApiError::DatabaseError)?;
+
+        Self::get_by_id(pool, id).await
     }
 
-    pub async fn delete_clase(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
-        sqlx::query_as!(
-            Clase,
-            "DELETE FROM clase
-            WHERE id_clase = ?
-            RETURNING
-                id_clase,
-                dia,
-                horario,
-                cupo_profe,
-                cupo_maximo,
-                estado,
-                descripcion,
-                id_sala,
-                dni_profesor",
+    pub async fn delete_clase(pool: &SqlitePool, id: &str) -> Result<Option<Clase>, ApiError> {
+        let clase = Self::get_by_id(pool, id).await?;
+        
+        sqlx::query!(
+            "DELETE FROM clase WHERE id_clase = ?",
             id
         )
-        .fetch_optional(&pool)
+        .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)
+        .map_err(ApiError::DatabaseError)?;
+
+        Ok(clase)
     }
 }

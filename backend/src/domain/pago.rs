@@ -11,8 +11,8 @@ pub struct Pago {
     fecha: NaiveDate,
     hora: String,
     sena: bool,
-    id_membresia: String,
-    reserva_paga: Reserva,
+    id_membresia: Option<String>,
+    reserva_paga: Option<String>,
 }
 
 impl Pago {
@@ -36,12 +36,12 @@ impl Pago {
         self.sena
     }
 
-    pub fn get_id_membresia(&self) -> &str {
-        &self.id_membresia
+    pub fn get_id_membresia(&self) -> Option<&String> {
+        self.id_membresia.as_ref()
     }
 
-    pub fn get_reserva_paga(&self) -> Reserva {
-        self.reserva_paga.clone()
+    pub fn get_reserva_paga(&self) -> Option<&String> {
+        self.reserva_paga.as_ref()
     }
 }
 
