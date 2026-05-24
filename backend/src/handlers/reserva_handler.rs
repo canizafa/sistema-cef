@@ -1,19 +1,19 @@
-pub fn create_reserva_handler() {
+pub async fn create_reserva_handler() {
     todo!()
 }
 
-pub fn get_reserva_handler() {
+pub async fn get_reserva_handler() {
     todo!()
 }
 
-pub fn update_reserva_handler() {
+pub async fn update_reserva_handler() {
     todo!()
 }
 
-pub fn delete_reserva_handler() {
+pub async fn delete_reserva_handler() {
     todo!()
 }
 
-pub fn get_reservas_handler() {
+pub async fn get_reservas_handler() {
     todo!()
 }

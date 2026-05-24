@@ -26,14 +26,17 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::DatabaseError(e))?;
 
-    let app_state = AppState { db };
+    let app_state = AppState {
+        db,
+        jwt_secret: env::var("JWT_SECRET")?,
+    };
 
     sqlx::migrate!("./migrations")
         .run(&app_state.db)
         .await
         .map_err(|e| AppError::MigrationError(e))?;
 
-    let app = root::router().with_state(app_state.db);
+    let app = root::router().with_state(app_state);
 
     axum::serve(listener, app)
         .await

@@ -1,19 +1,19 @@
+use crate::AppState;
 use axum::{
     Router,
     routing::{get, post},
 };
-use sqlx::SqlitePool;
 
 use crate::handlers::{
     create_cliente_handler, delete_cliente_handler, get_cliente_handler, get_clientes_handler,
     update_cliente_handler,
 };
 
-pub fn cliente_router() -> Router<SqlitePool> {
+pub fn cliente_router() -> Router<AppState> {
     Router::new()
-        .route("/create", post(create_cliente_handler()))
-        .route("/get-cliente", get(get_cliente_handler()))
-        .route("/update-cliente", post(update_cliente_handler()))
-        .route("/delete-cliente", post(delete_cliente_handler()))
-        .route("/get-all", get(get_clientes_handler()))
+        .route("/create", post(create_cliente_handler))
+        .route("/get-cliente", get(get_cliente_handler))
+        .route("/update-cliente", post(update_cliente_handler))
+        .route("/delete-cliente", post(delete_cliente_handler))
+        .route("/get-all", get(get_clientes_handler))
 }

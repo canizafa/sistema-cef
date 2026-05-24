@@ -7,6 +7,7 @@ use crate::domain::Rol;
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
+    pub rol: Rol,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
