@@ -10,24 +10,37 @@ impl ClaseRepository {
         sqlx::query_as!(
             Clase,
             "INSERT INTO clase
-            (dia, horario, cupo_profe, cupo_maximo, estado, descripcion, id_sala, dni_profesor)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING
-                id_clase,
-                dia,
-                horario,
-                cupo_profe,
-                cupo_maximo,
-                estado,
-                descripcion,
-                id_sala,
-                dni_profesor",
+               (
+                   id_clase,
+                   dia,
+                   horario,
+                   cupo_profe,
+                   cupo_maximo,
+                   estado,
+                   id_actividad,
+                   id_sala,
+                   dni_profesor
+               )
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+               RETURNING
+                   id_clase,
+                   dia,
+                   horario,
+                   cupo_profe,
+                   cupo_maximo,
+                   estado,
+                   id_actividad,
+                   id_sala,
+                   dni_profesor
+               ",
+            clase.get_id(),
             clase.get_dia(),
             clase.get_horario(),
             clase.get_cupo_profe(),
             clase.get_cupo_maximo(),
             clase.get_estado(),
-            clase.get_descripcion(),
+            clase.get_id_actividad(),
             clase.get_id_sala(),
             clase.get_dni_profesor()
         )
@@ -60,18 +73,20 @@ impl ClaseRepository {
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         sqlx::query_as!(
             Clase,
-            "SELECT
-                id_clase,
-                dia,
-                horario,
-                cupo_profe,
-                cupo_maximo,
-                estado,
-                descripcion,
-                id_sala,
-                dni_profesor
-            FROM clase
-            WHERE id_clase = ?",
+            "
+                SELECT
+                    id_clase,
+                    dia,
+                    horario,
+                    cupo_profe,
+                    cupo_maximo,
+                    estado,
+                    id_actividad,
+                    id_sala,
+                    dni_profesor
+                FROM clase
+                WHERE id_clase = ?
+                ",
             id
         )
         .fetch_optional(&pool)
