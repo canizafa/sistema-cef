@@ -4,7 +4,7 @@ use crate::errors::{ApiError, AppError};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 
-pub fn generar_token(dni: &str, rol: Rol, secret: &str) -> Result<String, AppError> {
+pub fn generar_token(dni: i64, rol: Rol, secret: &str) -> Result<String, AppError> {
     let exp = (Utc::now() + Duration::hours(24)).timestamp() as usize;
     let claims = Claims {
         sub: dni.to_string(),

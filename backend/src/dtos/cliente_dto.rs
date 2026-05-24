@@ -7,7 +7,7 @@ use crate::dtos::{CreateFichaMedicaRequest, FichaMedicaResponse};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateClienteRequest {
-    pub dni: String,
+    pub dni: i64,
     pub nombre_apellido: String,
     pub password: String,
     pub email: String,
@@ -19,7 +19,7 @@ pub struct CreateClienteRequest {
 
 #[derive(Debug, Serialize)]
 pub struct ClienteResponse {
-    pub dni: String,
+    pub dni: i64,
     pub nombre_apellido: String,
     pub email: String,
     pub telefono: String,

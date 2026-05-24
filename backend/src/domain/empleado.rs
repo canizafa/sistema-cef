@@ -47,7 +47,7 @@ impl From<CreateEmpleadoRequest> for Empleado {
     fn from(request: CreateEmpleadoRequest) -> Self {
         let password_hash = hash_password(&request.password).expect("Failed to hash password");
         Self {
-            dni_empleado: request.dni.parse::<i64>().expect("DNI inválido"),
+            dni_empleado: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash,
             mail: request.mail,
