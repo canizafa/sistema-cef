@@ -1,6 +1,7 @@
 // Página de inicio de sesión.
+// Página de inicio de sesión.
 // Formulario de inicio de sesión con email y contraseña. Guarda el JWT en el estado global al autenticar.
-// Llama a authService.login(), guarda la sesión en el contexto global y redirige a /clases.
+// Llama a authService.login(), guarda la sesión en el contexto global y redirige según el rol del usuario.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
@@ -16,21 +17,27 @@ export function LoginPage() {
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault(); // Evita que la pagina se recargue al enviar el formulario
+    e.preventDefault();
     setError(null);
     setLoading(true);
     try {
       const data = await authService.login({ mail, password });
       dispatch({ type: 'LOGIN', payload: { user: data.user, token: data.token } });
-      navigate('/clases');
+
+      // Redirigir según rol
+      if (data.user.rol === 'cliente') {
+        navigate('/');                  // Cliente ve la landing
+      } else {
+        navigate('/admin/clientes');    // Dueño y recepcionista van al panel
+      }
     } catch {
       setError('Email o contraseña incorrectos');
-    } finally{
+    } finally {
       setLoading(false);
     }
   }
 
-  return(
+  return (
     <div className='min-h-screen flex flex-col'>
       <Header />
       <main className='flex-1 flex items-center justify-center px-4 py-12'>
@@ -38,7 +45,7 @@ export function LoginPage() {
           <h1 className='text-2xl font-bold mb-6 text-center'>Iniciar sesión</h1>
           <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='space-y-1'>
-              <label htmlFor='mail' className='text-sm font-medium'> Email</label>
+              <label htmlFor='mail' className='text-sm font-medium'>Email</label>
               <input
                 id='mail'
                 type='email'
@@ -46,7 +53,7 @@ export function LoginPage() {
                 value={mail}
                 onChange={(e) => setMail(e.target.value)}
                 required
-                className='flex h-10 w-full rounded-mb border border-input bg-background px-3 py-2 text-sm'
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
               />
             </div>
             <div className='space-y-1'>
@@ -58,7 +65,7 @@ export function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className='flex h-10 w-full rounded-mb border border-input bg-background px-3 py-2 text-sm'
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
               />
             </div>
             {error && <p className='text-sm text-red-600'>{error}</p>}
@@ -66,15 +73,15 @@ export function LoginPage() {
               type="submit"
               disabled={loading}
               className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'
-              >
-                {loading ? 'Ingresando...' : 'Ingresar'}
-                </button>  
+            >
+              {loading ? 'Ingresando...' : 'Ingresar'}
+            </button>
           </form>
           <p className="text-sm text-center text-gray-500 mt-4">
-             ¿No tenés cuenta?{' '}
-             <Link to="/register" className="text-brand hover:underline">
-                 Registrarse
-              </Link>
+            ¿No tenés cuenta?{' '}
+            <Link to="/register" className="text-brand hover:underline">
+              Registrarse
+            </Link>
           </p>
         </div>
       </main>
