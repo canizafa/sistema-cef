@@ -28,7 +28,7 @@ export const authService = {
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('/auth/register', data);
+        await api.post('/auth/register-cliente', data);
     },
 
     logout(): void {

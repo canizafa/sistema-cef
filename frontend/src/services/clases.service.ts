@@ -2,64 +2,55 @@ import api from './api';
 
 export type EstadoClase = 'activa' | 'inactiva';
 
+// Lo que devuelve el back
 export type ClaseDTO = {
-    id_clase: number;
-    dia: string;
+    id_clase: string;      // 
+    dia: string;           // NaiveDate se serializa como string "YYYY-MM-DD"
     horario: string;
     estado: EstadoClase;
+    lleno: boolean;        // faltaba
+    descripcion: string;   // faltaba
+    id_actividad: string;  // faltaba
 };
 
+// Lo que manda el front al crear
 export type NuevaClaseData = {
-    dia: string;
+    dia: string;           // "YYYY-MM-DD"
     horario: string;
     cupo_profe: number;
     cupo_maximo: number;
     estado: EstadoClase;
-    id_actividad: number;
-    id_sala: number;
-    dni_profesor: number;
-};
-
-export type NuevaReservaData = {
-    fecha: string;
-    estado: string;
-    dni_cliente: number;
-    id_clase: number;
-};
-
-export type NuevaListaEsperaData = {
-    dni_cliente: number;
-    id_clase: number;
-    fecha: string;
+    id_actividad: string;  // era number
+    id_sala: string;       // era number
+    dni_profesor: string;  // era number
+    descripcion: string;   // faltaba
 };
 
 export const clasesService = {
-    async getClases(): Promise<ClaseDTO[]> {
-        const response = await api.get('/clases');
-        return response.data;
-    },
+   
 
     async crearClase(data: NuevaClaseData) {
-        const response = await api.post('/clases', data);
-        return response.data;
-    },
-};
-
-export const reservasService = {
-    async crearReserva(data: NuevaReservaData) {
-        const response = await api.post('/reservas', data);
+        const response = await api.post('/clase/create', data);
         return response.data;
     },
 
-    async cancelarReserva(idReserva: number) {
-        const response = await api.delete(`/reservas/${idReserva}`);
+    
+     async getClases(): Promise<ClaseDTO[]> {
+        const response = await api.get('/clase/get-all');
         return response.data;
     },
-};
 
-export const listaEsperaService = {
-    async anotarse(data: NuevaListaEsperaData) {
-        const response = await api.post('/lista-espera', data);
+    async getClase(params: unknown) {
+        const response = await api.get('/clase/get-clase', { params });
         return response.data;
     },
+    async actualizarClase(data: unknown) {
+        const response = await api.post('/clase/update-clase', data);
+        return response.data;
+    },
+
+    async eliminarClase(data: unknown) {
+        const response = await api.post('/clase/delete-clase', data);
+        return response.data;
+    }, 
 };
