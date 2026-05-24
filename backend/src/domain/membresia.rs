@@ -36,7 +36,7 @@ impl From<CreateMembresiaRequest> for Membresia {
             tipo: request.tipo,
             estado: request.estado,
             fecha_inicio: request.fecha_inicio,
-            fecha_fin: request.fecha_fin,
+            fecha_fin: None,
         }
     }
 }

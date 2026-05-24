@@ -9,11 +9,11 @@ pub struct Clase {
     dia: NaiveDate,
     horario: String,
     descripcion: String,
-    cupo_profe: i32,
-    cupo_maximo: i32,
+    cupo_profe: i64,
+    cupo_maximo: i64,
     estado: Estado,
     id_sala: String,
-    dni_profesor: i32,
+    dni_profesor: i64,
     id_actividad: String,
 }
 
@@ -23,11 +23,11 @@ impl Clase {
         dia: NaiveDate,
         horario: String,
         descripcion: String,
-        cupo_profe: i32,
-        cupo_maximo: i32,
+        cupo_profe: i64,
+        cupo_maximo: i64,
         estado: Estado,
         id_sala: String,
-        dni_profesor: i32,
+        dni_profesor: i64,
         id_actividad: String,
     ) -> Self {
         Self {
@@ -53,10 +53,10 @@ impl Clase {
     pub fn get_horario(&self) -> String {
         self.horario.clone()
     }
-    pub fn get_cupo_profe(&self) -> i32 {
+    pub fn get_cupo_profe(&self) -> i64 {
         self.cupo_profe
     }
-    pub fn get_cupo_maximo(&self) -> i32 {
+    pub fn get_cupo_maximo(&self) -> i64 {
         self.cupo_maximo
     }
     pub fn get_estado(&self) -> Estado {
@@ -76,7 +76,7 @@ impl Clase {
     pub fn get_id_actividad(&self) -> String {
         self.id_actividad.clone()
     }
-    pub fn get_dni_profesor(&self) -> i32 {
+    pub fn get_dni_profesor(&self) -> i64 {
         self.dni_profesor
     }
 }

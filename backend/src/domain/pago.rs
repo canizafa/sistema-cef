@@ -12,7 +12,7 @@ pub struct Pago {
     hora: String,
     sena: bool,
     id_membresia: Option<String>,
-    reserva_paga: Option<String>,
+    reserva_paga: Option<Reserva>,
 }
 
 impl Pago {
@@ -40,7 +40,7 @@ impl Pago {
         self.id_membresia.as_ref()
     }
 
-    pub fn get_reserva_paga(&self) -> Option<&String> {
+    pub fn get_reserva_paga(&self) -> Option<&Reserva> {
         self.reserva_paga.as_ref()
     }
 }
@@ -53,8 +53,8 @@ impl From<CreatePagoRequest> for Pago {
             fecha: request.fecha,
             hora: request.hora,
             sena: request.sena,
-            id_membresia: request.id_membresia.to_string(),
-            reserva_paga: request.reserva_paga.into(),
+            id_membresia: Some(request.id_membresia),
+            reserva_paga: Some(request.reserva_paga.into()),
         }
     }
 }
