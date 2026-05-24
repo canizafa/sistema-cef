@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::domain::rol::Estado;
+use crate::domain::{Clase, rol::Estado};
 use chrono::NaiveDate;
 
 #[derive(Debug, Deserialize)]
@@ -29,4 +29,25 @@ pub struct ClaseResponse {
 #[derive(Debug, Serialize)]
 pub struct ClaseListResponse {
     pub clases: Vec<ClaseResponse>,
+}
+
+impl From<Clase> for ClaseResponse {
+    fn from(value: Clase) -> Self {
+        Self {
+            id_clase: value.get_id(),
+            dia: value.get_dia(),
+            horario: value.get_horario(),
+            estado: value.get_estado(),
+            lleno: value.is_lleno(),
+            descripcion: value.get_descripcion(),
+        }
+    }
+}
+
+impl From<Vec<Clase>> for ClaseListResponse {
+    fn from(value: Vec<Clase>) -> Self {
+        Self {
+            clases: value.into_iter().map(|c| c.into()).collect(),
+        }
+    }
 }

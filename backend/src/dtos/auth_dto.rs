@@ -13,6 +13,7 @@ pub struct LoginRequest {
 pub struct RegisterRequest {
     pub dni: i32,
     pub nombre_apellido: String,
+    pub password: String,
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,

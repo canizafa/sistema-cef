@@ -1,3 +1,4 @@
+pub mod asistencia;
 pub mod clase;
 pub mod cliente;
 pub mod empleado;

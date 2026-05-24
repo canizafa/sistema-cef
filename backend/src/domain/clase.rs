@@ -1,11 +1,9 @@
 use chrono::NaiveDate;
 use uuid::Uuid;
 
-use crate::{
-    domain::Estado,
-    dtos::{ClaseResponse, CreateClaseRequest},
-};
+use crate::{domain::Estado, dtos::CreateClaseRequest};
 
+#[derive(Debug, Clone)]
 pub struct Clase {
     id_clase: String,
     dia: NaiveDate,
@@ -19,14 +17,14 @@ pub struct Clase {
 }
 
 impl Clase {
-    pub fn get_id(&self) -> &str {
-        &self.id_clase
+    pub fn get_id(&self) -> String {
+        self.id_clase.clone()
     }
     pub fn get_dia(&self) -> NaiveDate {
         self.dia
     }
-    pub fn get_horario(&self) -> &str {
-        &self.horario
+    pub fn get_horario(&self) -> String {
+        self.horario.clone()
     }
     pub fn get_cupo_profe(&self) -> i32 {
         self.cupo_profe
@@ -34,11 +32,11 @@ impl Clase {
     pub fn get_cupo_maximo(&self) -> i32 {
         self.cupo_maximo
     }
-    pub fn get_estado(&self) -> &Estado {
-        &self.estado
+    pub fn get_estado(&self) -> Estado {
+        self.estado.clone()
     }
-    pub fn get_descripcion(&self) -> &str {
-        &self.descripcion
+    pub fn get_descripcion(&self) -> String {
+        self.descripcion.clone()
     }
     pub fn is_lleno(&self) -> bool {
         self.cupo_profe >= self.cupo_maximo
@@ -58,19 +56,6 @@ impl From<CreateClaseRequest> for Clase {
             descripcion: value.descripcion,
             id_sala: value.id_sala,
             dni_profesor: value.dni_profesor,
-        }
-    }
-}
-
-impl From<Clase> for ClaseResponse {
-    fn from(value: Clase) -> Self {
-        Self {
-            id_clase: value.id_clase.clone(),
-            dia: value.dia,
-            horario: value.horario.clone(),
-            estado: value.estado.clone(),
-            lleno: value.is_lleno(),
-            descripcion: value.descripcion.clone(),
         }
     }
 }

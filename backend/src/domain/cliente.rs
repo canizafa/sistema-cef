@@ -1,9 +1,13 @@
 use chrono::NaiveDate;
 
-use crate::domain::{Estado, FichaMedica, Rol};
+use crate::{
+    domain::{Estado, FichaMedica, Rol},
+    dtos::CreateClienteRequest,
+};
 
+#[derive(Debug, Clone)]
 pub struct Cliente {
-    dni: i32,
+    dni: String,
     nombre_apellido: String,
     email: String,
     telefono: String,
@@ -14,28 +18,43 @@ pub struct Cliente {
 }
 
 impl Cliente {
-    pub fn get_dni(&self) -> i32 {
-        self.dni
+    pub fn get_dni(&self) -> String {
+        self.dni.clone()
     }
-    pub fn get_nombre_apellido(&self) -> &str {
-        &self.nombre_apellido
+    pub fn get_nombre_apellido(&self) -> String {
+        self.nombre_apellido.clone()
     }
-    pub fn get_email(&self) -> &str {
-        &self.email
+    pub fn get_email(&self) -> String {
+        self.email.clone()
     }
-    pub fn get_telefono(&self) -> &str {
-        &self.telefono
+    pub fn get_telefono(&self) -> String {
+        self.telefono.clone()
     }
     pub fn get_fecha_nacimiento(&self) -> NaiveDate {
-        self.fecha_nacimiento
+        self.fecha_nacimiento.clone()
     }
-    pub fn get_estado(&self) -> &Estado {
-        &self.estado
+    pub fn get_estado(&self) -> Estado {
+        self.estado.clone()
     }
-    pub fn get_ficha_medica(&self) -> &FichaMedica {
-        &self.ficha_medica
+    pub fn get_ficha_medica(&self) -> FichaMedica {
+        self.ficha_medica.clone()
     }
-    pub fn get_rol(&self) -> &Rol {
-        &self.rol
+    pub fn get_rol(&self) -> Rol {
+        self.rol.clone()
+    }
+}
+
+impl From<CreateClienteRequest> for Cliente {
+    fn from(request: CreateClienteRequest) -> Self {
+        Self {
+            dni: request.dni,
+            nombre_apellido: request.nombre_apellido,
+            email: request.email,
+            telefono: request.telefono,
+            fecha_nacimiento: request.fecha_nacimiento,
+            estado: request.estado,
+            ficha_medica: request.ficha_medica.into(),
+            rol: Rol::Cliente,
+        }
     }
 }
