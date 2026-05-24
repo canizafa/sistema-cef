@@ -7,6 +7,7 @@ mod handlers;
 mod repository;
 mod routes;
 
+use crate::errors::ApiError;
 use crate::routes::root;
 use crate::{app_state::AppState, errors::AppError};
 use sqlx::SqlitePool;
@@ -28,7 +29,7 @@ async fn main() -> Result<(), AppError> {
 
     let app_state = AppState {
         db,
-        jwt_secret: env::var("JWT_SECRET")?,
+        jwt_secret: env::var("JWT_SECRET").map_err(|_| AppError::Api(ApiError::JwtTokenError))?,
     };
 
     sqlx::migrate!("./migrations")

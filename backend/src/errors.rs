@@ -109,6 +109,8 @@ impl IntoResponse for ApiError {
 
             // ===== HASH =====
             ApiError::PasswordHashError => StatusCode::INTERNAL_SERVER_ERROR,
+
+            ApiError::JwtTokenError => StatusCode::UNAUTHORIZED,
         };
 
         let body = Json(ErrorResponse {
