@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS lista_de_espera (
     id_espera TEXT PRIMARY KEY,
     tipo varchar(50),
-    fecha_ingreso date not null,
+    fecha_ingreso TEXT not null,
     id_clase TEXT,
     -- CREAR UNA NUEVA TABLA ASI
     -- CREATE TABLE lista_espera_cliente (

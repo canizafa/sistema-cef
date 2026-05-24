@@ -11,7 +11,6 @@ pub struct Clase {
     cupo_profe: i32,
     cupo_maximo: i32,
     estado: Estado,
-    descripcion: String,
     id_sala: String,
     dni_profesor: String,
 }
@@ -35,12 +34,11 @@ impl Clase {
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
     }
-    pub fn get_descripcion(&self) -> String {
-        self.descripcion.clone()
-    }
+
     pub fn is_lleno(&self) -> bool {
         self.cupo_profe >= self.cupo_maximo
     }
+
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
@@ -56,7 +54,6 @@ impl From<CreateClaseRequest> for Clase {
             cupo_profe: value.cupo_profe,
             cupo_maximo: value.cupo_maximo,
             estado: value.estado,
-            descripcion: value.descripcion,
             id_sala: value.id_sala,
             dni_profesor: value.dni_profesor,
         }

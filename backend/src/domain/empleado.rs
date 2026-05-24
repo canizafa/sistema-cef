@@ -4,18 +4,19 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct Empleado {
-    pub dni: String,
+    pub dni_empleado: i64,
     pub nombre_apellido: String,
     pub password_hash: String,
     pub mail: String,
+    pub password: String,
     pub genero: String,
     pub estado: String,
     pub rol: Rol,
 }
 
 impl Empleado {
-    pub fn get_dni(&self) -> String {
-        self.dni.clone()
+    pub fn get_dni(&self) -> i64 {
+        self.dni_empleado
     }
     pub fn get_nombre_apellido(&self) -> String {
         self.nombre_apellido.clone()
@@ -46,10 +47,11 @@ impl From<CreateEmpleadoRequest> for Empleado {
     fn from(request: CreateEmpleadoRequest) -> Self {
         let password_hash = hash_password(&request.password).expect("Failed to hash password");
         Self {
-            dni: request.dni,
+            dni_empleado: request.dni.parse::<i64>().expect("DNI inválido"),
             nombre_apellido: request.nombre_apellido,
             password_hash,
             mail: request.mail,
+            password: request.password,
             genero: request.genero,
             estado: request.estado,
             rol: request.rol,

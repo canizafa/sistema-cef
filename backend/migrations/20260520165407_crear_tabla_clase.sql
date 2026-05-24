@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS clase (
     id_clase TEXT PRIMARY KEY,
     dia varchar(20) not null,
-    horario time not null,
+    horario TEXT not null,
     cupo_profe integer,
     cupo_maximo integer not null,
     estado varchar(30),
@@ -11,6 +11,6 @@ CREATE TABLE IF NOT EXISTS clase (
     id_sala TEXT,
     dni_profesor integer,
     FOREIGN KEY (id_actividad) REFERENCES actividad(id_actividad),
-    FOREIGN KEY (id_sala) REFERENCES reserva(id_sala),
+    FOREIGN KEY (id_sala) REFERENCES sala(id_sala),
     foreign key (dni_profesor) REFERENCES profesor(dni_profesor)
 )
