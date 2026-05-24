@@ -3,20 +3,20 @@ use chrono::NaiveDate;
 use crate::domain::Estado;
 
 pub struct Clase {
-    id_clase: i32,
+    id_clase: String,
     dia: NaiveDate,
     horario: String,
     cupo_profe: i32,
     cupo_maximo: i32,
     estado: Estado,
     descripcion: String,
-    id_sala: i32,
+    id_sala: String,
     dni_profesor: i32,
 }
 
 impl Clase {
-    pub fn get_id(&self) -> i32 {
-        self.id_clase
+    pub fn get_id(&self) -> &str {
+        &self.id_clase
     }
     pub fn get_dia(&self) -> NaiveDate {
         self.dia
@@ -36,8 +36,8 @@ impl Clase {
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
-    pub fn get_id_sala(&self) -> i32 {
-        self.id_sala
+    pub fn get_id_sala(&self) -> &str {
+        &self.id_sala
     }
     pub fn get_dni_profesor(&self) -> i32 {
         self.dni_profesor

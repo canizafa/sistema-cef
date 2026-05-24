@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS cliente (
     fecha_nacimiento date,
     estado varchar(30),
     password varchar(100) not null,
-    id_ficha integer,
+    id_ficha TEXT,
     foreign key (id_ficha) references ficha_medica(id_ficha)
 )

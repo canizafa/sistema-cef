@@ -3,18 +3,18 @@ use chrono::NaiveDate;
 use crate::domain::Reserva;
 
 pub struct Pago {
-    id_pago: i32,
+    id_pago: String,
     monto: f64,
     fecha: NaiveDate,
     hora: String,
     sena: bool,
-    id_membresia: i32,
+    id_membresia: String,
     reserva_paga: Reserva,
 }
 
 impl Pago {
-    pub fn get_id_pago(&self) -> i32 {
-        self.id_pago
+    pub fn get_id_pago(&self) -> &str {
+        &self.id_pago
     }
 
     pub fn get_monto(&self) -> f64 {
@@ -33,8 +33,8 @@ impl Pago {
         self.sena
     }
 
-    pub fn get_id_membresia(&self) -> i32 {
-        self.id_membresia
+    pub fn get_id_membresia(&self) -> &str {
+        &self.id_membresia
     }
 
     pub fn get_reserva_paga(&self) -> &Reserva {
