@@ -19,5 +19,4 @@ impl AuthRepository {
     ) -> Result<(), ApiError> {
         todo!()
     }
-    //pub async fn logout(State(pool): State<SqlitePool>) {}
 }
