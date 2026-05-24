@@ -1,5 +1,4 @@
 use crate::{domain::ListaEspera, errors::ApiError};
-use axum::extract::State;
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
@@ -7,23 +6,21 @@ pub struct ListaDeEsperaRepository;
 
 impl ListaDeEsperaRepository {
     pub async fn delete_lista_espera(
-        State(pool): State<SqlitePool>,
-        id_espera: i32,
-    ) -> Result<Option<ListaEspera>, ApiError> {
+        pool: &SqlitePool,
+        id_espera: &str,
+    ) -> Result<ListaEspera, ApiError> {
         todo!()
     }
     pub async fn add_lista_espera(
-        State(pool): State<SqlitePool>,
-        id_espera: i32,
-        dni_cliente: i32,
-        id_clase: i32,
+        pool: &SqlitePool,
+        id_espera: &str,
+        dni_cliente: &str,
+        id_clase: &str,
         fecha: NaiveDate,
-    ) -> Result<Option<ListaEspera>, ApiError> {
+    ) -> Result<ListaEspera, ApiError> {
         todo!()
     }
-    pub async fn get_lista_espera(
-        State(pool): State<SqlitePool>,
-    ) -> Result<Option<ListaEspera>, ApiError> {
+    pub async fn get_lista_espera(pool: &SqlitePool) -> Result<ListaEspera, ApiError> {
         todo!()
     }
 }

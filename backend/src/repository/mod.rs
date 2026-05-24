@@ -1,4 +1,3 @@
-pub mod auth_repository;
 pub mod clase_repository;
 pub mod cliente_repository;
 pub mod empleado_repository;
@@ -8,7 +7,6 @@ pub mod membresia_repository;
 pub mod pago_repository;
 pub mod reserva_repository;
 
-pub use auth_repository::AuthRepository;
 pub use clase_repository::ClaseRepository;
 pub use cliente_repository::ClienteRepository;
 pub use empleado_repository::EmpleadoRepository;

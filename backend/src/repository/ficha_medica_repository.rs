@@ -1,4 +1,3 @@
-use axum::extract::State;
 use sqlx::SqlitePool;
 
 use crate::domain::FichaMedica;
@@ -8,28 +7,25 @@ pub struct FichaMedicaRepository;
 
 impl FichaMedicaRepository {
     pub async fn create_ficha_medica(
-        State(pool): State<SqlitePool>,
+        pool: &SqlitePool,
         ficha_medica: FichaMedica,
-    ) -> Result<Option<FichaMedica>, ApiError> {
+    ) -> Result<FichaMedica, ApiError> {
         todo!()
     }
-    pub async fn get_by_dni(
-        State(pool): State<SqlitePool>,
-        dni: i32,
-    ) -> Result<Option<FichaMedica>, ApiError> {
+    pub async fn get_by_dni(pool: &SqlitePool, dni: &str) -> Result<FichaMedica, ApiError> {
         todo!()
     }
     pub async fn update_ficha_medica(
-        State(pool): State<SqlitePool>,
-        dni: i32,
+        pool: &SqlitePool,
+        dni: &str,
         ficha_medica: FichaMedica,
-    ) -> Result<Option<FichaMedica>, ApiError> {
+    ) -> Result<FichaMedica, ApiError> {
         todo!()
     }
     pub async fn delete_ficha_medica(
-        State(pool): State<SqlitePool>,
-        dni: i32,
-    ) -> Result<Option<FichaMedica>, ApiError> {
+        pool: &SqlitePool,
+        dni: &str,
+    ) -> Result<FichaMedica, ApiError> {
         todo!()
     }
 }

@@ -12,7 +12,7 @@ impl ClienteRepository {
     pub async fn list_clientes(pool: &SqlitePool) -> Result<Vec<Cliente>, ApiError> {
         todo!()
     }
-    pub async fn find_by_dni(pool: &SqlitePool, dni: &str) -> Result<Option<Cliente>, ApiError> {
+    pub async fn find_by_dni(pool: &SqlitePool, dni: &str) -> Result<Cliente, ApiError> {
         todo!()
     }
     pub async fn find_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
