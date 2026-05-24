@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS empleado (
     password VARCHAR(255) NOT NULL DEFAULT '123456',
     genero VARCHAR(30),
     estado VARCHAR(30) NOT NULL,
-    rol VARCHAR(30) NOT NULL,
+    rol VARCHAR(30) NOT NULL
 );
