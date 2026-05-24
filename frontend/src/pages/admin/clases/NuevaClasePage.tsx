@@ -2,92 +2,188 @@
 // Solo accesible para recepcionista y dueño (protegido desde App.tsx).
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { clasesService } from '@/services/clases.service';
+import { clasesService, type EstadoClase } from '@/services/clases.service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function NuevaClasePage() {
-    // Un solo objeto de estado para todos los campos del formulario
     const [form, setForm] = useState({
-        nombre: '', tipo: '', profesor: '', dias: '', horario: '', duracionMin: '', cupoMaximo: ''
+        dia: '',
+        horario: '',
+        cupo_profe: '',
+        cupo_maximo: '',
+        estado: '' as EstadoClase | '',
+        id_actividad: '',
+        id_sala: '',
+        dni_profesor: '',
     });
-    const [error, setError] = useState<string | null>(null);     // null = sin error
-    const [success, setSuccess] = useState<string | null>(null); // null = sin mensaje de éxito
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    // Mismo patrón que NuevoEmpleadoPage: un handler para todos los inputs y el select
-    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }
 
+    // Select de shadcn no usa eventos nativos: recibe el value directamente
+    function handleSelect(name: string, value: string) {
+        setForm((prev) => ({ ...prev, [name]: value }));
+    }
+
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();    // Evita que el formulario recargue la página
+        e.preventDefault();
         setError(null);
         setSuccess(null);
         setLoading(true);
         try {
             await clasesService.crearClase({
-                ...form,
-                duracionMin: Number(form.duracionMin),
-                cupoMaximo: Number(form.cupoMaximo),
+                dia: form.dia,
+                horario: form.horario,
+                cupo_profe: Number(form.cupo_profe),
+                cupo_maximo: Number(form.cupo_maximo),
+                estado: form.estado as EstadoClase,
+                id_actividad: Number(form.id_actividad),
+                id_sala: Number(form.id_sala),
+                dni_profesor: Number(form.dni_profesor),
             });
             setSuccess('Clase creada correctamente');
-            // Vuelve a la lista de clases después de crear
             setTimeout(() => navigate('/admin/clases'), 1500);
         } catch {
             setError('Error al crear la clase. Revisá los datos.');
         } finally {
-            setLoading(false); // Siempre se ejecuta, haya error o no
+            setLoading(false);
         }
     }
 
-    // div en lugar de main porque el AdminLayout ya provee el main
     return (
-        <div className='flex-1 flex items-center justify-center px-4 py-12'>
-            <div className='w-full max-w-sm'>
-                <h1 className='text-2xl font-bold mb-6 text-center'>Nueva clase</h1>
-                <form onSubmit={handleSubmit} className='space-y-4'>
-                    <div className='space-y-1'>
-                        <label htmlFor='nombre' className='text-sm font-medium'>Nombre</label>
-                        <input id='nombre' name='nombre' placeholder='CrossFit' value={form.nombre} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+        <div className="flex-1 flex items-center justify-center px-4 py-12">
+            <div className="w-full max-w-sm">
+                <h1 className="text-2xl font-bold mb-6 text-center">Nueva clase</h1>
+                <form onSubmit={handleSubmit} className="space-y-4">
+
+                    <div className="space-y-1">
+                        <Label htmlFor="dia">Fecha</Label>
+                        <Input
+                            id="dia"
+                            name="dia"
+                            type="date"
+                            value={form.dia}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='tipo' className='text-sm font-medium'>Tipo</label>
-                        {/* Select en lugar de input: el tipo se elige de una lista fija */}
-                        <select id='tipo' name='tipo' value={form.tipo} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'>
-                            <option value='' disabled>Seleccioná un tipo</option>
-                            <option value='Fuerza'>Fuerza</option>
-                            <option value='Cardio'>Cardio</option>
-                            <option value='Flexibilidad'>Flexibilidad</option>
-                            <option value='Funcional'>Funcional</option>
-                        </select>
+
+                    <div className="space-y-1">
+                        <Label htmlFor="horario">Horario</Label>
+                        <Input
+                            id="horario"
+                            name="horario"
+                            type="time"
+                            value={form.horario}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='profesor' className='text-sm font-medium'>Profesor</label>
-                        <input id='profesor' name='profesor' placeholder='Juan Pérez' value={form.profesor} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+
+                    <div className="space-y-1">
+                        <Label htmlFor="cupo_maximo">Cupo máximo</Label>
+                        <Input
+                            id="cupo_maximo"
+                            name="cupo_maximo"
+                            type="number"
+                            min="1"
+                            placeholder="15"
+                            value={form.cupo_maximo}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='dias' className='text-sm font-medium'>Días</label>
-                        <input id='dias' name='dias' placeholder='Lun/Mié/Vie' value={form.dias} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+
+                    <div className="space-y-1">
+                        <Label htmlFor="cupo_profe">Cupo reservado para profesor</Label>
+                        <Input
+                            id="cupo_profe"
+                            name="cupo_profe"
+                            type="number"
+                            min="0"
+                            placeholder="1"
+                            value={form.cupo_profe}
+                            onChange={handleChange}
+                            required
+                        />
+                        <p className="text-xs text-muted">Lugares reservados fuera del cupo general</p>
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='horario' className='text-sm font-medium'>Horario</label>
-                        <input id='horario' name='horario' type='time' value={form.horario} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+
+                    <div className="space-y-1">
+                        <Label htmlFor="id_actividad">ID de actividad</Label>
+                        <Input
+                            id="id_actividad"
+                            name="id_actividad"
+                            type="number"
+                            min="1"
+                            placeholder="1"
+                            value={form.id_actividad}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='duracionMin' className='text-sm font-medium'>Duración (minutos)</label>
-                        <input id='duracionMin' name='duracionMin' type='number' min='1' placeholder='60' value={form.duracionMin} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+
+                    <div className="space-y-1">
+                        <Label htmlFor="id_sala">ID de sala</Label>
+                        <Input
+                            id="id_sala"
+                            name="id_sala"
+                            type="number"
+                            min="1"
+                            placeholder="1"
+                            value={form.id_sala}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    <div className='space-y-1'>
-                        <label htmlFor='cupoMaximo' className='text-sm font-medium'>Cupo máximo</label>
-                        <input id='cupoMaximo' name='cupoMaximo' type='number' min='1' placeholder='15' value={form.cupoMaximo} onChange={handleChange} required className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm' />
+
+                    <div className="space-y-1">
+                        <Label htmlFor="dni_profesor">DNI del profesor</Label>
+                        <Input
+                            id="dni_profesor"
+                            name="dni_profesor"
+                            type="number"
+                            min="1000000"
+                            placeholder="30123456"
+                            value={form.dni_profesor}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                    {error && <p className='text-sm text-red-600'>{error}</p>}
-                    {/* Mensaje de éxito en verde cuando la clase se creó correctamente */}
-                    {success && <p className='text-sm text-green-600'>{success}</p>}
-                    <button type='submit' disabled={loading} className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'>
+
+                    <div className="space-y-1">
+                        <Label>Estado</Label>
+                        <Select
+                            value={form.estado}
+                            onValueChange={(v) => handleSelect('estado', v)}
+                            required
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Seleccioná un estado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="activa">Activa</SelectItem>
+                                <SelectItem value="inactiva">Inactiva</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {error && <p className="text-xs text-destructive">{error}</p>}
+                    {success && <p className="text-xs text-success">{success}</p>}
+
+                    <Button type="submit" disabled={loading} className="w-full bg-brand text-white">
                         {loading ? 'Creando...' : 'Crear clase'}
-                    </button>
+                    </Button>
+
                 </form>
             </div>
         </div>

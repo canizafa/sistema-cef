@@ -1,20 +1,15 @@
-// Card visual de una clase individual.
-// Muestra descripcion, dia, horario y cupo. El botón cambia según el estado:
-// "Reservar" si hay cupo, "Sin cupo" si está llena, "Ya reservada" si el usuario ya la reservó.
-import { Clock, Users, Calendar } from 'lucide-react'
+import { Clock, Calendar } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 
-type EstadoReserva = 'disponible' | 'sin-cupo' | 'reservada'
+export type EstadoReserva = 'disponible' | 'sin-cupo' | 'reservada'
 
 interface ClaseCardClienteProps {
   idClase: number
-  descripcion: string
   dia: string
   horario: string
-  cupoMaximo: number
-  estado: EstadoReserva
+  estadoReserva: EstadoReserva
   onReservar?: () => void
   onCancelar?: () => void
   onListaEspera?: () => void
@@ -32,21 +27,18 @@ function getBadge(estado: EstadoReserva) {
 }
 
 export function ClaseCardCliente({
-  descripcion,
   dia,
   horario,
-  cupoMaximo,
-  estado,
+  estadoReserva,
   onReservar,
   onCancelar,
   onListaEspera,
 }: ClaseCardClienteProps) {
   return (
-    <Card className="bg-surface border-border relative">
+    <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <h3 className="text-xl font-semibold text-primary">{descripcion}</h3>
-          {getBadge(estado)}
+        <div className="flex items-start justify-end">
+          {getBadge(estadoReserva)}
         </div>
       </CardHeader>
 
@@ -59,20 +51,15 @@ export function ClaseCardCliente({
           <Clock className="w-4 h-4 text-destructive" />
           {horario}
         </div>
-        <div className="flex items-center gap-2 text-sm text-primary">
-          <Users className="w-4 h-4 text-destructive" />
-          Cupo máximo: {cupoMaximo} personas
-        </div>
       </CardContent>
 
       <CardFooter className="gap-2 pt-0">
-        {estado === 'disponible' && (
+        {estadoReserva === 'disponible' && (
           <Button variant="default" size="sm" className="flex-1" onClick={onReservar}>
             Inscribirse en la clase
           </Button>
         )}
-
-        {estado === 'sin-cupo' && (
+        {estadoReserva === 'sin-cupo' && (
           <>
             <Button variant="outline" size="sm" className="flex-1" disabled>
               Sin cupo
@@ -82,8 +69,7 @@ export function ClaseCardCliente({
             </Button>
           </>
         )}
-
-        {estado === 'reservada' && (
+        {estadoReserva === 'reservada' && (
           <Button variant="destructive" size="sm" className="flex-1" onClick={onCancelar}>
             Cancelar reserva
           </Button>
