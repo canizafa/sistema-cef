@@ -16,8 +16,8 @@ pub struct Pago {
 }
 
 impl Pago {
-    pub fn get_id_pago(&self) -> String {
-        self.id_pago.clone()
+    pub fn get_id_pago(&self) -> &str {
+        &self.id_pago
     }
 
     pub fn get_monto(&self) -> f64 {
@@ -36,8 +36,8 @@ impl Pago {
         self.sena
     }
 
-    pub fn get_id_membresia(&self) -> String {
-        self.id_membresia.clone()
+    pub fn get_id_membresia(&self) -> &str {
+        &self.id_membresia
     }
 
     pub fn get_reserva_paga(&self) -> Reserva {

@@ -28,14 +28,14 @@ pub struct ListaEsperaListResponse {
 impl From<ListaEspera> for ListaEsperaResponse {
     fn from(lista_espera: ListaEspera) -> Self {
         Self {
-            id_espera: lista_espera.get_id_lista(),
+            id_espera: lista_espera.get_id_lista().to_string(),
             clientes_en_espera: lista_espera
                 .get_clientes_en_espera()
                 .into_iter()
                 .map(|c| c.into())
                 .collect(),
-            id_clase: lista_espera.get_id_clase(),
-            tipo: lista_espera.get_tipo(),
+            id_clase: lista_espera.get_id_clase().to_string(),
+            tipo: lista_espera.get_tipo().to_string(),
             fecha: lista_espera.get_fecha_ingreso(),
         }
     }

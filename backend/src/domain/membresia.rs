@@ -12,8 +12,8 @@ pub struct Membresia {
 }
 
 impl Membresia {
-    pub fn get_id_membresia(&self) -> String {
-        self.id_membresia.clone()
+    pub fn get_id_membresia(&self) -> &str {
+        &self.id_membresia
     }
     pub fn get_tipo(&self) -> String {
         self.tipo.clone()

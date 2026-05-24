@@ -11,8 +11,8 @@ pub struct CreateClaseRequest {
     pub cupo_maximo: i32,
     pub estado: Estado,
     pub id_actividad: i32,
-    pub id_sala: i32,
-    pub dni_profesor: i32,
+    pub id_sala: String,
+    pub dni_profesor: String,
     pub descripcion: String,
 }
 
@@ -34,7 +34,7 @@ pub struct ClaseListResponse {
 impl From<Clase> for ClaseResponse {
     fn from(value: Clase) -> Self {
         Self {
-            id_clase: value.get_id(),
+            id_clase: value.get_id().to_string(),
             dia: value.get_dia(),
             horario: value.get_horario(),
             estado: value.get_estado(),

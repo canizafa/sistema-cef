@@ -12,13 +12,13 @@ pub struct Clase {
     cupo_maximo: i32,
     estado: Estado,
     descripcion: String,
-    id_sala: i32,
-    dni_profesor: i32,
+    id_sala: String,
+    dni_profesor: String,
 }
 
 impl Clase {
-    pub fn get_id(&self) -> String {
-        self.id_clase.clone()
+    pub fn get_id(&self) -> &str {
+        &self.id_clase
     }
     pub fn get_dia(&self) -> NaiveDate {
         self.dia
@@ -40,6 +40,9 @@ impl Clase {
     }
     pub fn is_lleno(&self) -> bool {
         self.cupo_profe >= self.cupo_maximo
+    }
+    pub fn get_id_sala(&self) -> &str {
+        &self.id_sala
     }
 }
 

@@ -27,8 +27,8 @@ pub struct ListMembresiaResponse {
 impl From<Membresia> for MembresiaResponse {
     fn from(membresia: Membresia) -> Self {
         Self {
-            id_membresia: membresia.get_id_membresia(),
-            tipo: membresia.get_tipo(),
+            id_membresia: membresia.get_id_membresia().to_string(),
+            tipo: membresia.get_tipo().to_string(),
             estado: membresia.get_estado(),
             fecha_inicio: membresia.get_fecha_inicio(),
             fecha_fin: membresia.get_fecha_fin(),

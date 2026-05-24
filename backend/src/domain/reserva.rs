@@ -14,8 +14,8 @@ pub struct Reserva {
 }
 
 impl Reserva {
-    pub fn get_id(&self) -> String {
-        self.id_reserva.clone()
+    pub fn get_id(&self) -> &str {
+        &self.id_reserva
     }
 
     pub fn get_estado(&self) -> Estado {

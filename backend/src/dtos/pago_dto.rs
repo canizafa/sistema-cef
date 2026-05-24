@@ -34,12 +34,12 @@ pub struct PagoListResponse {
 impl From<Pago> for PagoResponse {
     fn from(pago: Pago) -> Self {
         Self {
-            id_pago: pago.get_id_pago(),
+            id_pago: pago.get_id_pago().to_string(),
             monto: pago.get_monto(),
             fecha: pago.get_fecha(),
             hora: pago.get_hora(),
             sena: pago.get_sena(),
-            id_membresia: pago.get_id_membresia(),
+            id_membresia: pago.get_id_membresia().to_string(),
             reserva_paga: pago.get_reserva_paga().into(),
         }
     }
