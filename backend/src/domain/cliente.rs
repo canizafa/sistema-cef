@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::domain::{Estado, FichaMedica};
+use crate::domain::{Estado, FichaMedica, Rol};
 
 pub struct Cliente {
     dni: i32,
@@ -10,6 +10,7 @@ pub struct Cliente {
     fecha_nacimiento: NaiveDate,
     estado: Estado,
     ficha_medica: FichaMedica,
+    rol: Rol,
 }
 
 impl Cliente {
@@ -33,5 +34,8 @@ impl Cliente {
     }
     pub fn get_ficha_medica(&self) -> &FichaMedica {
         &self.ficha_medica
+    }
+    pub fn get_rol(&self) -> &Rol {
+        &self.rol
     }
 }

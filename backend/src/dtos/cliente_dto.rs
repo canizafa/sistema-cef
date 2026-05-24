@@ -1,7 +1,8 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-use crate::domain::rol::Estado;
+use crate::domain::rol::{Estado, Rol};
+use crate::dtos::{CreateFichaMedicaRequest, FichaMedicaResponse};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateClienteRequest {
@@ -11,7 +12,7 @@ pub struct CreateClienteRequest {
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
-    // pub ficha_medica:
+    pub ficha_medica: CreateFichaMedicaRequest,
 }
 
 #[derive(Debug, Serialize)]
@@ -22,6 +23,8 @@ pub struct ClienteResponse {
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
+    pub rol: Rol,
+    pub ficha_medica: FichaMedicaResponse,
 }
 
 #[derive(Debug, Serialize)]
