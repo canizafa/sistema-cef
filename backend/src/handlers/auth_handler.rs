@@ -71,8 +71,8 @@ pub async fn login_handler(
 }
 
 pub async fn register_cliente_handler(
-    state: &AppState,
-    body: CreateClienteRequest,
+    State(state): State<AppState>,
+    Json(body): Json<CreateClienteRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
     let cliente = Cliente::from(body);
     ClienteRepository::create_cliente(&state.db, &cliente).await?;
@@ -93,8 +93,8 @@ pub async fn register_cliente_handler(
 }
 
 pub async fn reset_password_cliente_handler(
-    state: &AppState,
-    body: ResetPasswordRequest,
+    State(state): State<AppState>,
+    Json(body): Json<ResetPasswordRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
     let cliente = ClienteRepository::find_by_email(&state.db, &body.email).await?;
 
@@ -116,8 +116,8 @@ pub async fn reset_password_cliente_handler(
 }
 
 pub async fn register_empleado_handler(
-    state: &AppState,
-    body: CreateEmpleadoRequest,
+    State(state): State<AppState>,
+    Json(body): Json<CreateEmpleadoRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
     let empleado = Empleado::from(body);
     EmpleadoRepository::create_empleado(&state.db, &empleado).await?;
@@ -138,8 +138,8 @@ pub async fn register_empleado_handler(
 }
 
 pub async fn login_empleado_handler(
-    state: &AppState,
-    body: LoginRequest,
+    State(state): State<AppState>,
+    Json(body): Json<LoginRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
     let empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await?;
 
@@ -159,8 +159,8 @@ pub async fn login_empleado_handler(
 }
 
 pub async fn reset_password_empleado_handler(
-    state: &AppState,
-    body: ResetPasswordRequest,
+    State(state): State<AppState>,
+    Json(body): Json<ResetPasswordRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
     let mut empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await?;
 
