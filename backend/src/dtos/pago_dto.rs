@@ -39,8 +39,8 @@ impl From<Pago> for PagoResponse {
             fecha: pago.get_fecha(),
             hora: pago.get_hora(),
             sena: pago.get_sena(),
-            id_membresia: pago.get_id_membresia().to_string(),
-            reserva_paga: pago.get_reserva_paga().into(),
+            id_membresia: pago.get_id_membresia().unwrap().to_string(),
+            reserva_paga: pago.get_reserva_paga().unwrap().clone().into(),
         }
     }
 }
