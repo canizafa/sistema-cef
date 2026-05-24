@@ -1,69 +1,30 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClaseCardRecepcionista } from '@/components/clases/ClaseCardRecepcionista'
+import { clasesService, type ClaseDTO } from '@/services/clases.service'
 
-type EstadoClase = 'activa' | 'inactiva'
-
-interface Clase {
-  idClase: number
-  descripcion: string
-  dia: string
-  horario: string
-  idSala: number
-  cupoMaximo: number
-  estado: EstadoClase
-}
-
-const clasesIniciales: Clase[] = [
-  {
-    idClase: 1,
-    descripcion: 'CrossFit',
-    dia: 'Lunes / Miércoles / Viernes',
-    horario: '18:00 hs',
-    idSala: 1,
-    cupoMaximo: 12,
-    estado: 'activa',
-  },
-  {
-    idClase: 2,
-    descripcion: 'Yoga',
-    dia: 'Martes / Jueves',
-    horario: '09:00 hs',
-    idSala: 2,
-    cupoMaximo: 10,
-    estado: 'activa',
-  },
-  {
-    idClase: 3,
-    descripcion: 'Spinning',
-    dia: 'Lunes / Miércoles / Viernes',
-    horario: '19:30 hs',
-    idSala: 3,
-    cupoMaximo: 15,
-    estado: 'activa',
-  },
-  {
-    idClase: 4,
-    descripcion: 'Funcional',
-    dia: 'Martes / Jueves / Sábado',
-    horario: '18:00 hs',
-    idSala: 1,
-    cupoMaximo: 15,
-    estado: 'activa',
-  },
-]
-
-export default function ClasesPage() {
+export default function ClasesAdminPage() {
   const navigate = useNavigate()
+  const [clases, setClases] = useState<ClaseDTO[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleEditar = (id: number) => {
-    // Aquí iría la navegación a /admin/clases/:id/editar
-    console.log('Editar clase id:', id)
-  }
+  useEffect(() => {
+    async function cargar() {
+      try {
+        const data = await clasesService.getClases()
+        setClases(data)
+      } catch {
+        setError('No se pudieron cargar las clases.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    cargar()
+  }, [])
 
-  const handleVerReservas = (id: number) => {
-    // Aquí iría la navegación o modal de reservas
-    console.log('Ver reservas de clase id:', id)
-  }
+  if (loading) return <p className="p-8 text-muted text-sm">Cargando clases...</p>
+  if (error)   return <p className="p-8 text-destructive text-sm">{error}</p>
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
@@ -80,22 +41,23 @@ export default function ClasesPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {clasesIniciales.map((clase) => (
-          <ClaseCardRecepcionista
-            key={clase.idClase}
-            idClase={clase.idClase}
-            descripcion={clase.descripcion}
-            dia={clase.dia}
-            horario={clase.horario}
-            idSala={clase.idSala}
-            cupoMaximo={clase.cupoMaximo}
-            estado={clase.estado}
-            onEditar={() => handleEditar(clase.idClase)}
-            onVerReservas={() => handleVerReservas(clase.idClase)}
-          />
-        ))}
-      </div>
+      {clases.length === 0 ? (
+        <p className="text-sm text-muted">No hay clases cargadas.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {clases.map((clase) => (
+            <ClaseCardRecepcionista
+              key={clase.id_clase}
+              idClase={clase.id_clase}
+              dia={clase.dia}
+              horario={clase.horario}
+              estado={clase.estado}
+              onEditar={() => console.log('Editar clase id:', clase.id_clase)}
+              onVerReservas={() => console.log('Ver reservas de clase id:', clase.id_clase)}
+            />
+          ))}
+        </div>
+      )}
     </main>
   )
 }
