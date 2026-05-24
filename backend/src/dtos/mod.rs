@@ -7,6 +7,7 @@ pub mod ficha_medica_dto;
 pub mod lista_espera_dto;
 pub mod membresia_dto;
 pub mod pago_dto;
+pub mod profesor_dto;
 pub mod reserva_dto;
 
 pub use asistencia_dto::{AsistenciaResponse, CreateAsistenciaRequest};
@@ -20,4 +21,5 @@ pub use lista_espera_dto::{
 };
 pub use membresia_dto::{CreateMembresiaRequest, MembresiaResponse};
 pub use pago_dto::{CreatePagoRequest, PagoResponse};
+pub use profesor_dto::{CreateProfesorRequest, ProfesorResponse};
 pub use reserva_dto::{CreateReservaRequest, ReservaResponse};
