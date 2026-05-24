@@ -17,11 +17,12 @@ impl ClaseRepository {
                    cupo_profe,
                    cupo_maximo,
                    estado,
+                   descripcion,
                    id_actividad,
                    id_sala,
                    dni_profesor
                )
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
                RETURNING
                    id_clase,
@@ -30,6 +31,7 @@ impl ClaseRepository {
                    cupo_profe,
                    cupo_maximo,
                    estado,
+                   descripcion,
                    id_actividad,
                    id_sala,
                    dni_profesor
@@ -40,13 +42,14 @@ impl ClaseRepository {
             clase.get_cupo_profe(),
             clase.get_cupo_maximo(),
             clase.get_estado(),
+            clase.get_descripcion(),
             clase.get_id_actividad(),
             clase.get_id_sala(),
             clase.get_dni_profesor()
         )
-        .fetch_optional(&pool)
+        .fetch(pool)
         .await
-        .map_err(ApiError::DatabaseError)
+        .map_err(ApiError::DatabaseError)?
     }
 
     pub async fn list_clases(pool: &SqlitePool) -> Result<Vec<Clase>, ApiError> {
@@ -66,8 +69,7 @@ impl ClaseRepository {
         )
         .fetch_all(&pool)
         .await
-        .map_err(ApiError::DatabaseError)
-        .map(Some)
+        .map_err(ApiError::DatabaseError)?
     }
 
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {

@@ -10,7 +10,7 @@ pub struct CreateClaseRequest {
     pub cupo_profe: i32,
     pub cupo_maximo: i32,
     pub estado: Estado,
-    pub id_actividad: i32,
+    pub id_actividad: String,
     pub id_sala: String,
     pub dni_profesor: String,
     pub descripcion: String,
@@ -24,6 +24,7 @@ pub struct ClaseResponse {
     pub estado: Estado,
     pub lleno: bool,
     pub descripcion: String,
+    pub id_actividad: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -40,6 +41,7 @@ impl From<Clase> for ClaseResponse {
             estado: value.get_estado(),
             lleno: value.is_lleno(),
             descripcion: value.get_descripcion(),
+            id_actividad: value.get_id_actividad(),
         }
     }
 }

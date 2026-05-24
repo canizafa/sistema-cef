@@ -14,6 +14,7 @@ pub struct Clase {
     estado: Estado,
     id_sala: String,
     dni_profesor: String,
+    id_actividad: String,
 }
 
 impl Clase {
@@ -46,6 +47,9 @@ impl Clase {
     pub fn get_descripcion(&self) -> String {
         self.descripcion.clone()
     }
+    pub fn get_id_actividad(&self) -> String {
+        self.id_actividad.clone()
+    }
 }
 
 impl From<CreateClaseRequest> for Clase {
@@ -61,6 +65,7 @@ impl From<CreateClaseRequest> for Clase {
             estado: value.estado,
             id_sala: value.id_sala,
             dni_profesor: value.dni_profesor,
+            id_actividad: value.id_actividad,
         }
     }
 }
