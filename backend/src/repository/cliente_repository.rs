@@ -127,7 +127,7 @@ impl ClienteRepository {
         Ok(clientes)
     }
 
-    pub async fn find_by_dni(pool: &SqlitePool, dni: i64) -> Result<Option<Cliente>, ApiError> {
+    pub async fn find_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
         let row = sqlx::query!(
             r#"
             SELECT
@@ -176,16 +176,14 @@ impl ClienteRepository {
                     Rol::Cliente,
                 );
 
-                Ok(Some(cliente))
+                Ok(cliente)
             }
-            None => Ok(None),
+
+            None => Err(ApiError::NotFound),
         }
     }
 
-    pub async fn find_by_email(
-        pool: &SqlitePool,
-        email: &str,
-    ) -> Result<Option<Cliente>, ApiError> {
+    pub async fn find_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
         let row = sqlx::query!(
             r#"
             SELECT
