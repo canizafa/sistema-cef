@@ -237,84 +237,17 @@ impl ClienteRepository {
             None => Ok(None),
         }
     }
-
-    pub async fn reset_password(
-        pool: &SqlitePool,
-        dni: i64,
-        password: &str,
-    ) -> Result<Option<Cliente>, ApiError> {
-        sqlx::query!(
-            r#"
-            UPDATE cliente
-            SET password = ?
-            WHERE dni_cliente = ?
-            "#,
-            password,
-            dni
-        )
-        .execute(pool)
-        .await
-        .map_err(ApiError::DatabaseError)?;
-
-        Self::find_by_dni(pool, dni).await
+    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
+        todo!()
     }
-
     pub async fn update_cliente(
         pool: &SqlitePool,
+        id: i64,
         cliente: &Cliente,
-    ) -> Result<Option<Cliente>, ApiError> {
-        let dni = cliente.get_dni();
-        let nombre = cliente.get_nombre_apellido();
-        let email = cliente.get_email();
-        let telefono = cliente.get_telefono();
-        let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
-        let estado = cliente.get_estado().to_string();
-        let password = cliente.get_password_hash();
-
-        sqlx::query!(
-            r#"
-            UPDATE cliente
-            SET
-                nombre_completo = ?,
-                email = ?,
-                telefono = ?,
-                fecha_nacimiento = ?,
-                estado = ?,
-                password = ?
-            WHERE dni_cliente = ?
-            "#,
-            nombre,
-            email,
-            telefono,
-            fecha_nacimiento,
-            estado,
-            password,
-            dni
-        )
-        .execute(pool)
-        .await
-        .map_err(ApiError::DatabaseError)?;
-
-        Self::find_by_dni(pool, dni).await
+    ) -> Result<Cliente, ApiError> {
+        todo!()
     }
-
-    pub async fn delete_cliente(
-        pool: &SqlitePool,
-        cliente: &Cliente,
-    ) -> Result<Option<Cliente>, ApiError> {
-        let dni = cliente.get_dni();
-        let old = Self::find_by_dni(pool, dni).await?;
-        sqlx::query!(
-            r#"
-            DELETE FROM cliente
-            WHERE dni_cliente = ?
-            "#,
-            dni
-        )
-        .execute(pool)
-        .await
-        .map_err(ApiError::DatabaseError)?;
-
-        Ok(old)
+    pub async fn delete_cliente(pool: &SqlitePool, id: i64) -> Result<Cliente, ApiError> {
+        todo!()
     }
 }
