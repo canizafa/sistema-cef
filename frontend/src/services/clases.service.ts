@@ -20,9 +20,9 @@ export type NuevaClaseData = {
     cupo_profe: number;
     cupo_maximo: number;
     estado: EstadoClase;
-    id_actividad: string;  // era number
-    id_sala: string;       // era number
-    dni_profesor: string;  // era number
+    id_actividad: string;  //
+    id_sala: string;       // 
+    dni_profesor: number;  //
     descripcion: string;   // faltaba
 };
 
