@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 use uuid::Uuid;
 
-use crate::{domain::Estado, dtos::CreateClaseRequest};
+use crate::{domain::Estado, dtos::CreateClaseRequest, errors::ApiError};
 
 #[derive(Debug, Clone)]
 pub struct Clase {
@@ -63,10 +63,6 @@ impl Clase {
         self.estado.clone()
     }
 
-    pub fn is_lleno(&self) -> bool {
-        self.cupo_profe >= self.cupo_maximo
-    }
-
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
@@ -78,6 +74,56 @@ impl Clase {
     }
     pub fn get_dni_profesor(&self) -> i64 {
         self.dni_profesor
+    }
+
+    pub fn validate_clase(&self) -> Result<(), ApiError> {
+        if self.cupo_profe > self.cupo_maximo {
+            return Err(ApiError::BadRequest(
+                "El cupo del profesor excede el cupo máximo".to_string(),
+            ));
+        }
+        if self.cupo_profe < 0 {
+            return Err(ApiError::BadRequest(
+                "El cupo del profesor no puede ser negativo".to_string(),
+            ));
+        }
+        if self.cupo_maximo < 0 {
+            return Err(ApiError::BadRequest(
+                "El cupo máximo no puede ser negativo".to_string(),
+            ));
+        }
+        if self.horario.is_empty() {
+            return Err(ApiError::BadRequest(
+                "El horario no puede estar vacío".to_string(),
+            ));
+        }
+        if self.descripcion.is_empty() {
+            return Err(ApiError::BadRequest(
+                "La descripción no puede estar vacía".to_string(),
+            ));
+        }
+
+        if self.id_sala.is_empty() {
+            return Err(ApiError::BadRequest(
+                "La sala no puede estar vacía".to_string(),
+            ));
+        }
+        if self.dni_profesor <= 0 {
+            return Err(ApiError::BadRequest(
+                "El DNI del profesor no puede ser negativo o cero".to_string(),
+            ));
+        }
+        if self.id_actividad.is_empty() {
+            return Err(ApiError::BadRequest(
+                "La actividad no puede estar vacía".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub fn is_lleno(&self) -> bool {
+        self.cupo_profe >= self.cupo_maximo
     }
 }
 

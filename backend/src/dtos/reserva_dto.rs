@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{Reserva, rol::Estado};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateReservaRequest {
     pub fecha: NaiveDate,
     pub tipo: String,
