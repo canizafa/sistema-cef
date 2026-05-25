@@ -1,12 +1,15 @@
 import api from './api';
 
-export type EstadoClase = 'activa' | 'inactiva';
+export type EstadoClase = 'alta' | 'baja';
 
 export type ClaseDTO = {
-    id_clase: number;
+    id_clase: string;
     dia: string;
     horario: string;
     estado: EstadoClase;
+    lleno: boolean;
+    descripcion: string;
+    id_actividad: string;
 };
 
 export type NuevaClaseData = {
@@ -35,8 +38,8 @@ export type NuevaListaEsperaData = {
 
 export const clasesService = {
     async getClases(): Promise<ClaseDTO[]> {
-        const response = await api.get('/clases');
-        return response.data;
+        const response = await api.get('/clase/get-all');
+        return response.data.clases;
     },
 
     async crearClase(data: NuevaClaseData) {
