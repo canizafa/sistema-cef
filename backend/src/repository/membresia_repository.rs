@@ -8,20 +8,23 @@ pub struct MembresiaRepository;
 impl MembresiaRepository {
     pub async fn create_membresia(
         pool: &SqlitePool,
-        membresia: Membresia,
+        membresia: &Membresia,
     ) -> Result<Membresia, ApiError> {
         todo!()
     }
-    pub async fn list_membresias(pool: &SqlitePool) -> Result<Option<Vec<Membresia>>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Option<Vec<Membresia>>, ApiError> {
         todo!()
     }
-    pub async fn get_membresia(pool: &SqlitePool, id: &str) -> Result<Option<Membresia>, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Membresia>, ApiError> {
+        todo!()
+    }
+    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Option<Membresia>, ApiError> {
         todo!()
     }
     pub async fn update_membresia(
         pool: &SqlitePool,
         id: &str,
-        membresia: Membresia,
+        membresia: &Membresia,
     ) -> Result<Membresia, ApiError> {
         todo!()
     }

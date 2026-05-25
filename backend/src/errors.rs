@@ -23,6 +23,11 @@ pub enum AppError {
 
 #[derive(Debug, Error)]
 pub enum ApiError {
+    #[error("not found")]
+    NotFound,
+
+    #[error("bad request")]
+    BadRequest(String),
     // ========= AUTH =========
     #[error("credenciales inválidas")]
     InvalidCredentials,

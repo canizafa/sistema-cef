@@ -3,7 +3,7 @@ use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use crate::{
     app_state::AppState,
     auth::{generar_token, generate_random_password},
-    domain::{Cliente, Empleado, Rol},
+    domain::{Cliente, Empleado},
     dtos::{
         AuthResponse, CreateClienteRequest, CreateEmpleadoRequest, LoginRequest,
         ResetPasswordRequest,
@@ -16,7 +16,7 @@ pub async fn login_handler(
     State(state): State<AppState>,
     Json(body): Json<LoginRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
-    let usuario_cliente = ClienteRepository::find_by_email(&state.db, &body.email).await;
+    let usuario_cliente = ClienteRepository::get_by_email(&state.db, &body.email).await;
     let usuario_empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await;
 
     if usuario_cliente.is_err() {
@@ -97,7 +97,7 @@ pub async fn reset_password_handler(
     State(state): State<AppState>,
     Json(body): Json<ResetPasswordRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let usuario_cliente = ClienteRepository::find_by_email(&state.db, &body.email).await;
+    let usuario_cliente = ClienteRepository::get_by_email(&state.db, &body.email).await;
     let usuario_empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await;
     if usuario_cliente.is_err() {
         if usuario_empleado.is_err() {
@@ -105,7 +105,7 @@ pub async fn reset_password_handler(
         }
         let mut empleado = usuario_empleado.unwrap();
         empleado.update_password(&generate_random_password(empleado.get_dni() as usize))?;
-        EmpleadoRepository::update_empleado(&state.db, &empleado).await?;
+        EmpleadoRepository::update_empleado(&state.db, empleado.get_dni(), &empleado).await?;
 
         Ok((
             StatusCode::OK,
@@ -115,7 +115,7 @@ pub async fn reset_password_handler(
         let mut cliente = usuario_cliente.unwrap();
 
         cliente.update_password(&generate_random_password(cliente.get_dni() as usize))?;
-        ClienteRepository::update_cliente(&state.db, &cliente).await?;
+        ClienteRepository::update_cliente(&state.db, cliente.get_dni(), &cliente).await?;
 
         Ok((
             StatusCode::OK,

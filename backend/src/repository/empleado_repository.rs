@@ -12,7 +12,7 @@ impl EmpleadoRepository {
     ) -> Result<Empleado, ApiError> {
         todo!()
     }
-    pub async fn list_empleados(pool: &SqlitePool) -> Result<Vec<Empleado>, ApiError> {
+    pub async fn get_empleados(pool: &SqlitePool) -> Result<Vec<Empleado>, ApiError> {
         todo!()
     }
     pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Empleado, ApiError> {
@@ -23,6 +23,7 @@ impl EmpleadoRepository {
     }
     pub async fn update_empleado(
         pool: &SqlitePool,
+        dni: i64,
         empleado: &Empleado,
     ) -> Result<Empleado, ApiError> {
         todo!()
