@@ -1,22 +1,241 @@
+use crate::{
+    domain::{Cliente, Estado, FichaMedica, Rol},
+    errors::ApiError,
+};
+use chrono::NaiveDate;
 use sqlx::SqlitePool;
-
-use crate::domain::Cliente;
-use crate::errors::ApiError;
-
 pub struct ClienteRepository;
 
 impl ClienteRepository {
     pub async fn create_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
-        todo!()
+        let dni = cliente.get_dni();
+        let nombre = cliente.get_nombre_apellido();
+        let email = cliente.get_email();
+        let telefono = cliente.get_telefono();
+        let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
+        let estado = cliente.get_estado();
+        let password = cliente.get_password_hash();
+
+        let ficha = cliente.get_ficha_medica();
+
+        let id_ficha = ficha.get_id_ficha();
+        let enfermedades = ficha.get_enfermedades();
+        let operaciones = ficha.get_operaciones_quirurgicas();
+        let detalles = ficha.get_detalles();
+
+        // primero crear ficha médica
+        sqlx::query!(
+            r#"
+            INSERT INTO ficha_medica (
+                id_ficha,
+                enfermedades,
+                operaciones_quirurgicas,
+                detalles
+            )
+            VALUES (?, ?, ?, ?)
+            "#,
+            id_ficha,
+            enfermedades,
+            operaciones,
+            detalles
+        )
+        .execute(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        // después crear cliente
+        sqlx::query!(
+            r#"
+            INSERT INTO cliente (
+                dni_cliente,
+                nombre_completo,
+                email,
+                telefono,
+                fecha_nacimiento,
+                estado,
+                password,
+                id_ficha
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            "#,
+            dni,
+            nombre,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            id_ficha
+        )
+        .execute(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        Ok(cliente.clone())
     }
+
     pub async fn list_clientes(pool: &SqlitePool) -> Result<Vec<Cliente>, ApiError> {
-        todo!()
+        let rows = sqlx::query!(
+            r#"
+            SELECT
+                c.dni_cliente as "dni_cliente!",
+                c.nombre_completo as "nombre_completo!",
+                c.email as "email!",
+                c.telefono as "telefono!",
+                c.fecha_nacimiento as "fecha_nacimiento!",
+                c.estado as "estado!",
+                c.password as "password!",
+
+                f.id_ficha as "id_ficha!",
+                f.enfermedades as "enfermedades!",
+                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
+                f.detalles as "detalles!"
+
+            FROM cliente c
+            INNER JOIN ficha_medica f
+                ON c.id_ficha = f.id_ficha
+            "#
+        )
+        .fetch_all(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        let clientes = rows
+            .into_iter()
+            .map(|row| {
+                let ficha = FichaMedica::new(
+                    row.id_ficha,
+                    row.enfermedades,
+                    row.operaciones_quirurgicas,
+                    row.detalles,
+                );
+
+                Cliente::new(
+                    row.dni_cliente,
+                    row.nombre_completo,
+                    row.password,
+                    row.email,
+                    row.telefono,
+                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
+                    Estado::from(row.estado),
+                    ficha,
+                    Rol::Cliente,
+                )
+            })
+            .collect();
+
+        Ok(clientes)
     }
+
     pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
-        todo!()
+        let row = sqlx::query!(
+            r#"
+            SELECT
+                c.dni_cliente as "dni_cliente!",
+                c.nombre_completo as "nombre_completo!",
+                c.email as "email!",
+                c.telefono as "telefono!",
+                c.fecha_nacimiento as "fecha_nacimiento!",
+                c.estado as "estado!",
+                c.password as "password!",
+
+                f.id_ficha as "id_ficha!",
+                f.enfermedades as "enfermedades!",
+                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
+                f.detalles as "detalles!"
+
+            FROM cliente c
+            INNER JOIN ficha_medica f
+                ON c.id_ficha = f.id_ficha
+            WHERE c.dni_cliente = ?
+            "#,
+            dni
+        )
+        .fetch_optional(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        match row {
+            Some(row) => {
+                let ficha = FichaMedica::new(
+                    row.id_ficha,
+                    row.enfermedades,
+                    row.operaciones_quirurgicas,
+                    row.detalles,
+                );
+
+                let cliente = Cliente::new(
+                    row.dni_cliente,
+                    row.nombre_completo,
+                    row.password,
+                    row.email,
+                    row.telefono,
+                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
+                    Estado::from(row.estado),
+                    ficha,
+                    Rol::Cliente,
+                );
+
+                Ok(cliente)
+            }
+
+            None => Err(ApiError::NotFound),
+        }
     }
+
     pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
-        todo!()
+        let row = sqlx::query!(
+            r#"
+            SELECT
+                c.dni_cliente as "dni_cliente!",
+                c.nombre_completo as "nombre_completo!",
+                c.email as "email!",
+                c.telefono as "telefono!",
+                c.fecha_nacimiento as "fecha_nacimiento!",
+                c.estado as "estado!",
+                c.password as "password!",
+
+                f.id_ficha as "id_ficha!",
+                f.enfermedades as "enfermedades!",
+                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
+                f.detalles as "detalles!"
+
+            FROM cliente c
+            INNER JOIN ficha_medica f
+                ON c.id_ficha = f.id_ficha
+            WHERE c.email = ?
+            "#,
+            email
+        )
+        .fetch_optional(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        match row {
+            Some(row) => {
+                let ficha = FichaMedica::new(
+                    row.id_ficha,
+                    row.enfermedades,
+                    row.operaciones_quirurgicas,
+                    row.detalles,
+                );
+
+                let cliente = Cliente::new(
+                    row.dni_cliente,
+                    row.nombre_completo,
+                    row.password,
+                    row.email,
+                    row.telefono,
+                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
+                    Estado::from(row.estado),
+                    ficha,
+                    Rol::Cliente,
+                );
+
+                Ok(cliente)
+            }
+            None => Err(ApiError::NotFound),
+        }
     }
     pub async fn update_cliente(
         pool: &SqlitePool,
@@ -25,7 +244,15 @@ impl ClienteRepository {
     ) -> Result<Cliente, ApiError> {
         todo!()
     }
-    pub async fn delete_cliente(pool: &SqlitePool, id: i64) -> Result<Cliente, ApiError> {
-        todo!()
+    pub async fn delete_cliente(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
+        let cliente = Self::get_by_dni(pool, dni).await?;
+
+        sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
+            .bind(dni)
+            .execute(pool)
+            .await
+            .map_err(ApiError::DatabaseError)?;
+
+        Ok(cliente)
     }
 }
