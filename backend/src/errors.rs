@@ -103,6 +103,7 @@ pub struct ErrorResponse {
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
+            ApiError::InvalidAsistencia => StatusCode::BAD_REQUEST,
             ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,
 
             ApiError::NotFound => StatusCode::NOT_FOUND,
