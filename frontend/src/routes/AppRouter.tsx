@@ -14,6 +14,9 @@ import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage';
 // Cliente
 import { ClasesPage } from '@/pages/cliente/ClasesPage';
 import { PerfilPage } from '@/pages/cliente/PerfilPage';
+import { PagoExitoPage } from '@/pages/cliente/PagoExitoPage';
+import { PagoFalloPage } from '@/pages/cliente/PagoFalloPage';
+import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
 
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
@@ -49,6 +52,11 @@ export const AppRouter = () => {
             {/* Rutas del cliente: requieren sesión activa */}
             <Route path="/clases" element={<ProtectedRoute><ClasesPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
+
+            {/* Resultado de pago — públicas porque MP redirige sin token */}
+            <Route path="/pago/exito" element={<PagoExitoPage />} />
+            <Route path="/pago/fallo" element={<PagoFalloPage />} />
+            <Route path="/pago/pendiente" element={<PagoPendientePage />} />
 
             {/* Rutas de administración: requieren rol admin o dueño */}
             <Route path="/admin" element={<AdminLayout />}>
