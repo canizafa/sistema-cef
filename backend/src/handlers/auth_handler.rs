@@ -16,7 +16,7 @@ pub async fn login_handler(
     State(state): State<AppState>,
     Json(body): Json<LoginRequest>,
 ) -> Result<Json<AuthResponse>, ApiError> {
-    let usuario_cliente = ClienteRepository::get_by_email(&state.db, &body.email).await;
+    let usuario_cliente = ClienteRepository::find_by_email(&state.db, &body.email).await;
     let usuario_empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await;
 
     if usuario_cliente.is_err() {
@@ -97,7 +97,7 @@ pub async fn reset_password_handler(
     State(state): State<AppState>,
     Json(body): Json<ResetPasswordRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let usuario_cliente = ClienteRepository::get_by_email(&state.db, &body.email).await;
+    let usuario_cliente = ClienteRepository::find_by_email(&state.db, &body.email).await;
     let usuario_empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await;
     if usuario_cliente.is_err() {
         if usuario_empleado.is_err() {
