@@ -31,7 +31,7 @@ impl From<Membresia> for MembresiaResponse {
             tipo: membresia.get_tipo().to_string(),
             estado: membresia.get_estado(),
             fecha_inicio: membresia.get_fecha_inicio(),
-            fecha_fin: membresia.get_fecha_fin(),
+            fecha_fin: membresia.get_fecha_fin().unwrap_or_default(),
         }
     }
 }

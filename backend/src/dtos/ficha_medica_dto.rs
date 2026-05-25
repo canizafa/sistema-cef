@@ -23,7 +23,7 @@ impl From<FichaMedica> for FichaMedicaResponse {
             id_ficha: ficha_medica.get_id_ficha(),
             enfermedades: ficha_medica.get_enfermedades(),
             operaciones_quirurgicas: ficha_medica.get_operaciones_quirurgicas(),
-            detalle: ficha_medica.get_detalle(),
+            detalle: ficha_medica.get_detalles(),
         }
     }
 }
