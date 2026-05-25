@@ -19,3 +19,10 @@ backend/database.db*
 # General
 .env
 .DS_Store
+
+# Archivos personales (facu-l)
+.superpowers/
+docs/
+guia-repositorio.md
+manual-de-estilo.md
+CEF/
