@@ -1,8 +1,10 @@
 use backend::errors::ApiError;
+use backend::mailer::Mailer;
 use backend::routes::root;
 use backend::{app_state::AppState, errors::AppError};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
@@ -18,9 +20,12 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::DatabaseError(e))?;
 
+    let mailer = Mailer::new()?;
+
     let app_state = AppState {
         db,
         jwt_secret: config.jwt_secret,
+        mailer: Arc::new(mailer),
     };
 
     sqlx::migrate!("./migrations")

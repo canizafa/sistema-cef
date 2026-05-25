@@ -5,5 +5,6 @@ pub mod domain;
 pub mod dtos;
 pub mod errors;
 pub mod handlers;
+pub mod mailer;
 pub mod repository;
 pub mod routes;

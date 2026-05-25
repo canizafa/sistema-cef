@@ -104,8 +104,15 @@ pub async fn reset_password_handler(
             return Err(ApiError::UserNotFound);
         }
         let mut empleado = usuario_empleado.unwrap();
-        empleado.update_password(&generate_random_password(empleado.get_dni() as usize))?;
+        let new_password = generate_random_password(empleado.get_dni() as usize);
+        empleado.update_password(&new_password)?;
         EmpleadoRepository::update_empleado(&state.db, empleado.get_dni(), &empleado).await?;
+
+        state
+            .mailer
+            .send_new_password(&body.email, &new_password)
+            .await
+            .map_err(|e| ApiError::InternalServerError)?;
 
         Ok((
             StatusCode::OK,
@@ -114,8 +121,15 @@ pub async fn reset_password_handler(
     } else {
         let mut cliente = usuario_cliente.unwrap();
 
-        cliente.update_password(&generate_random_password(cliente.get_dni() as usize))?;
+        let new_password = generate_random_password(cliente.get_dni() as usize);
+        cliente.update_password(&new_password)?;
         ClienteRepository::update_cliente(&state.db, cliente.get_dni(), &cliente).await?;
+
+        state
+            .mailer
+            .send_new_password(&body.email, &new_password)
+            .await
+            .map_err(|e| ApiError::InternalServerError)?;
 
         Ok((
             StatusCode::OK,
