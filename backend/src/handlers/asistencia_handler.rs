@@ -1,13 +1,16 @@
 use axum::{Json, extract::State};
-use sqlx::SqlitePool;
 
-use crate::AppState;
-use crate::dtos::CreateAsistenciaRequest;
+use crate::{
+    app_state::AppState,
+    dtos::{AsistenciaResponse, CreateAsistenciaRequest},
+    errors::ApiError,
+};
 
 pub async fn create_asistencia_handler(
     State(pool): State<AppState>,
-    Json(CreateAsistenciaRequest): Json<CreateAsistenciaRequest>,
-) {
+    Json(request): Json<CreateAsistenciaRequest>,
+) -> Result<Json<AsistenciaResponse>, ApiError> {
+    todo!()
 }
 
 pub async fn get_asistencia_handler() {

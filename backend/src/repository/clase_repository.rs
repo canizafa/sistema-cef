@@ -50,7 +50,7 @@ impl ClaseRepository {
 
         Ok(clase.clone())
     }
-    pub async fn list_clases(pool: &SqlitePool) -> Result<Vec<Clase>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Clase>, ApiError> {
         let rows = sqlx::query!(
             "SELECT
                 id_clase,
@@ -131,7 +131,7 @@ impl ClaseRepository {
     pub async fn update_clase(
         pool: &SqlitePool,
         id: &str,
-        clase: Clase,
+        clase: &Clase,
     ) -> Result<Option<Clase>, ApiError> {
         let dia = clase.get_dia();
         let horario = clase.get_horario();
