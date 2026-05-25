@@ -9,14 +9,16 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AppError {
-    #[error("api error")]
+    #[error("Hubo error en la API")]
     Api(ApiError),
-    #[error("internal server error")]
+    #[error("Hubo un error interno del servidor")]
     InternalServerError,
-    #[error("database error")]
+    #[error("Hubo un error en la base de datos")]
     DatabaseError(#[from] sqlx::Error),
-    #[error("migration error")]
+    #[error("Hubo un error en la migración de la base de datos")]
     MigrationError(#[from] sqlx::migrate::MigrateError),
+    #[error("Variable de entorno no encontrada")]
+    EnvironmentVariableNotFound,
 }
 
 #[derive(Debug, Error)]
@@ -35,6 +37,18 @@ pub enum ApiError {
     Forbidden,
 
     // ========= USER =========
+    #[error("dni inválido")]
+    InvalidDni,
+    #[error("nombre inválido")]
+    InvalidName,
+    #[error("email inválido")]
+    InvalidEmail,
+    #[error("fecha de nacimiento inválida")]
+    InvalidBirthDate,
+    #[error("contraseña inválida")]
+    InvalidPassword,
+    #[error("telefono inválido")]
+    InvalidPhone,
     #[error("usuario no encontrado")]
     UserNotFound,
 

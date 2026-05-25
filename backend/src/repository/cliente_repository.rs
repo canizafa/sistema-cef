@@ -18,13 +18,6 @@ impl ClienteRepository {
     pub async fn find_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
         todo!()
     }
-    pub async fn reset_password(
-        pool: &SqlitePool,
-        dni: i64,
-        password: &str,
-    ) -> Result<Cliente, ApiError> {
-        todo!()
-    }
     pub async fn update_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
         todo!()
     }
