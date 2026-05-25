@@ -8,8 +8,8 @@ use crate::handlers::{
 
 pub fn empleado_router() -> Router<AppState> {
     Router::new()
-        .route("/get-empleado/:id", get(get_empleado_handler))
-        .route("/update-empleado/:id", post(update_empleado_handler))
-        .route("/delete-empleado/:id", post(delete_empleado_handler))
+        .route("/get-empleado/{id}", get(get_empleado_handler))
+        .route("/update-empleado/{id}", post(update_empleado_handler))
+        .route("/delete-empleado/{id}", post(delete_empleado_handler))
         .route("/get-all", get(get_empleados_handler))
 }
