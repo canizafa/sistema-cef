@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS reserva (
     estado VARCHAR(30),
     tipo VARCHAR(50),
     fecha_reserva TEXT not null,
-    id_clase TEXT,
+    id_clase TEXT not null,
     FOREIGN KEY (id_clase) REFERENCES clase(id_clase)
 )

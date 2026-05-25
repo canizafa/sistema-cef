@@ -20,6 +20,29 @@ pub struct Cliente {
 }
 
 impl Cliente {
+    pub fn new(
+        dni: i64,
+        nombre_apellido: String,
+        password: String,
+        email: String,
+        telefono: String,
+        fecha_nacimiento: NaiveDate,
+        estado: Estado,
+        ficha_medica: FichaMedica,
+        rol: Rol,
+    ) -> Self {
+        Self {
+            dni,
+            nombre_apellido,
+            password,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            ficha_medica,
+            rol,
+        }
+    }
     pub fn get_dni(&self) -> i64 {
         self.dni
     }
