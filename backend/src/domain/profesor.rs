@@ -12,6 +12,14 @@ pub struct Profesor {
 }
 
 impl Profesor {
+    pub fn new(dni: i64, nombre_completo: String, genero: Genero, estado: Estado) -> Self {
+        Self {
+            dni,
+            nombre_completo,
+            genero,
+            estado,
+        }
+    }
     pub fn get_dni(&self) -> i64 {
         self.dni
     }

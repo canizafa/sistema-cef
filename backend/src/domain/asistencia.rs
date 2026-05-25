@@ -11,6 +11,22 @@ pub struct Asistencia {
 }
 
 impl Asistencia {
+    pub fn new(
+        id_asistencia: String,
+        fecha: NaiveDate,
+        metodo: String,
+        id_clase: String,
+        lista_espera: Vec<Cliente>,
+    ) -> Self {
+        Self {
+            id_asistencia,
+            fecha,
+            metodo,
+            id_clase,
+            lista_espera,
+        }
+    }
+
     pub fn get_id_asistencia(&self) -> String {
         self.id_asistencia.clone()
     }
