@@ -83,6 +83,12 @@ export function LoginPage() {
               Registrarse
             </Link>
           </p>
+          <p className="text-sm text-center text-gray-500 mt-2">
+            ¿No recordás tu contraseña?{' '}
+            <Link to="/recuperar-contrasena" className="text-brand hover:underline">
+              Recuperar contraseña
+            </Link>
+          </p>
         </div>
       </main>
     </div>
