@@ -1,0 +1,35 @@
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+};
+
+use rand::{Rng, rngs::OsRng};
+
+use crate::errors::ApiError;
+
+pub fn hash_password(password: &str) -> Result<String, ApiError> {
+    let salt = SaltString::generate(&mut OsRng);
+
+    let password_hash = Argon2::default()
+        .hash_password(password.as_bytes(), &salt)
+        .map_err(|_| ApiError::PasswordHashError)?
+        .to_string();
+
+    Ok(password_hash)
+}
+
+pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
+    let parsed_hash = PasswordHash::new(hash).map_err(|_| ApiError::PasswordHashError)?;
+
+    Ok(Argon2::default()
+        .verify_password(password.as_bytes(), &parsed_hash)
+        .is_ok())
+}
+
+pub fn generate_random_password(length: usize) -> String {
+    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+    let mut rng = rand::thread_rng();
+    (0..length)
+        .map(|_| CHARSET[rng.gen_range(0..CHARSET.len())] as char)
+        .collect()
+}
