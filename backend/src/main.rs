@@ -1,36 +1,46 @@
-//pense el main para levantar el servidor nomas, las otras responsabilidades las delego a otros archivos
-mod config;
+mod app_state;
+mod auth;
+mod domain;
+mod dtos;
+mod errors;
 mod handlers;
-mod models;
 mod repository;
 mod routes;
 
-use std::net::SocketAddr;
-
+use crate::errors::ApiError;
+use crate::routes::root;
+use crate::{app_state::AppState, errors::AppError};
 use sqlx::SqlitePool;
+use std::{env, net::SocketAddr};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), AppError> {
     dotenvy::dotenv().ok();
 
-    let puerto = 8081;
-    let dir = SocketAddr::from(([0, 0, 0, 0], puerto));
+    let port = 8081;
+    let dir = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
-        .unwrap_or_else(|e| {
-            panic!("fallo la conetsion de la dir {}:{}", dir, e);
-        });
+        .map_err(|_| AppError::InternalServerError)?;
 
-    let pool = SqlitePool::connect(&std::env::var("DATABASE_URL").unwrap())
+    let db = SqlitePool::connect(&env::var("DATABASE_URL").expect("DATABASE_URL no encontrada"))
         .await
-        .unwrap();
+        .map_err(|e| AppError::DatabaseError(e))?;
 
-    sqlx::migrate!("./migrations").run(&pool).await.unwrap();
+    let app_state = AppState {
+        db,
+        jwt_secret: env::var("JWT_SECRET").map_err(|_| AppError::Api(ApiError::JwtTokenError))?,
+    };
 
-    let app = routes::root::router().with_state(pool);
+    sqlx::migrate!("./migrations")
+        .run(&app_state.db)
+        .await
+        .map_err(|e| AppError::MigrationError(e))?;
 
-    axum::serve(listener, app).await.unwrap_or_else(|e| {
-        //esto levanta el servidor
-        panic!("fallo la conetsion con el servidor {}", e);
-    });
+    let app = root::router().with_state(app_state);
+
+    axum::serve(listener, app)
+        .await
+        .map_err(|_| AppError::InternalServerError)?;
+    Ok(())
 }

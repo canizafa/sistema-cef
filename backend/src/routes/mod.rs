@@ -1,5 +1,21 @@
-pub mod cliente;
-pub mod health_checker;
-
-pub mod auth;
+pub mod asistencia_route;
+pub mod auth_route;
+pub mod clase_route;
+pub mod cliente_route;
+pub mod empleado_route;
+pub mod health_checker_route;
+pub mod membresia_route;
+pub mod pago_route;
+pub mod reserva_route;
 pub mod root;
+
+pub use asistencia_route::asistencia_router;
+pub use auth_route::auth_router;
+pub use clase_route::clase_router;
+pub use cliente_route::cliente_router;
+pub use empleado_route::empleado_router;
+pub use health_checker_route::health_checker;
+pub use membresia_route::membresia_router;
+pub use pago_route::pago_router;
+pub use reserva_route::reserva_router;
+pub use root::router;

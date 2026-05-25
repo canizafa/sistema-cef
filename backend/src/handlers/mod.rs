@@ -1,1 +1,17 @@
-pub mod auth;
+pub mod asistencia_handler;
+pub mod auth_handler;
+pub mod clase_handler;
+pub mod cliente_handler;
+pub mod empleado_handler;
+pub mod membresia_handler;
+pub mod pago_handler;
+pub mod reserva_handler;
+
+pub use asistencia_handler::*;
+pub use auth_handler::*;
+pub use clase_handler::*;
+pub use cliente_handler::*;
+pub use empleado_handler::*;
+pub use membresia_handler::*;
+pub use pago_handler::*;
+pub use reserva_handler::*;
