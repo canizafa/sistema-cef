@@ -4,10 +4,16 @@ use backend::{app_state::AppState, errors::AppError};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
     dotenvy::dotenv().ok();
+
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
     let config = backend::config::Config::from_env()?;
     let port = 8081;
     let dir = SocketAddr::from(([0, 0, 0, 0], port));
@@ -32,7 +38,7 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::MigrationError(e))?;
 
-    let app = root::router().with_state(app_state);
+    let app = root::router().with_state(app_state).layer(cors);
 
     axum::serve(listener, app)
         .await
