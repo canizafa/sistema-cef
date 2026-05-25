@@ -10,7 +10,7 @@ use crate::handlers::reset_password_handler;
 pub fn auth_router() -> Router<AppState> {
     Router::new()
         .route("/login", post(login_handler))
-        .route("/change-password", post(reset_password_handler))
+        .route("/reset-password", post(reset_password_handler))
         .route("/register-empleado", post(register_empleado_handler))
         .route("/register-cliente", post(register_cliente_handler))
 }
