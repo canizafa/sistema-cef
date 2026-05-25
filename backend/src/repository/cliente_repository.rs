@@ -127,7 +127,7 @@ impl ClienteRepository {
         Ok(clientes)
     }
 
-    pub async fn find_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
+    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
         let row = sqlx::query!(
             r#"
             SELECT
@@ -183,7 +183,7 @@ impl ClienteRepository {
         }
     }
 
-    pub async fn find_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
+    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
         let row = sqlx::query!(
             r#"
             SELECT
@@ -237,9 +237,6 @@ impl ClienteRepository {
             None => Err(ApiError::NotFound),
         }
     }
-    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
-        todo!()
-    }
     pub async fn update_cliente(
         pool: &SqlitePool,
         id: i64,
@@ -248,7 +245,7 @@ impl ClienteRepository {
         todo!()
     }
     pub async fn delete_cliente(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
-        let cliente = Self::find_by_dni(pool, dni).await?;
+        let cliente = Self::get_by_dni(pool, dni).await?;
 
         sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
             .bind(dni)
