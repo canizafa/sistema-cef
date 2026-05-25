@@ -18,6 +18,7 @@ export function NuevaClasePage() {
         id_actividad: '',
         id_sala: '',
         dni_profesor: '',
+        descripcion: '',
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -29,7 +30,6 @@ export function NuevaClasePage() {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }
 
-    // Select de shadcn no usa eventos nativos: recibe el value directamente
     function handleSelect(name: string, value: string) {
         setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -46,9 +46,10 @@ export function NuevaClasePage() {
                 cupo_profe: Number(form.cupo_profe),
                 cupo_maximo: Number(form.cupo_maximo),
                 estado: form.estado as EstadoClase,
-                id_actividad: Number(form.id_actividad),
-                id_sala: Number(form.id_sala),
+                id_actividad: String(form.id_actividad),
+                id_sala: String(form.id_sala),
                 dni_profesor: Number(form.dni_profesor),
+                descripcion: form.descripcion,
             });
             setSuccess('Clase creada correctamente');
             setTimeout(() => navigate('/admin/clases'), 1500);
@@ -116,6 +117,18 @@ export function NuevaClasePage() {
                             required
                         />
                         <p className="text-xs text-muted">Lugares reservados fuera del cupo general</p>
+                    </div>
+
+                    <div className="space-y-1">
+                        <Label htmlFor="descripcion">Descripción</Label>
+                        <Input
+                            id="descripcion"
+                            name="descripcion"
+                            placeholder="Ej: Clase de yoga para principiantes"
+                            value={form.descripcion}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
 
                     <div className="space-y-1">

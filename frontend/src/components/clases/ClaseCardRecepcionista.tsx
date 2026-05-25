@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import type { EstadoClase } from '@/services/clases.service'
 
 interface ClaseCardRecepcionistaProps {
-  idClase: number
+  idClase: string
   dia: string
   horario: string
   estado: EstadoClase

@@ -18,21 +18,22 @@ export type NuevaClaseData = {
     cupo_profe: number;
     cupo_maximo: number;
     estado: EstadoClase;
-    id_actividad: number;
-    id_sala: number;
+    id_actividad: string;
+    id_sala: string;
     dni_profesor: number;
+    descripcion: string;
 };
 
 export type NuevaReservaData = {
     fecha: string;
     estado: string;
     dni_cliente: number;
-    id_clase: number;
+    id_clase: string;
 };
 
 export type NuevaListaEsperaData = {
     dni_cliente: number;
-    id_clase: number;
+    id_clase: string;
     fecha: string;
 };
 
@@ -43,19 +44,34 @@ export const clasesService = {
     },
 
     async crearClase(data: NuevaClaseData) {
-        const response = await api.post('/clases', data);
+        const response = await api.post('/clase/create', data);
+        return response.data;
+    },
+
+    async getClase(params: unknown) {
+        const response = await api.get('/clase/get-clase', { params });
+        return response.data;
+    },
+
+    async actualizarClase(data: unknown) {
+        const response = await api.post('/clase/update-clase', data);
+        return response.data;
+    },
+
+    async eliminarClase(data: unknown) {
+        const response = await api.post('/clase/delete-clase', data);
         return response.data;
     },
 };
 
 export const reservasService = {
     async crearReserva(data: NuevaReservaData) {
-        const response = await api.post('/reservas', data);
+        const response = await api.post('/reservas/create', data);
         return response.data;
     },
 
-    async cancelarReserva(idReserva: number) {
-        const response = await api.delete(`/reservas/${idReserva}`);
+    async cancelarReserva(idReserva: string) {
+        const response = await api.delete(`/reservas/delete-reserva/${idReserva}`);
         return response.data;
     },
 };
