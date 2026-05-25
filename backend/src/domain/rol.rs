@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::Type;
 
@@ -60,6 +62,36 @@ impl From<String> for Rol {
             "cliente" => Rol::Cliente,
             "duenio" => Rol::Duenio,
             _ => Rol::Profesor,
+        }
+    }
+}
+
+impl ToString for Rol {
+    fn to_string(&self) -> String {
+        match self {
+            Rol::Profesor => "profesor".to_string(),
+            Rol::Empleado => "empleado".to_string(),
+            Rol::Cliente => "cliente".to_string(),
+            Rol::Duenio => "duenio".to_string(),
+        }
+    }
+}
+
+impl ToString for Estado {
+    fn to_string(&self) -> String {
+        match self {
+            Estado::Alta => "alta".to_string(),
+            Estado::Baja => "baja".to_string(),
+        }
+    }
+}
+
+impl ToString for Genero {
+    fn to_string(&self) -> String {
+        match self {
+            Genero::Masculino => "masculino".to_string(),
+            Genero::Femenino => "femenino".to_string(),
+            Genero::Otro => "otro".to_string(),
         }
     }
 }

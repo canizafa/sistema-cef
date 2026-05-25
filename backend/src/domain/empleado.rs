@@ -14,6 +14,25 @@ pub struct Empleado {
 }
 
 impl Empleado {
+    pub fn new(
+        dni_empleado: i64,
+        nombre_apellido: String,
+        password_hash: String,
+        mail: String,
+        genero: String,
+        estado: String,
+        rol: Rol,
+    ) -> Self {
+        Self {
+            dni_empleado,
+            nombre_apellido,
+            password_hash,
+            mail,
+            genero,
+            estado,
+            rol,
+        }
+    }
     pub fn get_dni(&self) -> i64 {
         self.dni_empleado
     }
