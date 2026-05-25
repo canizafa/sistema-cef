@@ -1,4 +1,3 @@
-use backend::errors::ApiError;
 use backend::mailer::Mailer;
 use backend::routes::root;
 use backend::{app_state::AppState, errors::AppError};

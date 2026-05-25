@@ -8,3 +8,4 @@ pub mod handlers;
 pub mod mailer;
 pub mod repository;
 pub mod routes;
+pub mod services;
