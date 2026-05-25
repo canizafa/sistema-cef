@@ -5,6 +5,68 @@ Sistema para el Centro de actividades CEF (Grupo 4)
 
 # Backend — Guía de instalación y ejecución
 
+
+
+
+
+
+
+# Endpoints de la API
+
+## Health Check
+- `GET /api/health`
+
+## Autenticación
+- `POST /api/auth/login`
+- `POST /api/auth/reset-password`
+- `POST /api/auth/register-empleado`
+- `POST /api/auth/register-cliente`
+
+## Clases
+- `POST /api/clase/create`
+- `GET /api/clase/get-clase/{id}`
+- `POST /api/clase/update-clase/{id}`
+- `POST /api/clase/delete-clase/{id}`
+- `GET /api/clase/get-all`
+
+## Clientes
+- `POST /api/clientes/create`
+- `GET /api/clientes/get-cliente/{id}`
+- `POST /api/clientes/update-cliente/{id}`
+- `POST /api/clientes/delete-cliente/{id}`
+- `GET /api/clientes/get-all`
+
+## Empleados
+- `GET /api/empleados/get-empleado/{id}`
+- `POST /api/empleados/update-empleado/{id}`
+- `POST /api/empleados/delete-empleado/{id}`
+- `GET /api/empleados/get-all`
+
+## Membresías
+- `POST /api/membresias/create`
+- `GET /api/membresias/get-membresia-dni/{id}`
+- `GET /api/membresias/get-membresia-id/{id}`
+- `POST /api/membresias/update-membresia/{id}`
+- `DELETE /api/membresias/delete-membresia/{id}`
+- `GET /api/membresias/get-all`
+
+## Pagos
+- `POST /api/pagos/create`
+
+## Reservas
+- `POST /api/reservas/create`
+- `GET /api/reservas/get-reserva/{id}`
+- `DELETE /api/reservas/delete-reserva/{id}`
+- `PUT /api/reservas/update-reserva/{id}`
+- `GET /api/reservas/get-all`
+
+## Asistencias
+- `POST /api/asistencia/create`
+- `GET /api/asistencia/get-asistencia/{id}`
+- `POST /api/asistencia/update-asistencia/{id}`
+- `POST /api/asistencia/delete-asistencia/{id}`
+- `GET /api/asistencia/get-all`
+
 ## Requisitos previos
 
 ### 1. Instalar Rust
