@@ -9,6 +9,19 @@ pub struct FichaMedica {
 use crate::dtos::CreateFichaMedicaRequest;
 
 impl FichaMedica {
+    pub fn new(
+        id_ficha: String,
+        enfermedades: bool,
+        operaciones_quirurgicas: bool,
+        detalles: String,
+    ) -> Self {
+        Self {
+            id_ficha,
+            enfermedades,
+            operaciones_quirurgicas,
+            detalles,
+        }
+    }
     pub fn get_id_ficha(&self) -> String {
         self.id_ficha.clone()
     }

@@ -13,6 +13,24 @@ pub struct Register {
 }
 
 impl Register {
+    pub fn new(
+        dni: String,
+        nombre_apellido: String,
+        password: String,
+        email: String,
+        telefono: String,
+        fecha_nacimiento: NaiveDate,
+    ) -> Self {
+        Self {
+            dni,
+            nombre_apellido,
+            password,
+            email,
+            telefono,
+            fecha_nacimiento,
+        }
+    }
+
     pub fn get_dni(&self) -> String {
         self.dni.clone()
     }
