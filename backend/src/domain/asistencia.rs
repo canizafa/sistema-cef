@@ -1,6 +1,6 @@
-use chrono::NaiveDate;
+use chrono::{Local, NaiveDate};
 
-use crate::{domain::Cliente, dtos::CreateAsistenciaRequest};
+use crate::{domain::Cliente, dtos::CreateAsistenciaRequest, errors::ApiError};
 
 pub struct Asistencia {
     pub id_asistencia: String,
@@ -29,6 +29,15 @@ impl Asistencia {
 
     pub fn get_lista_espera(&self) -> Vec<Cliente> {
         self.lista_espera.clone()
+    }
+    pub fn validate_asistencia(&self) -> Result<(), ApiError> {
+        if self.fecha > Local::now().naive_local().date() {
+            return Err(ApiError::InvalidAsistencia);
+        }
+        if self.metodo.is_empty() {
+            return Err(ApiError::InvalidAsistencia);
+        }
+        Ok(())
     }
 }
 

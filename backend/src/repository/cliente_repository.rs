@@ -303,9 +303,7 @@ impl ClienteRepository {
         cliente: &Cliente,
     ) -> Result<Option<Cliente>, ApiError> {
         let dni = cliente.get_dni();
-
         let old = Self::find_by_dni(pool, dni).await?;
-
         sqlx::query!(
             r#"
             DELETE FROM cliente

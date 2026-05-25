@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 use uuid::Uuid;
 
-use crate::{domain::Estado, dtos::CreateReservaRequest};
+use crate::{domain::Estado, dtos::CreateReservaRequest, errors::ApiError};
 
 #[derive(Debug, Clone)]
 pub struct Reserva {
@@ -36,6 +36,25 @@ impl Reserva {
 
     pub fn get_dni_cliente(&self) -> String {
         self.dni_cliente.clone()
+    }
+
+    pub fn validate_reserva(&self) -> Result<(), ApiError> {
+        if self.tipo.is_empty() {
+            return Err(ApiError::BadRequest("tipo is required".to_string()));
+        }
+        if self.fecha_reserva == NaiveDate::MIN {
+            return Err(ApiError::BadRequest(
+                "fecha_reserva is required".to_string(),
+            ));
+        }
+        if self.dni_cliente.is_empty() {
+            return Err(ApiError::BadRequest("dni_cliente is required".to_string()));
+        }
+        if self.id_clase.is_empty() {
+            return Err(ApiError::BadRequest("id_clase is required".to_string()));
+        }
+
+        Ok(())
     }
 }
 

@@ -1,16 +1,17 @@
-use chrono::NaiveDate;
+use chrono::{Datelike, Local, NaiveDate};
 
 use crate::{
     auth::password::hash_password,
     domain::{Estado, FichaMedica, Rol},
     dtos::CreateClienteRequest,
+    errors::ApiError,
 };
 
 #[derive(Debug, Clone)]
 pub struct Cliente {
     dni: i64,
     nombre_apellido: String,
-    password: String,
+    password_hash: String,
     email: String,
     telefono: String,
     fecha_nacimiento: NaiveDate,
@@ -68,7 +69,33 @@ impl Cliente {
         self.rol.clone()
     }
     pub fn get_password_hash(&self) -> String {
-        self.password.clone()
+        self.password_hash.clone()
+    }
+    pub fn update_password(&mut self, password: &str) -> Result<(), ApiError> {
+        if password.len() < 8 {
+            return Err(ApiError::WeakPassword);
+        }
+        self.password_hash = hash_password(password)?;
+        Ok(())
+    }
+    pub fn validate_cliente(&self) -> Result<(), ApiError> {
+        if self.dni <= 0 {
+            return Err(ApiError::InvalidDni);
+        }
+        if self.nombre_apellido.is_empty() {
+            return Err(ApiError::InvalidName);
+        }
+        if self.email.is_empty() {
+            return Err(ApiError::InvalidEmail);
+        }
+        if self.telefono.is_empty() {
+            return Err(ApiError::InvalidPhone);
+        }
+        let now = Local::now().date_naive();
+        if now.year() - self.fecha_nacimiento.year() < 14 {
+            return Err(ApiError::InvalidBirthDate);
+        }
+        Ok(())
     }
 }
 
@@ -78,7 +105,7 @@ impl From<CreateClienteRequest> for Cliente {
         Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password: password_hash,
+            password_hash,
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,

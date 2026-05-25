@@ -5,3 +5,4 @@ pub mod password;
 pub use claims::Claims;
 pub use jwt::generar_token;
 pub use jwt::validar_token;
+pub use password::generate_random_password;

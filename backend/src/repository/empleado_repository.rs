@@ -133,8 +133,8 @@ impl EmpleadoRepository {
     }
     pub async fn update_empleado(
         pool: &SqlitePool,
-        dni: &str,
-        empleado: Empleado,
+        dni: i64,
+        empleado: &Empleado,
     ) -> Result<Empleado, ApiError> {
         sqlx::query(
             r#"
