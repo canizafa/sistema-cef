@@ -1,6 +1,3 @@
-// Servicio de autenticación.
-// Expone las funciones login(), register() y changePassword() que llaman al backend.
-// Existe para separar la lógica HTTP de los componentes de UI que manejan los formularios.
 import api from './api';
 import type { User } from '../context/AuthContext';
 
@@ -9,7 +6,6 @@ export interface LoginData {
     password: string;
 }
 
-// Campos que acepta el modelo Cliente en el backend
 export interface RegisterData {
     nombre: string;
     email: string;
@@ -20,7 +16,6 @@ export interface RegisterData {
     ficha: string;
 }
 
-
 export interface AuthResponse {
     token: string;
     user: User;
@@ -28,12 +23,16 @@ export interface AuthResponse {
 
 export const authService = {
     async login(data: LoginData): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/auth/login', data);
+        const response = await api.post('/auth/login', data);
         return response.data;
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('/clientes', data);
+        await api.post('/auth/register', data);
+    },
+
+    async forgotPassword(data: { email: string }): Promise<void> {
+        await api.post('/auth/forgot-password', data);
     },
 
     logout(): void {

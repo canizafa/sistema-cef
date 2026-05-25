@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { empleadoService } from '@/services/empleados.service';
 
-export function AdminPage() {
+export function NuevoEmpleadoPage() {
     // Un solo objeto de estado para todos los campos del formulario
     const [form, setForm] = useState({
         nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'recepcionista' as const

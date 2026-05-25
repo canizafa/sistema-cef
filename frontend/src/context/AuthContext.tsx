@@ -12,6 +12,7 @@ export type User = {
     nombre: string;
     email: string;
     rol: Rol;
+    dni: number;  
 };
 
 type AuthState = {
