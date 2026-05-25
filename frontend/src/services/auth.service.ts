@@ -31,6 +31,10 @@ export const authService = {
         await api.post('/auth/register', data);
     },
 
+    async forgotPassword(data: { email: string }): Promise<void> {
+        await api.post('/auth/forgot-password', data);
+    },
+
     logout(): void {
         localStorage.removeItem('token');
     },

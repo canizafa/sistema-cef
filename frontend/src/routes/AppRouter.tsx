@@ -9,6 +9,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LandingPage } from '@/pages/public/LandingPage';
 import { LoginPage } from '@/pages/public/LoginPage';
 import { RegisterPage } from '@/pages/public/RegisterPage';
+import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage';
 
 // Cliente
 import { ClasesPage } from '@/pages/cliente/ClasesPage';
@@ -43,6 +44,7 @@ export const AppRouter = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/recuperar-contrasena" element={<ForgotPasswordPage />} />
 
             {/* Rutas del cliente: requieren sesión activa */}
             <Route path="/clases" element={<ProtectedRoute><ClasesPage /></ProtectedRoute>} />
