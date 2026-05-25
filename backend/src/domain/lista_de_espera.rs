@@ -12,6 +12,21 @@ pub struct ListaEspera {
 }
 
 impl ListaEspera {
+    pub fn new(
+        id_lista: String,
+        tipo: String,
+        fecha_ingreso: NaiveDate,
+        id_clase: String,
+        clientes_en_espera: Vec<Cliente>,
+    ) -> Self {
+        Self {
+            id_lista,
+            tipo,
+            fecha_ingreso,
+            id_clase,
+            clientes_en_espera,
+        }
+    }
     pub fn get_id_lista(&self) -> &str {
         &self.id_lista
     }

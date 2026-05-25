@@ -17,6 +17,27 @@ pub struct Pago {
 }
 
 impl Pago {
+    pub fn new(
+        id_pago: String,
+        titulo: String,
+        monto: f64,
+        fecha: NaiveDate,
+        hora: String,
+        sena: bool,
+        id_membresia: Option<String>,
+        reserva_paga: Option<Reserva>,
+    ) -> Self {
+        Self {
+            id_pago,
+            titulo,
+            monto,
+            fecha,
+            hora,
+            sena,
+            id_membresia,
+            reserva_paga,
+        }
+    }
     pub fn get_titulo(&self) -> &str {
         &self.titulo
     }

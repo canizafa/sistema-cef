@@ -12,6 +12,21 @@ pub struct Membresia {
 }
 
 impl Membresia {
+    pub fn new(
+        id_membresia: String,
+        tipo: String,
+        estado: Estado,
+        fecha_inicio: NaiveDate,
+        fecha_fin: Option<NaiveDate>,
+    ) -> Self {
+        Self {
+            id_membresia,
+            tipo,
+            estado,
+            fecha_inicio,
+            fecha_fin,
+        }
+    }
     pub fn get_id_membresia(&self) -> &str {
         &self.id_membresia
     }

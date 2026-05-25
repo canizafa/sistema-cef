@@ -14,6 +14,24 @@ pub struct Reserva {
 }
 
 impl Reserva {
+    pub fn new(
+        id_reserva: String,
+        estado: Estado,
+        tipo: String,
+        fecha_reserva: NaiveDate,
+        dni_cliente: String,
+        id_clase: String,
+    ) -> Self {
+        Self {
+            id_reserva,
+            estado,
+            tipo,
+            fecha_reserva,
+            dni_cliente,
+            id_clase,
+        }
+    }
+
     pub fn get_id(&self) -> &str {
         &self.id_reserva
     }
