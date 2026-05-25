@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::{domain::Estado, dtos::CreateMembresiaRequest};
+use crate::{domain::Estado, dtos::CreateMembresiaRequest, errors::ApiError};
 
 #[derive(Debug, Clone)]
 pub struct Membresia {
@@ -26,6 +26,30 @@ impl Membresia {
     }
     pub fn get_fecha_fin(&self) -> Option<NaiveDate> {
         self.fecha_fin
+    }
+    pub fn validate_membresia(&self) -> Result<(), ApiError> {
+        if self.fecha_inicio > self.fecha_fin.unwrap_or_default() {
+            return Err(ApiError::BadRequest(
+                "Fecha de inicio no puede ser posterior a la fecha de fin".to_string(),
+            ));
+        }
+        if self.fecha_inicio < NaiveDate::from_ymd_opt(1900, 1, 1).unwrap_or_default() {
+            return Err(ApiError::BadRequest(
+                "Fecha de inicio no puede ser anterior a 1900-01-01".to_string(),
+            ));
+        }
+        if self.id_membresia.is_empty() {
+            return Err(ApiError::BadRequest(
+                "id_membresia no puede estar vacío".to_string(),
+            ));
+        }
+        if self.tipo.is_empty() {
+            return Err(ApiError::BadRequest(
+                "tipo no puede estar vacío".to_string(),
+            ));
+        }
+
+        Ok(())
     }
 }
 

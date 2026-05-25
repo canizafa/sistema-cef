@@ -1,6 +1,7 @@
 use crate::{
     domain::{Estado, Genero},
     dtos::CreateProfesorRequest,
+    errors::ApiError,
 };
 
 pub struct Profesor {
@@ -25,6 +26,20 @@ impl Profesor {
 
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
+    }
+    pub fn validate_profesor(&self) -> Result<(), ApiError> {
+        if self.dni <= 0 {
+            return Err(ApiError::BadRequest(
+                "dni must be greater than 0".to_string(),
+            ));
+        }
+        if self.nombre_completo.is_empty() {
+            return Err(ApiError::BadRequest(
+                "nombre_completo cannot be empty".to_string(),
+            ));
+        }
+
+        Ok(())
     }
 }
 

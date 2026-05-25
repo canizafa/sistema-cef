@@ -33,7 +33,7 @@ impl From<Empleado> for EmpleadoResponse {
         Self {
             dni: empleado.get_dni(),
             nombre_apellido: empleado.get_nombre_apellido(),
-            mail: empleado.get_mail(),
+            mail: empleado.get_email(),
             genero: empleado.get_genero(),
             estado: empleado.get_estado(),
             rol: empleado.get_rol(),
