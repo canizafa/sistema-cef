@@ -6,37 +6,40 @@ use axum::{
 };
 
 use crate::{
-    app_state::AppState, domain::Cliente, dtos::CreateClienteRequest, errors::ApiError,
+    app_state::AppState,
+    domain::Cliente,
+    dtos::{ClienteResponse, CreateClienteRequest},
+    errors::ApiError,
     repository::ClienteRepository,
 };
 
 pub async fn create_cliente_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClienteRequest>,
-) -> Result<Json<Cliente>, ApiError> {
+) -> Result<Json<ClienteResponse>, ApiError> {
     let cliente = Cliente::from(request);
     cliente.validate_cliente()?;
     ClienteRepository::create_cliente(&state.db, &cliente).await?;
-    Ok(Json(cliente))
+    Ok(Json(ClienteResponse::from(cliente)))
 }
 
 pub async fn get_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-) -> Result<Json<Cliente>, ApiError> {
+) -> Result<Json<ClienteResponse>, ApiError> {
     let cliente = ClienteRepository::get_by_dni(&state.db, id).await?;
-    Ok(Json(cliente))
+    Ok(Json(ClienteResponse::from(cliente)))
 }
 
 pub async fn update_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
     Json(request): Json<CreateClienteRequest>,
-) -> Result<Json<Cliente>, ApiError> {
+) -> Result<Json<ClienteResponse>, ApiError> {
     let cliente = Cliente::from(request);
     cliente.validate_cliente()?;
     ClienteRepository::update_cliente(&state.db, id, &cliente).await?;
-    Ok(Json(cliente))
+    Ok(Json(ClienteResponse::from(cliente)))
 }
 
 pub async fn delete_cliente_handler(
@@ -49,7 +52,9 @@ pub async fn delete_cliente_handler(
 
 pub async fn get_clientes_handler(
     State(state): State<AppState>,
-) -> Result<Json<Vec<Cliente>>, ApiError> {
+) -> Result<Json<Vec<ClienteResponse>>, ApiError> {
     let clientes = ClienteRepository::list_clientes(&state.db).await?;
-    Ok(Json(clientes))
+    Ok(Json(
+        clientes.into_iter().map(ClienteResponse::from).collect(),
+    ))
 }
