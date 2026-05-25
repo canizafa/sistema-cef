@@ -44,21 +44,24 @@ pub enum ApiError {
     // ========= USER =========
     #[error("dni inválido")]
     InvalidDni,
+
     #[error("nombre inválido")]
     InvalidName,
-    #[error("email inválido")]
-    InvalidEmail,
-    #[error("fecha de nacimiento inválida")]
-    InvalidBirthDate,
-    #[error("contraseña inválida")]
-    InvalidPassword,
-    #[error("telefono inválido")]
-    InvalidPhone,
-    #[error("usuario no encontrado")]
-    UserNotFound,
 
     #[error("email inválido")]
     InvalidEmail,
+
+    #[error("fecha de nacimiento inválida")]
+    InvalidBirthDate,
+
+    #[error("contraseña inválida")]
+    InvalidPassword,
+
+    #[error("telefono inválido")]
+    InvalidPhone,
+
+    #[error("usuario no encontrado")]
+    UserNotFound,
 
     #[error("contraseña insegura")]
     WeakPassword,
@@ -97,6 +100,16 @@ pub struct ErrorResponse {
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
+            ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,
+
+            ApiError::NotFound => StatusCode::NOT_FOUND,
+
+            ApiError::InvalidDni => StatusCode::BAD_REQUEST,
+            ApiError::InvalidName => StatusCode::BAD_REQUEST,
+            ApiError::InvalidEmail => StatusCode::BAD_REQUEST,
+            ApiError::InvalidBirthDate => StatusCode::BAD_REQUEST,
+            ApiError::InvalidPassword => StatusCode::BAD_REQUEST,
+            ApiError::InvalidPhone => StatusCode::BAD_REQUEST,
             // ===== AUTH =====
             ApiError::InvalidCredentials => StatusCode::UNAUTHORIZED,
 
@@ -108,8 +121,6 @@ impl IntoResponse for ApiError {
 
             // ===== USER =====
             ApiError::UserNotFound => StatusCode::NOT_FOUND,
-
-            ApiError::InvalidEmail => StatusCode::BAD_REQUEST,
 
             ApiError::WeakPassword => StatusCode::BAD_REQUEST,
 

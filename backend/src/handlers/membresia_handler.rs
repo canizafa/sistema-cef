@@ -1,6 +1,6 @@
 use crate::app_state::AppState;
 use crate::domain::Membresia;
-use crate::dtos::MembresiaResponse;
+use crate::dtos::{CreateMembresiaRequest, MembresiaResponse};
 use crate::errors::ApiError;
 use crate::repository::MembresiaRepository;
 use axum::Json;
@@ -10,7 +10,7 @@ use axum::response::IntoResponse;
 
 pub async fn create_membresia_handler(
     State(state): State<AppState>,
-    Json(request): Json<Membresia>,
+    Json(request): Json<CreateMembresiaRequest>,
 ) -> Result<Json<MembresiaResponse>, ApiError> {
     let membresia = Membresia::from(request);
     membresia.validate_membresia()?;
@@ -56,7 +56,7 @@ pub async fn get_membresias_handler(
 pub async fn update_membresia_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(request): Json<Membresia>,
+    Json(request): Json<CreateMembresiaRequest>,
 ) -> Result<Json<MembresiaResponse>, ApiError> {
     let membresia = Membresia::from(request);
     membresia.validate_membresia()?;

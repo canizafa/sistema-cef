@@ -10,7 +10,7 @@ rustflags = ["-A", "warnings"]
 argon2 = "0.5"
 password-hash = "0.5"
 rand = "0.8"
-axum = "0.8.9"
+axum = {version = "0.8.9", features = ["macros"]}
 chrono = {version="0.4.44", features=["serde"]}
 dotenvy = "0.15.7"
 jsonwebtoken = "10.4.0"

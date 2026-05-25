@@ -6,13 +6,16 @@ use axum::{
 };
 
 use crate::{
-    app_state::AppState, domain::Empleado, dtos::EmpleadoResponse, errors::ApiError,
+    app_state::AppState,
+    domain::Empleado,
+    dtos::{CreateEmpleadoRequest, EmpleadoResponse},
+    errors::ApiError,
     repository::EmpleadoRepository,
 };
 
 pub async fn create_empleado_handler(
     State(state): State<AppState>,
-    Json(body): Json<Empleado>,
+    Json(body): Json<CreateEmpleadoRequest>,
 ) -> Result<Json<EmpleadoResponse>, ApiError> {
     let empleado = Empleado::from(body);
     empleado.validate_empleado()?;
@@ -36,11 +39,11 @@ pub async fn get_empleados_handler(
         empleados.into_iter().map(EmpleadoResponse::from).collect(),
     ))
 }
-
+#[axum::debug_handler]
 pub async fn update_empleado_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-    Json(body): Json<Empleado>,
+    Json(body): Json<CreateEmpleadoRequest>,
 ) -> Result<Json<EmpleadoResponse>, ApiError> {
     let empleado = Empleado::from(body);
     empleado.validate_empleado()?;

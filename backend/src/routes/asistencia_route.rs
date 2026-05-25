@@ -1,12 +1,14 @@
-use crate::AppState;
 use axum::{
     Router,
     routing::{get, post},
 };
 
-use crate::handlers::{
-    create_asistencia_handler, delete_asistencia_handler, get_asistencia_handler,
-    get_asistencias_handler, update_asistencia_handler,
+use crate::{
+    app_state::AppState,
+    handlers::{
+        create_asistencia_handler, delete_asistencia_handler, get_asistencia_handler,
+        get_asistencias_handler, update_asistencia_handler,
+    },
 };
 
 pub fn asistencia_router() -> Router<AppState> {
