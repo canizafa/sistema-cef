@@ -23,6 +23,9 @@ pub enum AppError {
 
 #[derive(Debug, Error)]
 pub enum ApiError {
+    #[error("asistencia inválida")]
+    InvalidAsistencia,
+
     #[error("not found")]
     NotFound,
 

@@ -112,7 +112,7 @@ pub async fn reset_password_handler(
             .mailer
             .send_new_password(&body.email, &new_password)
             .await
-            .map_err(|e| ApiError::InternalServerError)?;
+            .map_err(|_| ApiError::InternalServerError)?;
 
         Ok((
             StatusCode::OK,
@@ -129,7 +129,7 @@ pub async fn reset_password_handler(
             .mailer
             .send_new_password(&body.email, &new_password)
             .await
-            .map_err(|e| ApiError::InternalServerError)?;
+            .map_err(|_| ApiError::InternalServerError)?;
 
         Ok((
             StatusCode::OK,

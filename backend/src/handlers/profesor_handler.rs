@@ -1,0 +1,61 @@
+use axum::{
+    Json,
+    extract::{Path, State},
+};
+
+use crate::{
+    app_state::AppState,
+    domain::Profesor,
+    dtos::{CreateProfesorRequest, ProfesorResponse},
+    errors::ApiError,
+    repository::ProfesorRepository,
+};
+
+pub async fn create_profesor_handler(
+    State(state): State<AppState>,
+    Json(request): Json<CreateProfesorRequest>,
+) -> Result<Json<ProfesorResponse>, ApiError> {
+    let profesor = Profesor::from(request);
+    profesor.validate_profesor()?;
+    let profesor = ProfesorRepository::create_profesor(&state.db, &profesor).await?;
+    Ok(Json(ProfesorResponse::from(profesor)))
+}
+
+pub async fn get_profesor_by_dni_handler(
+    State(state): State<AppState>,
+    Path(dni): Path<String>,
+) -> Result<Json<ProfesorResponse>, ApiError> {
+    let profesor = ProfesorRepository::get_profesor_by_dni(&state.db, &dni).await?;
+    Ok(Json(ProfesorResponse::from(profesor)))
+}
+
+pub async fn get_profesores_handler(
+    State(state): State<AppState>,
+) -> Result<Json<Vec<ProfesorResponse>>, ApiError> {
+    let profesores = ProfesorRepository::get_all(&state.db).await?;
+    Ok(Json(
+        profesores
+            .into_iter()
+            .map(|p| ProfesorResponse::from(p))
+            .collect(),
+    ))
+}
+
+pub async fn update_profesor_handler(
+    State(state): State<AppState>,
+    Path(dni): Path<String>,
+    Json(request): Json<CreateProfesorRequest>,
+) -> Result<Json<ProfesorResponse>, ApiError> {
+    let profesor = Profesor::from(request);
+    profesor.validate_profesor()?;
+    let profesor = ProfesorRepository::update_profesor(&state.db, &dni, &profesor).await?;
+    Ok(Json(ProfesorResponse::from(profesor)))
+}
+
+pub async fn delete_profesor_handler(
+    State(state): State<AppState>,
+    Path(dni): Path<String>,
+) -> Result<Json<()>, ApiError> {
+    ProfesorRepository::delete_profesor(&state.db, &dni).await?;
+    Ok(Json(()))
+}
