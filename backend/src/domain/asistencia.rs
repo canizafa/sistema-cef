@@ -1,7 +1,7 @@
 use chrono::{Local, NaiveDate};
 
 use crate::{domain::Cliente, dtos::CreateAsistenciaRequest, errors::ApiError};
-
+#[derive(Debug, Clone)]
 pub struct Asistencia {
     pub id_asistencia: String,
     pub fecha: NaiveDate,
