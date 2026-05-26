@@ -1,5 +1,5 @@
 use crate::dtos::sala_dto::CreateSalaRequest;
-
+#[derive(Debug, Clone)]
 pub struct Sala {
     pub id: String,
     pub numero: i64,
