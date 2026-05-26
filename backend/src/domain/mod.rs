@@ -13,6 +13,7 @@ pub mod reserva;
 pub mod rol;
 pub mod sala;
 
+pub use actividad::Actividad;
 pub use clase::Clase;
 pub use cliente::Cliente;
 pub use empleado::Empleado;
