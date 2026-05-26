@@ -3,6 +3,7 @@
 // si el rol es "dueno" también muestra el link a Empleados. Sin sesión muestra Iniciar sesión y Registrarse.
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import logo from '@/assets/Logo.png';
 
 export function Header() {
     const { token, user, dispatch } = useAuth();
@@ -14,12 +15,13 @@ export function Header() {
     }
 
     return (
-        <header className="bg-white border-b boder-gray-200 shadow-sm">
-            <div className="max-w-5x1 mx-auto px-4 h-16 flex item-center justify-between">
+      <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+            
+            <div className="max-w-375 mx-auto px-8 h-24 flex items-center justify-between">
 
-                {/*Logo -- siempre visible, lleva al inicio */}
-                <Link to="/" className="text-xl font-bold text-brand">
-                    CEF
+               
+                <Link to="/" className="shrink-0">
+                    <img src={logo} alt="Logo CEF" className="h-16 w-auto object-contain" />
                 </Link>
 
                 <nav className="flex items-center gap-4">
