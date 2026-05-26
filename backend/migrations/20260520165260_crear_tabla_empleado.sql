@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS empleado (
     nombre_apellido VARCHAR(100) NOT NULL,
     mail VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL DEFAULT '123456',
-    genero VARCHAR(30),
+    genero VARCHAR(30) NOT NULL,
     estado VARCHAR(30) NOT NULL,
     rol VARCHAR(30) NOT NULL
 );
