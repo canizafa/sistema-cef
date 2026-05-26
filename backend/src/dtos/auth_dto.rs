@@ -7,13 +7,18 @@ use crate::domain::Rol;
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
-    pub rol: Rol,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ResetPasswordRequest {
     pub email: String,
     pub password: String,
+}
+
+pub struct CreateChangePasswordRequest {
+    pub dni_cliente: String,
+    pub old_password: String,
+    pub new_password: String,
 }
 
 #[derive(Debug, Deserialize)]

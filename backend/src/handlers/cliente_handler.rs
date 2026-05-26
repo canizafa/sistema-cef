@@ -18,6 +18,12 @@ pub async fn create_cliente_handler(
     Json(request): Json<CreateClienteRequest>,
 ) -> Result<Json<ClienteResponse>, ApiError> {
     let cliente = Cliente::from(request);
+    let existe = ClienteRepository::get_by_dni(&state.db, cliente.get_dni())
+        .await
+        .is_ok();
+    if existe {
+        return Err(ApiError::EmailAlreadyExists);
+    }
     cliente.validate_cliente()?;
     ClienteRepository::create_cliente(&state.db, &cliente).await?;
     Ok(Json(ClienteResponse::from(cliente)))
