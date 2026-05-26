@@ -6,9 +6,10 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 export type EstadoReserva = 'disponible' | 'sin-cupo' | 'reservada'
 
 interface ClaseCardClienteProps {
-  idClase: number
+  idClase: string
   dia: string
   horario: string
+  descripcion: string
   estadoReserva: EstadoReserva
   onReservar?: () => void
   onCancelar?: () => void
@@ -29,6 +30,7 @@ function getBadge(estado: EstadoReserva) {
 export function ClaseCardCliente({
   dia,
   horario,
+  descripcion,
   estadoReserva,
   onReservar,
   onCancelar,
@@ -37,7 +39,8 @@ export function ClaseCardCliente({
   return (
     <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-end">
+        <div className="flex items-start justify-between">
+          <p className="text-sm font-medium text-primary">{descripcion}</p>
           {getBadge(estadoReserva)}
         </div>
       </CardHeader>
@@ -56,7 +59,7 @@ export function ClaseCardCliente({
       <CardFooter className="gap-2 pt-0">
         {estadoReserva === 'disponible' && (
           <Button variant="default" size="sm" className="flex-1" onClick={onReservar}>
-            Inscribirse en la clase
+            Reservar clase
           </Button>
         )}
         {estadoReserva === 'sin-cupo' && (

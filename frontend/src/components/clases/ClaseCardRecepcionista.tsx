@@ -24,7 +24,7 @@ export function ClaseCardRecepcionista({
     <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-end">
-          {estado === 'activa' ? (
+          {estado === 'alta' ? (
             <Badge className="bg-success text-white">Activa</Badge>
           ) : (
             <Badge variant="outline">Inactiva</Badge>
