@@ -1,4 +1,5 @@
 use crate::dtos::sala_dto::CreateSalaRequest;
+use crate::errors::ApiError;
 
 pub struct Sala {
     pub id: String,
@@ -23,8 +24,14 @@ impl Sala {
     pub fn get_capacidad_maxima(&self) -> i64 {
         self.capacidad_maxima
     }
-    pub fn validate_sala(&self) -> bool {
-        self.numero > 0 && self.capacidad_maxima > 0
+    pub fn validate_sala(&self) -> Result<(), ApiError> {
+        if self.numero <= 0 || self.capacidad_maxima <= 0 {
+            Err(ApiError::BadRequest(
+                "El número y la capacidad máxima deben ser mayores a 0".to_string(),
+            ))
+        } else {
+            Ok(())
+        }
     }
 }
 impl From<CreateSalaRequest> for Sala {

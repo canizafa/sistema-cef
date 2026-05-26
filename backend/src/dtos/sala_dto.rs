@@ -1,10 +1,14 @@
+use serde::{Deserialize, Serialize};
+
 use crate::domain::sala::Sala;
 
+#[derive(Debug, Deserialize)]
 pub struct CreateSalaRequest {
     pub numero: i64,
     pub capacidad_maxima: i64,
 }
 
+#[derive(Debug, Serialize)]
 pub struct SalaResponse {
     pub id: String,
     pub numero: i64,
