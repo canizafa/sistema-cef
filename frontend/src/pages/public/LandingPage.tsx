@@ -4,6 +4,9 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/context/AuthContext';
 
+// Array con las disciplinas para renderizarlas dinámicamente
+  const clases = ['FUNCIONAL', 'PILATES', 'CROSSFIT', 'YOGA'];
+
 export function LandingPage() {
   const { user } = useAuth();
 
@@ -79,7 +82,8 @@ export function LandingPage() {
         </a>
       </section>
 
-      <section id="clases" className="py-20 md:py-28 bg-white">
+   {/* SECCIÓN NUESTRAS CLASES MODIFICADA */}
+      <section id="clases" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-800">
@@ -89,9 +93,20 @@ export function LandingPage() {
               Explora nuestra variedad de disciplinas diseñadas para todos los niveles.
             </p>
           </div>
+
+          {/* Contenedor Grid Responsivo */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {clases.map((clase, index) => (
+              <div
+                key={index}
+                className="aspect-square flex items-center justify-center bg-gray-600 text-white font-bold text-xl tracking-wider rounded-lg shadow-md hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+              >
+                {clase}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
