@@ -13,8 +13,6 @@ frontend/yarn-error.log*
 frontend/pnpm-debug.log*
 frontend/lerna-debug.log*
 
-# Database creada localmente
-backend/database.db*
 
 # General
 .env
