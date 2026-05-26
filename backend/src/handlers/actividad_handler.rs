@@ -14,7 +14,7 @@ pub async fn create_actividad_handler(
     Json(request): Json<CreateActividadRequest>,
 ) -> Result<Json<ActividadResponse>, ApiError> {
     let actividad = Actividad::from(request);
-    actividad.validate_actividad();
+    actividad.validate_actividad()?;
     ActividadRepository::create_actividad(&state.db, &actividad).await?;
     Ok(Json(ActividadResponse::from(actividad)))
 }
