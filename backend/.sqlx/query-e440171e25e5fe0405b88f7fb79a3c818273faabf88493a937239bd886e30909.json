@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n               SELECT\n                   id_actividad as \"id_actividad!\",\n                   nombre,\n                   descripcion\n               FROM actividad\n               WHERE id_actividad = ?\n               ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_actividad!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "nombre",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "descripcion",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "e440171e25e5fe0405b88f7fb79a3c818273faabf88493a937239bd886e30909"
+}

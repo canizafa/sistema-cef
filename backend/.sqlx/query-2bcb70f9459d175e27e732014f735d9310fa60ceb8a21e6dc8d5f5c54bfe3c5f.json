@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   INSERT INTO ficha_medica (\n                       id_ficha,\n                       enfermedades,\n                       operaciones_quirurgicas,\n                       detalles\n                   )\n                   VALUES (?, ?, ?, ?)\n                   ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "2bcb70f9459d175e27e732014f735d9310fa60ceb8a21e6dc8d5f5c54bfe3c5f"
+}

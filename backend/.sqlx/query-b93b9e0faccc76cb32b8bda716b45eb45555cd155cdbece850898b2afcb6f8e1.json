@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   INSERT INTO asistencia (\n                       id_asistencia,\n                       fecha,\n                       metodo,\n                       id_reserva\n                   )\n                   VALUES (?, ?, ?, ?)\n                   ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "b93b9e0faccc76cb32b8bda716b45eb45555cd155cdbece850898b2afcb6f8e1"
+}

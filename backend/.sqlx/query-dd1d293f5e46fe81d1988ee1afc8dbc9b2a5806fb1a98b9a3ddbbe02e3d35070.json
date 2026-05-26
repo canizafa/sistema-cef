@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    UPDATE sala\n                    SET\n                        numero = ?,\n                        capacidad_maxima = ?\n                    WHERE id_sala = ?\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "dd1d293f5e46fe81d1988ee1afc8dbc9b2a5806fb1a98b9a3ddbbe02e3d35070"
+}
