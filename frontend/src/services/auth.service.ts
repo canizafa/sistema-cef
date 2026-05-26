@@ -42,7 +42,7 @@ export const authService = {
     },
 
     async forgotPassword(data: { email: string }): Promise<void> {
-        await api.post('/auth/forgot-password', data);
+        await api.post('/auth/reset-password', data);
     },
 
     logout(): void {
