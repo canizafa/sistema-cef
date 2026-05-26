@@ -1,3 +1,4 @@
+pub mod actividad;
 pub mod asistencia;
 pub mod clase;
 pub mod cliente;
@@ -10,6 +11,7 @@ pub mod profesor;
 pub mod register;
 pub mod reserva;
 pub mod rol;
+pub mod sala;
 
 pub use clase::Clase;
 pub use cliente::Cliente;
@@ -17,6 +19,7 @@ pub use empleado::Empleado;
 pub use ficha_medica::FichaMedica;
 pub use lista_de_espera::ListaEspera;
 pub use membresia::Membresia;
+pub use pago::Pago;
 pub use profesor::Profesor;
 pub use register::Register;
 pub use reserva::Reserva;
