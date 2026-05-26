@@ -7,7 +7,7 @@ use axum::{
 
 use crate::{
     app_state::AppState,
-    auth::{generar_token, generate_random_password},
+    auth::{generar_token, generate_random_password, password::hash_password},
     domain::{Cliente, Empleado},
     dtos::{
         AuthResponse, CreateChangePasswordRequest, CreateClienteRequest, CreateEmpleadoRequest,
@@ -163,7 +163,9 @@ pub async fn change_password_handler(
         if !cliente.get_password_hash().eq(&body.old_password) {
             return Err(ApiError::InvalidCredentials);
         }
-        cliente.update_password(&body.new_password)?;
+        let new_password = hash_password(&body.new_password)?;
+        cliente.update_password(&new_password)?;
+
         ClienteRepository::update_cliente(&state.db, dni, &cliente).await?;
 
         Ok(StatusCode::OK)
@@ -172,7 +174,8 @@ pub async fn change_password_handler(
         if !empleado.get_password_hash().eq(&body.old_password) {
             return Err(ApiError::InvalidCredentials);
         }
-        empleado.update_password(&body.new_password)?;
+        let new_password_hash = hash_password(&body.new_password)?;
+        empleado.update_password(&new_password_hash)?;
         EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;
 
         Ok(StatusCode::OK)
