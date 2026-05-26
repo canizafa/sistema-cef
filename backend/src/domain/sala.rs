@@ -1,6 +1,6 @@
 use crate::dtos::sala_dto::CreateSalaRequest;
 use crate::errors::ApiError;
-
+#[derive(Debug, Clone)]
 pub struct Sala {
     pub id: String,
     pub numero: i64,

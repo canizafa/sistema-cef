@@ -1,5 +1,5 @@
 use crate::{dtos::CreateActividadRequest, errors::ApiError};
-
+#[derive(Debug, Clone)]
 pub struct Actividad {
     pub id: String,
     pub nombre: String,
