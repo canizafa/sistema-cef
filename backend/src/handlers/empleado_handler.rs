@@ -18,6 +18,12 @@ pub async fn create_empleado_handler(
     Json(body): Json<CreateEmpleadoRequest>,
 ) -> Result<Json<EmpleadoResponse>, ApiError> {
     let empleado = Empleado::from(body);
+    let existe = EmpleadoRepository::get_by_dni(&state.db, empleado.get_dni())
+        .await
+        .is_ok();
+    if existe {
+        return Err(ApiError::EmailAlreadyExists);
+    }
     empleado.validate_empleado()?;
     EmpleadoRepository::create_empleado(&state.db, &empleado).await?;
     Ok(Json(EmpleadoResponse::from(empleado)))

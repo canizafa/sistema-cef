@@ -1,4 +1,9 @@
-use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use axum::{
+    Json,
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+};
 
 use crate::{
     app_state::AppState,
@@ -136,4 +141,13 @@ pub async fn reset_password_handler(
             "Contraseña cambiada exitosamente".into_response(),
         ))
     }
+}
+
+pub async fn change_password_handler(
+    state: &State<AppState>,
+    Path(dni): Path<i64>,
+    Json(body): Json<ChangePasswordBody>,
+) -> Result<(StatusCode, Response), ApiError> {
+    // cambiar contraseña con la contraseña anterior
+    // y la nueva contraseña
 }
