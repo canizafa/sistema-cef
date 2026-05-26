@@ -10,8 +10,8 @@ use crate::{
     auth::{generar_token, generate_random_password},
     domain::{Cliente, Empleado},
     dtos::{
-        AuthResponse, CreateClienteRequest, CreateEmpleadoRequest, LoginRequest,
-        ResetPasswordRequest,
+        AuthResponse, CreateChangePasswordRequest, CreateClienteRequest, CreateEmpleadoRequest,
+        LoginRequest, ResetPasswordRequest,
     },
     errors::ApiError,
     repository::{ClienteRepository, EmpleadoRepository},
@@ -29,23 +29,31 @@ pub async fn login_handler(
             return Err(ApiError::UserNotFound);
         }
         let usuario = usuario_empleado.unwrap();
-        let token = generar_token(usuario.get_dni(), body.rol.clone(), &state.jwt_secret)
-            .map_err(|_| ApiError::JwtTokenError)?;
+        let token = generar_token(
+            usuario.get_dni(),
+            usuario.get_rol().clone(),
+            &state.jwt_secret,
+        )
+        .map_err(|_| ApiError::JwtTokenError)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: body.rol,
+            rol: usuario.get_rol(),
         }))
     } else {
         let usuario = usuario_cliente.unwrap();
-        let token = generar_token(usuario.get_dni(), body.rol.clone(), &state.jwt_secret)
-            .map_err(|_| ApiError::JwtTokenError)?;
+        let token = generar_token(
+            usuario.get_dni(),
+            usuario.get_rol().clone(),
+            &state.jwt_secret,
+        )
+        .map_err(|_| ApiError::JwtTokenError)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: body.rol,
+            rol: usuario.get_rol(),
         }))
     }
 }
@@ -146,8 +154,35 @@ pub async fn reset_password_handler(
 pub async fn change_password_handler(
     state: &State<AppState>,
     Path(dni): Path<i64>,
-    Json(body): Json<ChangePasswordBody>,
-) -> Result<(StatusCode, Response), ApiError> {
-    // cambiar contraseña con la contraseña anterior
-    // y la nueva contraseña
+    Json(body): Json<CreateChangePasswordRequest>,
+) -> Result<(StatusCode, impl IntoResponse), ApiError> {
+    let usuario_cliente = ClienteRepository::get_by_dni(&state.db, dni).await;
+    let usuario_empleado = EmpleadoRepository::get_by_dni(&state.db, dni).await;
+    if usuario_cliente.is_ok() {
+        let mut cliente = usuario_cliente.unwrap();
+        if !cliente.get_password_hash().eq(&body.old_password) {
+            return Err(ApiError::InvalidCredentials);
+        }
+        cliente.update_password(&body.new_password)?;
+        ClienteRepository::update_cliente(&state.db, dni, &cliente).await?;
+
+        Ok((
+            StatusCode::OK,
+            "Contraseña cambiada exitosamente".into_response(),
+        ))
+    } else if usuario_empleado.is_ok() {
+        let mut empleado = usuario_empleado.unwrap();
+        if !empleado.get_password_hash().eq(&body.old_password) {
+            return Err(ApiError::InvalidCredentials);
+        }
+        empleado.update_password(&body.new_password)?;
+        EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;
+
+        Ok((
+            StatusCode::OK,
+            "Contraseña cambiada exitosamente".into_response(),
+        ))
+    } else {
+        return Err(ApiError::NotFound);
+    }
 }
