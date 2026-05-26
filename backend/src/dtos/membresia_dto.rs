@@ -8,7 +8,7 @@ pub struct CreateMembresiaRequest {
     pub tipo: String,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: NaiveDate,
+    pub fecha_fin: Option<NaiveDate>,
 }
 
 #[derive(Debug, Serialize)]
@@ -17,7 +17,7 @@ pub struct MembresiaResponse {
     pub tipo: String,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: NaiveDate,
+    pub fecha_fin: Option<NaiveDate>,
 }
 
 pub struct ListMembresiaResponse {
@@ -31,7 +31,7 @@ impl From<Membresia> for MembresiaResponse {
             tipo: membresia.get_tipo().to_string(),
             estado: membresia.get_estado(),
             fecha_inicio: membresia.get_fecha_inicio(),
-            fecha_fin: membresia.get_fecha_fin().unwrap_or_default(),
+            fecha_fin: membresia.get_fecha_fin(),
         }
     }
 }
