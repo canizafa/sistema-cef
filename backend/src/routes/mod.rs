@@ -1,3 +1,4 @@
+pub mod actividad_route;
 pub mod asistencia_route;
 pub mod auth_route;
 pub mod clase_route;
@@ -10,6 +11,7 @@ pub mod pago_route;
 pub mod profesor_route;
 pub mod reserva_route;
 pub mod root;
+pub mod sala_route;
 
 pub use asistencia_route::asistencia_router;
 pub use auth_route::auth_router;
