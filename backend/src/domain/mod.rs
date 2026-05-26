@@ -1,0 +1,25 @@
+pub mod asistencia;
+pub mod clase;
+pub mod cliente;
+pub mod empleado;
+pub mod ficha_medica;
+pub mod lista_de_espera;
+pub mod membresia;
+pub mod pago;
+pub mod profesor;
+pub mod register;
+pub mod reserva;
+pub mod rol;
+
+pub use clase::Clase;
+pub use cliente::Cliente;
+pub use empleado::Empleado;
+pub use ficha_medica::FichaMedica;
+pub use lista_de_espera::ListaEspera;
+pub use membresia::Membresia;
+pub use profesor::Profesor;
+pub use register::Register;
+pub use reserva::Reserva;
+pub use rol::Estado;
+pub use rol::Genero;
+pub use rol::Rol;
