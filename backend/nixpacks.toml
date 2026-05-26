@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["rustup"]
+
+[phases.install]
+cmds = [
+  "rustup default 1.88.0"
+]
+
+[variables]
+RUSTUP_TOOLCHAIN = "1.88.0"
