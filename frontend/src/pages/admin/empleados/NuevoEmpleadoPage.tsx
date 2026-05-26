@@ -5,9 +5,11 @@ import { Header } from '@/components/layout/Header';
 import { empleadoService } from '@/services/empleados.service';
 
 export function NuevoEmpleadoPage() {
-    // Un solo objeto de estado para todos los campos del formulario
+    // Un solo objeto de estado para todos los campos del formulario.
+    // nombre y apellido se mantienen separados en el form y se concatenan al enviar (nombre_apellido).
+    // genero y estado los requiere el backend: genero lo elige el usuario, estado se hardcodea a 'alta'.
     const [form, setForm] = useState({
-        nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'recepcionista' as const
+        nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'recepcionista' as const
     });
     const [error, setError] = useState<string | null>(null);     // null = sin error
     const [success, setSuccess] = useState<string | null>(null); // null = sin mensaje de éxito
@@ -24,10 +26,17 @@ export function NuevoEmpleadoPage() {
         setSuccess(null);
         setLoading(true);
         try {
-            await empleadoService.registrarEmpleado(form); // Manda los datos al backend
+            await empleadoService.registrarEmpleado({
+                nombre_apellido: `${form.nombre} ${form.apellido}`, // el backend espera un solo campo
+                dni: Number(form.dni),                              // el input es string, el backend espera number
+                mail: form.mail,
+                password: form.password,
+                genero: form.genero,
+                estado: 'alta',                                     // siempre alta al registrar
+                rol: form.rol,
+            });
             setSuccess('Empleado registrado correctamente');
-            // Limpia el formulario para poder registrar otro empleado
-            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'recepcionista' });
+            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'recepcionista' });
         } catch {
             setError('Error al registrar el empleado. Revisá los datos.');
         } finally {
@@ -61,6 +70,15 @@ export function NuevoEmpleadoPage() {
                         <div className="space-y-1">
                             <label htmlFor="password" className="text-sm font-medium">Contraseña inicial</label>
                             <input id="password" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label htmlFor="genero" className="text-sm font-medium">Género</label>
+                            {/* Select en lugar de input: el género se elige de una lista fija */}
+                            <select id="genero" name="genero" value={form.genero} onChange={handleChange} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                            </select>
                         </div>
                         <div className="space-y-1">
                             <label htmlFor="rol" className="text-sm font-medium">Rol</label>
