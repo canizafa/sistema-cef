@@ -35,7 +35,7 @@ impl ProfesorRepository {
 
         Ok(profesor.clone())
     }
-    pub async fn get_profesor_by_dni(pool: &SqlitePool, dni: &str) -> Result<Profesor, ApiError> {
+    pub async fn get_profesor_by_dni(pool: &SqlitePool, dni: i64) -> Result<Profesor, ApiError> {
         let row = sqlx::query!(
             r#"
                     SELECT
@@ -91,7 +91,7 @@ impl ProfesorRepository {
     }
     pub async fn update_profesor(
         pool: &SqlitePool,
-        dni: &str,
+        dni: i64,
         profesor: &Profesor,
     ) -> Result<Profesor, ApiError> {
         let nombre = profesor.get_nombre_completo();
@@ -118,7 +118,7 @@ impl ProfesorRepository {
 
         Self::get_profesor_by_dni(pool, dni).await
     }
-    pub async fn delete_profesor(pool: &SqlitePool, dni: &str) -> Result<Profesor, ApiError> {
+    pub async fn delete_profesor(pool: &SqlitePool, dni: i64) -> Result<Profesor, ApiError> {
         let profesor = Self::get_profesor_by_dni(pool, dni).await?;
 
         sqlx::query!(
