@@ -30,17 +30,18 @@ Base: `http://localhost:8081`
 |--------|------|
 | POST | `/api/clientes/create` |
 | GET | `/api/clientes/get-cliente/{id}` |
-| POST | `/api/clientes/update-cliente/{id}` |
-| POST | `/api/clientes/delete-cliente/{id}` |
+| PUT | `/api/clientes/update-cliente/{id}` |
+| DELETE | `/api/clientes/delete-cliente/{id}` |
 | GET | `/api/clientes/get-all` |
 
 ### Empleados
 
 | Método | Ruta |
 |--------|------|
+| POST | `/api/empleados/create` |
 | GET | `/api/empleados/get-empleado/{id}` |
-| POST | `/api/empleados/update-empleado/{id}` |
-| POST | `/api/empleados/delete-empleado/{id}` |
+| PUT | `/api/empleados/update-empleado/{id}` |
+| DELETE | `/api/empleados/delete-empleado/{id}` |
 | GET | `/api/empleados/get-all` |
 
 ### Profesores
@@ -50,7 +51,7 @@ Base: `http://localhost:8081`
 | POST | `/api/profesores/create-profesor` |
 | GET | `/api/profesores/get-profesor/{dni}` |
 | GET | `/api/profesores/get-all` |
-| POST | `/api/profesores/update-profesor/{dni}` |
+| PUT | `/api/profesores/update-profesor/{dni}` |
 | DELETE | `/api/profesores/delete-profesor/{dni}` |
 
 ### Clases
@@ -59,8 +60,8 @@ Base: `http://localhost:8081`
 |--------|------|
 | POST | `/api/clase/create` |
 | GET | `/api/clase/get-clase/{id}` |
-| POST | `/api/clase/update-clase/{id}` |
-| POST | `/api/clase/delete-clase/{id}` |
+| PUT | `/api/clase/update-clase/{id}` |
+| DELETE | `/api/clase/delete-clase/{id}` |
 | GET | `/api/clase/get-all` |
 
 ### Reservas
@@ -79,8 +80,8 @@ Base: `http://localhost:8081`
 |--------|------|
 | POST | `/api/asistencia/create` |
 | GET | `/api/asistencia/get-asistencia/{id}` |
-| POST | `/api/asistencia/update-asistencia/{id}` |
-| POST | `/api/asistencia/delete-asistencia/{id}` |
+| PUT | `/api/asistencia/update-asistencia/{id}` |
+| DELETE | `/api/asistencia/delete-asistencia/{id}` |
 | GET | `/api/asistencia/get-all` |
 
 ### Membresías
@@ -88,9 +89,9 @@ Base: `http://localhost:8081`
 | Método | Ruta |
 |--------|------|
 | POST | `/api/membresias/create` |
-| GET | `/api/membresias/get-membresia-id/{id}` |
 | GET | `/api/membresias/get-membresia-dni/{id}` |
-| POST | `/api/membresias/update-membresia/{id}` |
+| GET | `/api/membresias/get-membresia-id/{id}` |
+| PUT | `/api/membresias/update-membresia/{id}` |
 | DELETE | `/api/membresias/delete-membresia/{id}` |
 | GET | `/api/membresias/get-all` |
 
@@ -100,27 +101,26 @@ Base: `http://localhost:8081`
 |--------|------|
 | POST | `/api/pagos/create` |
 
----
-
-### Actividades (`/api/actividades` sugerido)
+### Salas
 
 | Método | Ruta |
 |--------|------|
-| POST | `/create` |
-| GET | `/get-actividad/{id}` |
-| GET | `/get-actividades` |
-| PUT | `/update/{id}` |
-| DELETE | `/delete/{id}` |
+| POST | `/api/salas/` |
+| GET | `/api/salas/` |
+| GET | `/api/salas/:id` |
+| PUT | `/api/salas/:id` |
+| DELETE | `/api/salas/:id` |
 
-### Salas (`/api/salas` sugerido)
+### Actividades
 
 | Método | Ruta |
 |--------|------|
-| POST | `/` |
-| GET | `/` |
-| GET | `/{id}` |
-| PUT | `/{id}` |
-| DELETE | `/{id}` |
+| POST | `/api/actividades/create` |
+| GET | `/api/actividades/get-actividad/{id}` |
+| GET | `/api/actividades/get-actividades` |
+| PUT | `/api/actividades/update/{id}` |
+| DELETE | `/api/actividades/delete/{id}` |
+
 
 
 # Backend — Guía de instalación y ejecución
