@@ -12,13 +12,10 @@ impl MembresiaRepository {
     ) -> Result<Membresia, ApiError> {
         todo!()
     }
-    pub async fn get_all(pool: &SqlitePool) -> Result<Option<Vec<Membresia>>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Membresia>, ApiError> {
         todo!()
     }
-    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Membresia>, ApiError> {
-        todo!()
-    }
-    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Option<Membresia>, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Membresia, ApiError> {
         todo!()
     }
     pub async fn update_membresia(
