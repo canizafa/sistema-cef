@@ -16,6 +16,12 @@ pub async fn create_profesor_handler(
     Json(request): Json<CreateProfesorRequest>,
 ) -> Result<Json<ProfesorResponse>, ApiError> {
     let profesor = Profesor::from(request);
+    let existe = ProfesorRepository::get_profesor_by_dni(&state.db, profesor.get_dni())
+        .await
+        .is_ok();
+    if existe {
+        return Err(ApiError::EmailAlreadyExists);
+    }
     profesor.validate_profesor()?;
     let profesor = ProfesorRepository::create_profesor(&state.db, &profesor).await?;
     Ok(Json(ProfesorResponse::from(profesor)))
