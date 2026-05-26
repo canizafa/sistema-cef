@@ -68,7 +68,7 @@ impl MembresiaRepository {
                     crate::domain::Estado::from(row.estado),
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                     row.fecha_fin
-                        .map(|f| NaiveDate::parse_from_str(f, "%Y-%m-%d").unwrap_or_default()),
+                        .map(|f| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
                 )
             })
             .collect())
@@ -98,7 +98,7 @@ impl MembresiaRepository {
                 crate::domain::Estado::from(row.estado),
                 NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                 row.fecha_fin
-                    .map(|f| NaiveDate::parse_from_str(f, "%Y-%m-%d").unwrap_or_default()),
+                    .map(|f| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
             )),
             None => Err(ApiError::NotFound),
         }
