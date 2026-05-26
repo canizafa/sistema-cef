@@ -15,8 +15,7 @@ async fn main() -> Result<(), AppError> {
         .allow_methods(Any)
         .allow_headers(Any);
     let config = backend::config::Config::from_env()?;
-    let port = 8081;
-    let dir = SocketAddr::from(([0, 0, 0, 0], port));
+    let dir = SocketAddr::from(([0, 0, 0, 0], config.port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
         .map_err(|_| AppError::InternalServerError)?;
