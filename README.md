@@ -20,6 +20,7 @@ Base: `http://localhost:8081`
 | Método | Ruta |
 |--------|------|
 | POST | `/api/auth/login` |
+| PUT | `/api/auth/change-password/{dni}` |
 | POST | `/api/auth/reset-password` |
 | POST | `/api/auth/register-empleado` |
 | POST | `/api/auth/register-cliente` |

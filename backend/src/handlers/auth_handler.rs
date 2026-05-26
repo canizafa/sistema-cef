@@ -152,10 +152,10 @@ pub async fn reset_password_handler(
 }
 
 pub async fn change_password_handler(
-    state: &State<AppState>,
+    State(state): State<AppState>,
     Path(dni): Path<i64>,
     Json(body): Json<CreateChangePasswordRequest>,
-) -> Result<(StatusCode, impl IntoResponse), ApiError> {
+) -> Result<(StatusCode), ApiError> {
     let usuario_cliente = ClienteRepository::get_by_dni(&state.db, dni).await;
     let usuario_empleado = EmpleadoRepository::get_by_dni(&state.db, dni).await;
     if usuario_cliente.is_ok() {
@@ -166,10 +166,7 @@ pub async fn change_password_handler(
         cliente.update_password(&body.new_password)?;
         ClienteRepository::update_cliente(&state.db, dni, &cliente).await?;
 
-        Ok((
-            StatusCode::OK,
-            "Contraseña cambiada exitosamente".into_response(),
-        ))
+        Ok(StatusCode::OK)
     } else if usuario_empleado.is_ok() {
         let mut empleado = usuario_empleado.unwrap();
         if !empleado.get_password_hash().eq(&body.old_password) {
@@ -178,10 +175,7 @@ pub async fn change_password_handler(
         empleado.update_password(&body.new_password)?;
         EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;
 
-        Ok((
-            StatusCode::OK,
-            "Contraseña cambiada exitosamente".into_response(),
-        ))
+        Ok(StatusCode::OK)
     } else {
         return Err(ApiError::NotFound);
     }
