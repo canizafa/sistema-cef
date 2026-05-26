@@ -1,8 +1,11 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-
-use crate::dtos::CreateReservaRequest;
-
+// SE EDITO RESERVA_PAGA POR STRING PORQUE
+/*⚠️ Importante
+SE ESTABAN mezclando 2 responsabilidades:
+crear reserva ❌ (no debería pasar en pago)
+registrar pago ✔️
+!!!!!!!Un pago no debería construir una reserva dentro!!!!!!!!*/
 #[derive(Debug, Deserialize, Clone)]
 pub struct CreatePagoRequest {
     pub titulo: String,
@@ -11,7 +14,7 @@ pub struct CreatePagoRequest {
     pub hora: String,
     pub sena: bool,
     pub id_membresia: String,
-    pub reserva_paga: CreateReservaRequest,
+    pub reserva_paga: String,
 }
 
 #[derive(Debug, Serialize)]

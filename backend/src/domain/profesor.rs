@@ -3,7 +3,7 @@ use crate::{
     dtos::CreateProfesorRequest,
     errors::ApiError,
 };
-
+#[derive(Debug, Clone)]
 pub struct Profesor {
     dni: i64,
     nombre_completo: String,
