@@ -15,9 +15,7 @@ impl ClienteRepository {
         let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
         let estado = cliente.get_estado();
         let password = cliente.get_password_hash();
-
         let ficha = cliente.get_ficha_medica();
-
         let id_ficha = ficha.get_id_ficha();
         let enfermedades = ficha.get_enfermedades();
         let operaciones = ficha.get_operaciones_quirurgicas();
