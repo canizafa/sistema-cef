@@ -1,6 +1,6 @@
 use axum::{
     Router,
-    routing::{get, post},
+    routing::{delete, get, post, put},
 };
 
 use crate::{
@@ -15,7 +15,7 @@ pub fn asistencia_router() -> Router<AppState> {
     Router::new()
         .route("/create", post(create_asistencia_handler))
         .route("/get-asistencia/{id}", get(get_asistencia_by_id_handler))
-        .route("/update-asistencia/{id}", post(update_asistencia_handler))
-        .route("/delete-asistencia/{id}", post(delete_asistencia_handler))
+        .route("/update-asistencia/{id}", put(update_asistencia_handler))
+        .route("/delete-asistencia/{id}", delete(delete_asistencia_handler))
         .route("/get-all", get(get_asistencias_handler))
 }

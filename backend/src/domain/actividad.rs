@@ -1,4 +1,4 @@
-use crate::dtos::CreateActividadRequest;
+use crate::{dtos::CreateActividadRequest, errors::ApiError};
 #[derive(Debug, Clone)]
 pub struct Actividad {
     pub id: String,
@@ -23,8 +23,14 @@ impl Actividad {
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
-    pub fn validate_actividad(&self) -> bool {
-        !self.nombre.is_empty() && !self.descripcion.is_empty()
+    pub fn validate_actividad(&self) -> Result<(), ApiError> {
+        if self.nombre.is_empty() || self.descripcion.is_empty() {
+            Err(ApiError::BadRequest(
+                "Nombre y descripción son obligatorios".to_string(),
+            ))
+        } else {
+            Ok(())
+        }
     }
 }
 
