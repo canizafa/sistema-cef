@@ -34,7 +34,7 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(reserva.clone())
     }
@@ -52,7 +52,8 @@ impl ReservaRepository {
             "#
         )
         .fetch_all(pool)
-        .await?;
+        .await
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         let reservas = rows
             .into_iter()
@@ -88,7 +89,7 @@ impl ReservaRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Reserva::new(
@@ -134,7 +135,7 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Self::get_reserva(pool, id).await
     }
@@ -150,7 +151,7 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
         Ok(reserva)
     }
 }

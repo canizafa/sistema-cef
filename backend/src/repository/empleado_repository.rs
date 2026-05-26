@@ -89,7 +89,7 @@ impl EmpleadoRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Empleado {
@@ -122,7 +122,7 @@ impl EmpleadoRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Empleado {
@@ -165,7 +165,7 @@ impl EmpleadoRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Self::get_by_dni(pool, dni).await
     }
@@ -181,7 +181,7 @@ impl EmpleadoRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(empleado)
     }

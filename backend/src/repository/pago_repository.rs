@@ -39,7 +39,7 @@ impl PagoRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(pago.clone())
     }
@@ -59,7 +59,7 @@ impl PagoRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(rows
             .into_iter()
@@ -94,7 +94,7 @@ impl PagoRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Pago::new(
@@ -121,7 +121,7 @@ impl PagoRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(pago)
     }

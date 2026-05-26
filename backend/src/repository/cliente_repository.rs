@@ -39,7 +39,7 @@ impl ClienteRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         // después crear cliente
         sqlx::query!(
@@ -96,7 +96,7 @@ impl ClienteRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         let clientes = rows
             .into_iter()
@@ -151,7 +151,7 @@ impl ClienteRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => {
@@ -207,7 +207,7 @@ impl ClienteRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => {
@@ -249,7 +249,7 @@ impl ClienteRepository {
             .bind(dni)
             .execute(pool)
             .await
-            .map_err(ApiError::DatabaseError)?;
+            .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(cliente)
     }

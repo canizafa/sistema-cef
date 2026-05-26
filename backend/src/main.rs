@@ -25,6 +25,10 @@ async fn main() -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::DatabaseError(e))?;
 
+    sqlx::query("PRAGMA foreign_keys = ON;")
+        .execute(&db)
+        .await?;
+
     let mailer = Mailer::new()?;
 
     let app_state = AppState {

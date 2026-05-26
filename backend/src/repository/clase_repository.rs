@@ -46,7 +46,7 @@ impl ClaseRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|error| ApiError::DatabaseError(error))?;
 
         Ok(clase.clone())
     }
@@ -67,7 +67,7 @@ impl ClaseRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         let clases: Result<Vec<Clase>, ApiError> = rows
             .into_iter()
@@ -109,7 +109,7 @@ impl ClaseRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Some(Clase::new(
@@ -166,7 +166,7 @@ impl ClaseRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Self::get_by_id(pool, id).await
     }
@@ -177,7 +177,7 @@ impl ClaseRepository {
         sqlx::query!("DELETE FROM clase WHERE id_clase = ?", id)
             .execute(pool)
             .await
-            .map_err(ApiError::DatabaseError)?;
+            .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(clase)
     }

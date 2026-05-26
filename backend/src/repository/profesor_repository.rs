@@ -31,7 +31,7 @@ impl ProfesorRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(profesor.clone())
     }
@@ -50,7 +50,7 @@ impl ProfesorRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(Profesor::new(
@@ -75,7 +75,7 @@ impl ProfesorRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(rows
             .into_iter()
@@ -114,7 +114,7 @@ impl ProfesorRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Self::get_profesor_by_dni(pool, dni).await
     }
@@ -130,7 +130,7 @@ impl ProfesorRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
         Ok(profesor)
     }
 }
