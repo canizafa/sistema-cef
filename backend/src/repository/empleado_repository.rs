@@ -1,6 +1,6 @@
 use sqlx::SqlitePool;
 
-use crate::domain::{Empleado, Rol};
+use crate::domain::Empleado;
 use crate::errors::ApiError;
 pub struct EmpleadoRepository;
 
@@ -71,10 +71,6 @@ impl EmpleadoRepository {
         Ok(empleados)
     }
 
-    // el *as* fuerza a sqlx a tratar el campo como NO opcional (NOT NULL)
-    // y a inferir el tipo exacto.
-    // Esto evita que sqlx lo interprete como Option<T> y genere
-    // errores de mismatched types
     pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Empleado, ApiError> {
         let row = sqlx::query!(
             r#"

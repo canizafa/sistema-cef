@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::{domain::Reserva, dtos::CreatePagoRequest, errors::ApiError};
+use crate::{dtos::CreatePagoRequest, errors::ApiError};
 
 use uuid::Uuid;
 
@@ -12,10 +12,8 @@ pub struct Pago {
     hora: String,
     sena: bool,
     id_membresia: Option<String>,
-    reserva_paga: Option<String>, //NO SE PUEDE GUARDAR UN OPTION DE OTRA CLASE,
-} // adeMAS SE GUARDA SOLO EL ID DE LA RESERVA
-//LITERALMENTE NO SE Puede hacer eso en sql
-// En SQL no existe como objeto, existe como relacion por ID (foreign key)
+    reserva_paga: Option<String>,
+}
 impl Pago {
     pub fn new(
         id_pago: String,

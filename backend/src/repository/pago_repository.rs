@@ -109,14 +109,6 @@ impl PagoRepository {
             None => Err(ApiError::NotFound),
         }
     }
-    pub async fn update_pago(
-        //se puede editar un pago?????
-        pool: &SqlitePool,
-        id: &str,
-        pago: &Pago,
-    ) -> Result<Option<Pago>, ApiError> {
-        todo!()
-    }
     pub async fn delete_pago(pool: &SqlitePool, id: &str) -> Result<Pago, ApiError> {
         let pago = Self::get_pago(pool, id).await?;
 
