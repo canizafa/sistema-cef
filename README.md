@@ -105,11 +105,11 @@ Base: `http://localhost:8081`
 
 | Método | Ruta |
 |--------|------|
-| POST | `/api/salas/` |
-| GET | `/api/salas/` |
-| GET | `/api/salas/:id` |
-| PUT | `/api/salas/:id` |
-| DELETE | `/api/salas/:id` |
+| POST | `/api/salas/create` |
+| GET | `/api/salas/get-all` |
+| GET | `/api/salas/get-sala/{id}` |
+| PUT | `/api/salas/update-sala/{id}` |
+| DELETE | `/api/salas/delete-sala/{id}` |
 
 ### Actividades
 
