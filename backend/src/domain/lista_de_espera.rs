@@ -4,7 +4,7 @@ use crate::{domain::Cliente, dtos::CreateListaEsperaRequest};
 
 #[derive(Debug, Clone)]
 pub struct ListaEspera {
-    id_lista: String,
+    id_espera: String,
     tipo: String,
     fecha_ingreso: NaiveDate,
     id_clase: String,
@@ -13,14 +13,14 @@ pub struct ListaEspera {
 
 impl ListaEspera {
     pub fn new(
-        id_lista: String,
+        id_espera: String,
         tipo: String,
         fecha_ingreso: NaiveDate,
         id_clase: String,
         clientes_en_espera: Vec<Cliente>,
     ) -> Self {
         Self {
-            id_lista,
+            id_espera,
             tipo,
             fecha_ingreso,
             id_clase,
@@ -28,7 +28,7 @@ impl ListaEspera {
         }
     }
     pub fn get_id_lista(&self) -> &str {
-        &self.id_lista
+        &self.id_espera
     }
     pub fn get_tipo(&self) -> String {
         self.tipo.clone()
@@ -47,7 +47,7 @@ impl ListaEspera {
 impl From<CreateListaEsperaRequest> for ListaEspera {
     fn from(request: CreateListaEsperaRequest) -> Self {
         Self {
-            id_lista: uuid::Uuid::new_v4().to_string(),
+            id_espera: uuid::Uuid::new_v4().to_string(),
             tipo: request.tipo,
             fecha_ingreso: request.fecha,
             id_clase: request.id_clase,
