@@ -20,10 +20,6 @@ pub struct MembresiaResponse {
     pub fecha_fin: Option<NaiveDate>,
 }
 
-pub struct ListMembresiaResponse {
-    pub membresias: Vec<MembresiaResponse>,
-}
-
 impl From<Membresia> for MembresiaResponse {
     fn from(membresia: Membresia) -> Self {
         Self {
@@ -32,17 +28,6 @@ impl From<Membresia> for MembresiaResponse {
             estado: membresia.get_estado(),
             fecha_inicio: membresia.get_fecha_inicio(),
             fecha_fin: membresia.get_fecha_fin(),
-        }
-    }
-}
-
-impl From<Vec<Membresia>> for ListMembresiaResponse {
-    fn from(membresias: Vec<Membresia>) -> Self {
-        Self {
-            membresias: membresias
-                .into_iter()
-                .map(MembresiaResponse::from)
-                .collect(),
         }
     }
 }

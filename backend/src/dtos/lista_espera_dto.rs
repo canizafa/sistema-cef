@@ -40,10 +40,3 @@ impl From<ListaEspera> for ListaEsperaResponse {
         }
     }
 }
-impl From<Vec<ListaEspera>> for ListaEsperaListResponse {
-    fn from(lista_espera: Vec<ListaEspera>) -> Self {
-        Self {
-            lista_espera: lista_espera.into_iter().map(|l| l.into()).collect(),
-        }
-    }
-}
