@@ -4,8 +4,10 @@ pub mod clase_route;
 pub mod cliente_route;
 pub mod empleado_route;
 pub mod health_checker_route;
+pub mod lista_espera_route;
 pub mod membresia_route;
 pub mod pago_route;
+pub mod profesor_route;
 pub mod reserva_route;
 pub mod root;
 

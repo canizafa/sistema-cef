@@ -48,9 +48,3 @@ impl From<Cliente> for ClienteResponse {
         }
     }
 }
-
-impl From<Vec<ClienteResponse>> for ClienteListResponse {
-    fn from(clientes: Vec<ClienteResponse>) -> Self {
-        Self { clientes }
-    }
-}

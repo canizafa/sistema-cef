@@ -8,7 +8,7 @@ pub struct CreateMembresiaRequest {
     pub tipo: String,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: NaiveDate,
+    pub fecha_fin: Option<NaiveDate>,
 }
 
 #[derive(Debug, Serialize)]
@@ -17,11 +17,7 @@ pub struct MembresiaResponse {
     pub tipo: String,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: NaiveDate,
-}
-
-pub struct ListMembresiaResponse {
-    pub membresias: Vec<MembresiaResponse>,
+    pub fecha_fin: Option<NaiveDate>,
 }
 
 impl From<Membresia> for MembresiaResponse {
@@ -31,18 +27,7 @@ impl From<Membresia> for MembresiaResponse {
             tipo: membresia.get_tipo().to_string(),
             estado: membresia.get_estado(),
             fecha_inicio: membresia.get_fecha_inicio(),
-            fecha_fin: membresia.get_fecha_fin().unwrap_or_default(),
-        }
-    }
-}
-
-impl From<Vec<Membresia>> for ListMembresiaResponse {
-    fn from(membresias: Vec<Membresia>) -> Self {
-        Self {
-            membresias: membresias
-                .into_iter()
-                .map(MembresiaResponse::from)
-                .collect(),
+            fecha_fin: membresia.get_fecha_fin(),
         }
     }
 }
