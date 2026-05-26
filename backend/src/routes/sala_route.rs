@@ -8,7 +8,7 @@ use crate::handlers::sala_handler::{
     update_sala_handler,
 };
 
-pub fn sala_routes() -> Router<AppState> {
+pub fn sala_router() -> Router<AppState> {
     Router::new()
         .route("/", post(create_sala_handler))
         .route("/", get(get_salas_handler))

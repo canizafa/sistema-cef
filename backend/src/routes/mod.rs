@@ -13,6 +13,7 @@ pub mod reserva_route;
 pub mod root;
 pub mod sala_route;
 
+pub use actividad_route::actividad_router;
 pub use asistencia_route::asistencia_router;
 pub use auth_route::auth_router;
 pub use clase_route::clase_router;

@@ -3,69 +3,127 @@ Sistema para el Centro de actividades CEF (Grupo 4)
 
 ---
 
+# Endpoints API
+
+Base: `http://localhost:8081`
+
+## Activos
+
+### Health
+
+| Método | Ruta |
+|--------|------|
+| GET | `/api/health` |
+
+### Auth
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/auth/login` |
+| POST | `/api/auth/reset-password` |
+| POST | `/api/auth/register-empleado` |
+| POST | `/api/auth/register-cliente` |
+
+### Clientes
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/clientes/create` |
+| GET | `/api/clientes/get-cliente/{id}` |
+| POST | `/api/clientes/update-cliente/{id}` |
+| POST | `/api/clientes/delete-cliente/{id}` |
+| GET | `/api/clientes/get-all` |
+
+### Empleados
+
+| Método | Ruta |
+|--------|------|
+| GET | `/api/empleados/get-empleado/{id}` |
+| POST | `/api/empleados/update-empleado/{id}` |
+| POST | `/api/empleados/delete-empleado/{id}` |
+| GET | `/api/empleados/get-all` |
+
+### Profesores
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/profesores/create-profesor` |
+| GET | `/api/profesores/get-profesor/{dni}` |
+| GET | `/api/profesores/get-all` |
+| POST | `/api/profesores/update-profesor/{dni}` |
+| DELETE | `/api/profesores/delete-profesor/{dni}` |
+
+### Clases
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/clase/create` |
+| GET | `/api/clase/get-clase/{id}` |
+| POST | `/api/clase/update-clase/{id}` |
+| POST | `/api/clase/delete-clase/{id}` |
+| GET | `/api/clase/get-all` |
+
+### Reservas
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/reservas/create` |
+| GET | `/api/reservas/get-reserva/{id}` |
+| PUT | `/api/reservas/update-reserva/{id}` |
+| DELETE | `/api/reservas/delete-reserva/{id}` |
+| GET | `/api/reservas/get-all` |
+
+### Asistencias
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/asistencia/create` |
+| GET | `/api/asistencia/get-asistencia/{id}` |
+| POST | `/api/asistencia/update-asistencia/{id}` |
+| POST | `/api/asistencia/delete-asistencia/{id}` |
+| GET | `/api/asistencia/get-all` |
+
+### Membresías
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/membresias/create` |
+| GET | `/api/membresias/get-membresia-id/{id}` |
+| GET | `/api/membresias/get-membresia-dni/{id}` |
+| POST | `/api/membresias/update-membresia/{id}` |
+| DELETE | `/api/membresias/delete-membresia/{id}` |
+| GET | `/api/membresias/get-all` |
+
+### Pagos
+
+| Método | Ruta |
+|--------|------|
+| POST | `/api/pagos/create` |
+
+---
+
+### Actividades (`/api/actividades` sugerido)
+
+| Método | Ruta |
+|--------|------|
+| POST | `/create` |
+| GET | `/get-actividad/{id}` |
+| GET | `/get-actividades` |
+| PUT | `/update/{id}` |
+| DELETE | `/delete/{id}` |
+
+### Salas (`/api/salas` sugerido)
+
+| Método | Ruta |
+|--------|------|
+| POST | `/` |
+| GET | `/` |
+| GET | `/{id}` |
+| PUT | `/{id}` |
+| DELETE | `/{id}` |
+
+
 # Backend — Guía de instalación y ejecución
-
-
-
-
-
-
-
-# Endpoints de la API
-
-## Health Check
-- `GET /api/health`
-
-## Autenticación
-- `POST /api/auth/login`
-- `POST /api/auth/reset-password`
-- `POST /api/auth/register-empleado`
-- `POST /api/auth/register-cliente`
-
-## Clases
-- `POST /api/clase/create`
-- `GET /api/clase/get-clase/{id}`
-- `POST /api/clase/update-clase/{id}`
-- `POST /api/clase/delete-clase/{id}`
-- `GET /api/clase/get-all`
-
-## Clientes
-- `POST /api/clientes/create`
-- `GET /api/clientes/get-cliente/{id}`
-- `POST /api/clientes/update-cliente/{id}`
-- `POST /api/clientes/delete-cliente/{id}`
-- `GET /api/clientes/get-all`
-
-## Empleados
-- `GET /api/empleados/get-empleado/{id}`
-- `POST /api/empleados/update-empleado/{id}`
-- `POST /api/empleados/delete-empleado/{id}`
-- `GET /api/empleados/get-all`
-
-## Membresías
-- `POST /api/membresias/create`
-- `GET /api/membresias/get-membresia-dni/{id}`
-- `GET /api/membresias/get-membresia-id/{id}`
-- `POST /api/membresias/update-membresia/{id}`
-- `DELETE /api/membresias/delete-membresia/{id}`
-- `GET /api/membresias/get-all`
-
-## Pagos
-- `POST /api/pagos/create`
-
-## Reservas
-- `POST /api/reservas/create`
-- `GET /api/reservas/get-reserva/{id}`
-- `DELETE /api/reservas/delete-reserva/{id}`
-- `PUT /api/reservas/update-reserva/{id}`
-- `GET /api/reservas/get-all`
-
-## Asistencias
-- `POST /api/asistencia/create`
-- `GET /api/asistencia/get-asistencia/{id}`
-- `POST /api/asistencia/update-asistencia/{id}`
-- `POST /api/asistencia/delete-asistencia/{id}`
-- `GET /api/asistencia/get-all`
 
 ## Requisitos previos
 
