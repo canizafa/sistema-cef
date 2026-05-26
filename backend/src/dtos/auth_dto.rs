@@ -15,8 +15,9 @@ pub struct ResetPasswordRequest {
     pub password: String,
 }
 
+#[derive(Debug, Deserialize)]
 pub struct CreateChangePasswordRequest {
-    pub dni_cliente: String,
+    pub dni_cliente: i64,
     pub old_password: String,
     pub new_password: String,
 }
