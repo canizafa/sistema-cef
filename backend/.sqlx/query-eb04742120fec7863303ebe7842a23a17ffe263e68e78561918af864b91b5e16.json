@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                c.dni_cliente as \"dni_cliente!\",\n                c.nombre_completo as \"nombre_completo!\",\n                c.email as \"email!\",\n                c.telefono as \"telefono!\",\n                c.fecha_nacimiento as \"fecha_nacimiento!\",\n                c.estado as \"estado!\",\n                c.password as \"password!\",\n\n                f.id_ficha as \"id_ficha!\",\n                f.enfermedades as \"enfermedades!\",\n                f.operaciones_quirurgicas as \"operaciones_quirurgicas!\",\n                f.detalles as \"detalles!\"\n\n            FROM cliente c\n            INNER JOIN ficha_medica f\n                ON c.id_ficha = f.id_ficha\n            WHERE c.email = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "dni_cliente!",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "nombre_completo!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "email!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "telefono!",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_nacimiento!",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "estado!",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "password!",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_ficha!",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "enfermedades!",
+        "ordinal": 8,
+        "type_info": "Bool"
+      },
+      {
+        "name": "operaciones_quirurgicas!",
+        "ordinal": 9,
+        "type_info": "Bool"
+      },
+      {
+        "name": "detalles!",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "eb04742120fec7863303ebe7842a23a17ffe263e68e78561918af864b91b5e16"
+}

@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   SELECT\n                       id_pago as \"id_pago!\",\n                       monto as \"monto!\",\n                       fecha as \"fecha!\",\n                       hora as \"hora!\",\n                       sena as \"sena!\",\n                       id_membresia,\n                       reserva_paga\n                   FROM pagos\n                   WHERE id_pago = ?\n                   ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_pago!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "monto!",
+        "ordinal": 1,
+        "type_info": "Float"
+      },
+      {
+        "name": "fecha!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "hora!",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "sena!",
+        "ordinal": 4,
+        "type_info": "Bool"
+      },
+      {
+        "name": "id_membresia",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "reserva_paga",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "11949ff1e1b5644175ae13a4cffae0bde7a357e81e6a33d89dfc057908ac27af"
+}

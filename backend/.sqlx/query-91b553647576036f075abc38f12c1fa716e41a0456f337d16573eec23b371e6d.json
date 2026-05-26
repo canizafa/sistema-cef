@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    INSERT INTO sala (\n                        id_sala,\n                        numero,\n                        capacidad_maxima\n                    )\n                    VALUES (?, ?, ?)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "91b553647576036f075abc38f12c1fa716e41a0456f337d16573eec23b371e6d"
+}

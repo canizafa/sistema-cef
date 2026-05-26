@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n                id_clase,\n                dia,\n                horario,\n                cupo_profe,\n                cupo_maximo,\n                estado,\n                descripcion,\n                id_actividad,\n                id_sala,\n                dni_profesor\n            FROM clase\n            WHERE id_clase = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_clase",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "dia",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "horario",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "cupo_profe",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "cupo_maximo",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "estado",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "descripcion",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_actividad",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_sala",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "dni_profesor",
+        "ordinal": 9,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "adbf8fe6bc6cf08f4469578ec2044f001138e05071462c8bce69455d25fdb2ee"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    INSERT INTO lista_de_espera (\n                        id_espera,\n                        tipo,\n                        fecha_ingreso,\n                        id_clase\n                    )\n                    VALUES (?, ?, ?, ?)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "28cc18a52136361292086ceca18ae87563a561142bdb73603906be847ae6c6e1"
+}

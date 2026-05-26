@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                        dni_profesor as \"dni_profesor!\",\n                        nombre as \"nombre!\",\n                        genero as \"genero!\",\n                        estado as \"estado!\"\n                    FROM profesor\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "dni_profesor!",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "nombre!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "genero!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "estado!",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "d45da7fd3945d17146e8a51a515b4c9f4b19350875b86d1005cf74b5cb069d4b"
+}

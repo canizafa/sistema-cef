@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO cliente (\n                dni_cliente,\n                nombre_completo,\n                email,\n                telefono,\n                fecha_nacimiento,\n                estado,\n                password,\n                id_ficha\n            )\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "d169016a0e8ab1ad437869fbe0fff34e913fd0f931851d78a9c896e93a541421"
+}

@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                        id_asistencia as \"id_asistencia!\",\n                        fecha as \"fecha!\",\n                        metodo as \"metodo!\",\n                        id_reserva as \"id_reserva!\"\n                    FROM asistencia\n                    WHERE id_asistencia = ?\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_asistencia!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "metodo!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_reserva!",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "e46d6c3fa093551b8fda187559010bec48992659f78ed9609de6c2f9a80772eb"
+}

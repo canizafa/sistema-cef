@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE clase\n            SET\n                dia = ?,\n                horario = ?,\n                cupo_profe = ?,\n                cupo_maximo = ?,\n                estado = ?,\n                descripcion = ?,\n                id_sala = ?,\n                dni_profesor = ?\n            WHERE id_clase = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "06925e4626d79d67241eb2a2d8840f2d7c64af1659ad98eff6ffc926f7f8bc54"
+}
