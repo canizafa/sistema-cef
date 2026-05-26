@@ -8,7 +8,6 @@ use crate::{
     repository::ActividadRepository,
 };
 
-#[axum::debug_handler]
 pub async fn create_actividad_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateActividadRequest>,
