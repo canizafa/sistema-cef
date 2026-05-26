@@ -1,4 +1,5 @@
 use chrono::NaiveDate;
+use uuid::Uuid;
 
 use crate::{domain::Estado, dtos::CreateMembresiaRequest, errors::ApiError};
 
@@ -58,11 +59,6 @@ impl Membresia {
                 "id_membresia no puede estar vacío".to_string(),
             ));
         }
-        if self.tipo.is_empty() {
-            return Err(ApiError::BadRequest(
-                "tipo no puede estar vacío".to_string(),
-            ));
-        }
 
         Ok(())
     }
@@ -71,7 +67,7 @@ impl Membresia {
 impl From<CreateMembresiaRequest> for Membresia {
     fn from(request: CreateMembresiaRequest) -> Self {
         Self {
-            id_membresia: request.id_membresia,
+            id_membresia: Uuid::new_v4().to_string(),
             tipo: request.tipo,
             estado: request.estado,
             fecha_inicio: request.fecha_inicio,

@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::domain::{Estado, Genero, Profesor};
 
@@ -10,7 +10,7 @@ pub struct CreateProfesorRequest {
     pub estado: Estado,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct ProfesorResponse {
     pub dni: i64,
     pub nombre_completo: String,

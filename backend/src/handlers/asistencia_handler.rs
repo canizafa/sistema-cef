@@ -34,12 +34,7 @@ pub async fn update_asistencia_handler(
 ) -> Result<Json<AsistenciaResponse>, ApiError> {
     let asistencia = Asistencia::from(request);
     asistencia.validate_asistencia()?;
-    let updated = AsistenciaRepository::update_asistencia(
-        &pool.db,
-        &asistencia.get_id_asistencia(),
-        &asistencia,
-    )
-    .await?;
+    let updated = AsistenciaRepository::update_asistencia(&pool.db, &id, &asistencia).await?;
     Ok(Json(AsistenciaResponse::from(updated)))
 }
 

@@ -23,9 +23,9 @@ pub async fn create_profesor_handler(
 
 pub async fn get_profesor_by_dni_handler(
     State(state): State<AppState>,
-    Path(dni): Path<String>,
+    Path(dni): Path<i64>,
 ) -> Result<Json<ProfesorResponse>, ApiError> {
-    let profesor = ProfesorRepository::get_profesor_by_dni(&state.db, &dni).await?;
+    let profesor = ProfesorRepository::get_profesor_by_dni(&state.db, dni).await?;
     Ok(Json(ProfesorResponse::from(profesor)))
 }
 
@@ -43,19 +43,19 @@ pub async fn get_profesores_handler(
 
 pub async fn update_profesor_handler(
     State(state): State<AppState>,
-    Path(dni): Path<String>,
+    Path(dni): Path<i64>,
     Json(request): Json<CreateProfesorRequest>,
 ) -> Result<Json<ProfesorResponse>, ApiError> {
     let profesor = Profesor::from(request);
     profesor.validate_profesor()?;
-    let profesor = ProfesorRepository::update_profesor(&state.db, &dni, &profesor).await?;
+    let profesor = ProfesorRepository::update_profesor(&state.db, dni, &profesor).await?;
     Ok(Json(ProfesorResponse::from(profesor)))
 }
 
 pub async fn delete_profesor_handler(
     State(state): State<AppState>,
-    Path(dni): Path<String>,
+    Path(dni): Path<i64>,
 ) -> Result<Json<()>, ApiError> {
-    ProfesorRepository::delete_profesor(&state.db, &dni).await?;
+    ProfesorRepository::delete_profesor(&state.db, dni).await?;
     Ok(Json(()))
 }

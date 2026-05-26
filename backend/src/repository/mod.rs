@@ -1,3 +1,4 @@
+pub mod actividad_repository;
 pub mod asistencia_repository;
 pub mod clase_repository;
 pub mod cliente_repository;
@@ -8,7 +9,9 @@ pub mod membresia_repository;
 pub mod pago_repository;
 pub mod profesor_repository;
 pub mod reserva_repository;
+pub mod sala_repository;
 
+pub use actividad_repository::ActividadRepository;
 pub use asistencia_repository::AsistenciaRepository;
 pub use clase_repository::ClaseRepository;
 pub use cliente_repository::ClienteRepository;
@@ -19,3 +22,4 @@ pub use membresia_repository::MembresiaRepository;
 pub use pago_repository::PagoRepository;
 pub use profesor_repository::ProfesorRepository;
 pub use reserva_repository::ReservaRepository;
+pub use sala_repository::SalaRepository;

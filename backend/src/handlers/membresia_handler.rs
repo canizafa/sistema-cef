@@ -23,34 +23,27 @@ pub async fn get_membresia_by_id_handler(
     Path(id): Path<String>,
 ) -> Result<Json<MembresiaResponse>, ApiError> {
     let membresia = MembresiaRepository::get_by_id(&state.db, &id).await?;
-    if let Some(m) = membresia {
-        Ok(Json(MembresiaResponse::from(m)))
-    } else {
-        Err(ApiError::NotFound)
-    }
+    Ok(Json(MembresiaResponse::from(membresia)))
 }
 
 pub async fn get_membresia_by_dni_handler(
     State(state): State<AppState>,
-    Path(dni): Path<i64>,
+    Path(id): Path<String>,
 ) -> Result<Json<MembresiaResponse>, ApiError> {
-    let membresia = MembresiaRepository::get_by_dni(&state.db, dni).await?;
-    if let Some(m) = membresia {
-        Ok(Json(MembresiaResponse::from(m)))
-    } else {
-        Err(ApiError::NotFound)
-    }
+    let membresia = MembresiaRepository::get_by_id(&state.db, &id).await?;
+    Ok(Json(MembresiaResponse::from(membresia)))
 }
 
 pub async fn get_membresias_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<MembresiaResponse>>, ApiError> {
     let membresias = MembresiaRepository::get_all(&state.db).await?;
-    if let Some(m) = membresias {
-        Ok(Json(m.into_iter().map(MembresiaResponse::from).collect()))
-    } else {
-        Err(ApiError::NotFound)
-    }
+    Ok(Json(
+        membresias
+            .into_iter()
+            .map(MembresiaResponse::from)
+            .collect(),
+    ))
 }
 
 pub async fn update_membresia_handler(

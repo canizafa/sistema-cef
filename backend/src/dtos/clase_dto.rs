@@ -45,11 +45,3 @@ impl From<Clase> for ClaseResponse {
         }
     }
 }
-
-impl From<Vec<Clase>> for ClaseListResponse {
-    fn from(value: Vec<Clase>) -> Self {
-        Self {
-            clases: value.into_iter().map(|c| c.into()).collect(),
-        }
-    }
-}

@@ -9,12 +9,13 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AppError {
+    #[error("Hubo un error en la base de datos")]
+    DatabaseError(#[from] sqlx::Error),
+
     #[error("Hubo error en la API")]
     Api(ApiError),
     #[error("Hubo un error interno del servidor")]
     InternalServerError,
-    #[error("Hubo un error en la base de datos")]
-    DatabaseError(#[from] sqlx::Error),
     #[error("Hubo un error en la migración de la base de datos")]
     MigrationError(#[from] sqlx::migrate::MigrateError),
     #[error("Variable de entorno no encontrada")]
@@ -73,7 +74,7 @@ pub enum ApiError {
     EmailAlreadyExists,
 
     // ========= DATABASE =========
-    #[error("error de base de datos")]
+    #[error("error de base de datos: {0}")]
     DatabaseError(#[from] sqlx::Error),
 
     // ========= SERVER =========

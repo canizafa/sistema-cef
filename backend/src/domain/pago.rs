@@ -1,35 +1,31 @@
-use chrono::{Local, NaiveDate};
+use chrono::NaiveDate;
 
-use crate::{domain::Reserva, dtos::CreatePagoRequest, errors::ApiError};
+use crate::{dtos::CreatePagoRequest, errors::ApiError};
 
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct Pago {
     id_pago: String,
-    titulo: String,
     monto: f64,
     fecha: NaiveDate,
     hora: String,
     sena: bool,
     id_membresia: Option<String>,
-    reserva_paga: Option<Reserva>,
+    reserva_paga: Option<String>,
 }
-
 impl Pago {
     pub fn new(
         id_pago: String,
-        titulo: String,
         monto: f64,
         fecha: NaiveDate,
         hora: String,
         sena: bool,
         id_membresia: Option<String>,
-        reserva_paga: Option<Reserva>,
+        reserva_paga: Option<String>,
     ) -> Self {
         Self {
             id_pago,
-            titulo,
             monto,
             fecha,
             hora,
@@ -37,9 +33,6 @@ impl Pago {
             id_membresia,
             reserva_paga,
         }
-    }
-    pub fn get_titulo(&self) -> &str {
-        &self.titulo
     }
 
     pub fn get_id_pago(&self) -> &str {
@@ -66,7 +59,7 @@ impl Pago {
         self.id_membresia.as_ref()
     }
 
-    pub fn get_reserva_paga(&self) -> Option<&Reserva> {
+    pub fn get_reserva_paga(&self) -> Option<&String> {
         self.reserva_paga.as_ref()
     }
     pub fn validate_pago(&self) -> Result<(), ApiError> {
@@ -83,13 +76,12 @@ impl From<CreatePagoRequest> for Pago {
     fn from(request: CreatePagoRequest) -> Self {
         Self {
             id_pago: Uuid::new_v4().to_string(),
-            titulo: request.titulo,
             monto: request.monto,
             fecha: request.fecha,
             hora: request.hora,
             sena: request.sena,
             id_membresia: Some(request.id_membresia),
-            reserva_paga: Some(request.reserva_paga.into()),
+            reserva_paga: Some(request.reserva_paga),
         }
     }
 }
