@@ -22,19 +22,18 @@ export function LoginPage() {
     try {
       const data = await authService.login({ email, password, rol: 'cliente' });
 
-      dispatch({
-        type: 'LOGIN',
-        payload: {
-          user: {
-            id: Number(data.dni),
-            nombre: data.email,
-            email: data.email,
-            rol: data.rol as 'dueno' | 'recepcionista' | 'cliente',
-            dni: Number(data.dni),
-          },
-          token: data.token,
-        },
-      });
+      const user = {
+        id: Number(data.dni),
+        nombre: data.email,
+        email: data.email,
+        rol: data.rol as 'dueno' | 'recepcionista' | 'cliente',
+        dni: Number(data.dni),
+      };
+
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      dispatch({ type: 'LOGIN', payload: { user, token: data.access_token } });
 
       if (data.rol === 'cliente') {
         navigate('/');

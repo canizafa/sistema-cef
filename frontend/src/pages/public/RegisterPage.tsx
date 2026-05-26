@@ -13,7 +13,7 @@ export function RegisterPage() {
         telefono: '',
         fecha_nacimiento: '',
         password: '',
-        estado: 'activo',
+        estado: 'alta',
         enfermedades: false,
         operaciones_quirurgicas: false,
         detalle: '',
