@@ -2,15 +2,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::Actividad;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateActividadRequest {
     pub nombre: String,
     pub descripcion: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ActividadResponse {
-    pub id: i32,
+    pub id: String,
     pub nombre: String,
     pub descripcion: String,
 }

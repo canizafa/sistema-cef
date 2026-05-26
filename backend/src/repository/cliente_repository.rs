@@ -240,7 +240,65 @@ impl ClienteRepository {
         id: i64,
         cliente: &Cliente,
     ) -> Result<Cliente, ApiError> {
-        todo!()
+        let nombre = cliente.get_nombre_apellido();
+        let email = cliente.get_email();
+        let telefono = cliente.get_telefono();
+        let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
+        let estado = cliente.get_estado().to_string();
+        let password = cliente.get_password_hash();
+
+        let ficha = cliente.get_ficha_medica();
+        let id_ficha = ficha.get_id_ficha();
+        let enfermedades = ficha.get_enfermedades();
+        let operaciones = ficha.get_operaciones_quirurgicas();
+        let detalles = ficha.get_detalles();
+
+        // 1) actualizar ficha médica
+        sqlx::query!(
+            r#"
+                UPDATE ficha_medica
+                SET
+                    enfermedades = ?,
+                    operaciones_quirurgicas = ?,
+                    detalles = ?
+                WHERE id_ficha = ?
+                "#,
+            enfermedades,
+            operaciones,
+            detalles,
+            id_ficha
+        )
+        .execute(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        // 2) actualizar cliente
+        sqlx::query!(
+            r#"
+                UPDATE cliente
+                SET
+                    nombre_completo = ?,
+                    email = ?,
+                    telefono = ?,
+                    fecha_nacimiento = ?,
+                    estado = ?,
+                    password = ?
+                WHERE dni_cliente = ?
+                "#,
+            nombre,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            id
+        )
+        .execute(pool)
+        .await
+        .map_err(ApiError::DatabaseError)?;
+
+        // 3) devolver cliente actualizado
+        Self::get_by_dni(pool, id).await
     }
     pub async fn delete_cliente(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
         let cliente = Self::get_by_dni(pool, dni).await?;
