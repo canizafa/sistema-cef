@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE empleado\n                SET\n                    nombre_apellido = ?,\n                    mail = ?,\n                    password = ?,\n                    genero = ?,\n                    estado = ?,\n                    rol = ?\n                WHERE dni_empleado = ?\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "51fa09b51ecddac7df374ebf1ca97416be5e255942de65d809ad0ce9c3d65986"
+}

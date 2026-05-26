@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n               UPDATE actividad\n               SET\n                   nombre = ?,\n                   descripcion = ?\n               WHERE id_actividad = ?\n               ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "ac6074c4b5152fbaf58d873a03433ac00f3e195063f3a1bd0361230c3fd716e8"
+}

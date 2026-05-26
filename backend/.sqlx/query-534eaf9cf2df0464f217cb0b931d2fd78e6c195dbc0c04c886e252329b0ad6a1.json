@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    UPDATE membresias\n                    SET\n                        tipo = ?,\n                        estado = ?,\n                        fecha_inicio = ?,\n                        fecha_fin = ?\n                    WHERE id_membresia = ?\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "534eaf9cf2df0464f217cb0b931d2fd78e6c195dbc0c04c886e252329b0ad6a1"
+}

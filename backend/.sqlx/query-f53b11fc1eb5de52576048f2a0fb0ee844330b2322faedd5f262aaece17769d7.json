@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                SELECT\n                    dni_empleado as \"dni_empleado!: i64\",\n                    nombre_apellido,\n                    mail,\n                    password,\n                    genero as \"genero!: String\",\n                    estado,\n                    rol\n                FROM empleado\n                WHERE mail = ?\n                ",
+  "describe": {
+    "columns": [
+      {
+        "name": "dni_empleado!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "nombre_apellido",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "mail",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "password",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "genero!: String",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "estado",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "rol",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f53b11fc1eb5de52576048f2a0fb0ee844330b2322faedd5f262aaece17769d7"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   DELETE FROM pagos\n                   WHERE id_pago = ?\n                   ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "4838fe3fb025e152913e2d227126a8021d36850959d28ca4945a5eaeb07350c3"
+}

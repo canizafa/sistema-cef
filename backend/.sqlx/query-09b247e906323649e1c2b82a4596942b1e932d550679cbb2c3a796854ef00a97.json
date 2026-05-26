@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                        id_sala as \"id_sala!\",\n                        numero as \"numero!\",\n                        capacidad_maxima as \"capacidad_maxima!\"\n                    FROM sala\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_sala!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "numero!",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "capacidad_maxima!",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "09b247e906323649e1c2b82a4596942b1e932d550679cbb2c3a796854ef00a97"
+}

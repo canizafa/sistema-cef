@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    DELETE FROM lista_de_espera\n                    WHERE id_espera = ?\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "91b7085137636387ee512130087b1fa25bde871d253d407a549cd620646bbad8"
+}

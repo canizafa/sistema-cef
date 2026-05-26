@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE cliente\n                SET\n                    nombre_completo = ?,\n                    email = ?,\n                    telefono = ?,\n                    fecha_nacimiento = ?,\n                    estado = ?,\n                    password = ?\n                WHERE dni_cliente = ?\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "b7f5dd64c8c7abac9e8b4a1244916599fdb5919d3febf2d366b559dcf71a1cf8"
+}
