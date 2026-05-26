@@ -32,7 +32,7 @@ impl FichaMedicaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(ficha_medica)
     }
@@ -51,7 +51,7 @@ impl FichaMedicaRepository {
         )
         .fetch_optional(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         match row {
             Some(row) => Ok(FichaMedica::new(
@@ -88,7 +88,7 @@ impl FichaMedicaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Self::get_by_id(pool, id_ficha).await
     }
@@ -107,7 +107,7 @@ impl FichaMedicaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(|e| ApiError::DatabaseError(e))?;
 
         Ok(ficha)
     }

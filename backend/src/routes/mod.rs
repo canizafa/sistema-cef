@@ -19,5 +19,6 @@ pub use empleado_route::empleado_router;
 pub use health_checker_route::health_checker;
 pub use membresia_route::membresia_router;
 pub use pago_route::pago_router;
+pub use profesor_route::profesor_router;
 pub use reserva_route::reserva_router;
 pub use root::router;
