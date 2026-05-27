@@ -59,9 +59,11 @@ export const AppRouter = () => {
             <Route path="/pago/pendiente" element={<PagoPendientePage />} />
 
             {/* Rutas de administración: requieren rol admin o dueño */}
-            <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminPage />} />
-
+         <Route path="/admin" element={
+    <ProtectedRoute>
+        <AdminLayout />
+    </ProtectedRoute>
+}>
                 {/* Clases */}
                 <Route path="clases" element={<AdminClasesPage />} />
                 <Route path="clases/nueva" element={<NuevaClasePage />} />
