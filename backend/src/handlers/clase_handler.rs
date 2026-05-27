@@ -2,6 +2,7 @@ use axum::{
     extract::{Json, Path, State},
     http::StatusCode,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -11,6 +12,7 @@ use crate::{
     repository::ClaseRepository,
 };
 
+#[instrument(name = "clase.create", skip(state, request), err)]
 pub async fn create_clase_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClaseRequest>,
@@ -21,6 +23,7 @@ pub async fn create_clase_handler(
     Ok(Json(ClaseResponse::from(clase)))
 }
 
+#[instrument(name = "clase.get", skip(state), fields(id = %id), err)]
 pub async fn get_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -33,6 +36,7 @@ pub async fn get_clase_handler(
     }
 }
 
+#[instrument(name = "clase.update", skip(state, request), fields(id = %id), err)]
 pub async fn update_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -44,6 +48,7 @@ pub async fn update_clase_handler(
     Ok(Json(ClaseResponse::from(clase)))
 }
 
+#[instrument(name = "clase.delete", skip(state), fields(id = %id), err)]
 pub async fn delete_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -52,6 +57,7 @@ pub async fn delete_clase_handler(
     Ok(StatusCode::OK)
 }
 
+#[instrument(name = "clase.list", skip(state), err)]
 pub async fn get_clases_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<ClaseResponse>>, ApiError> {

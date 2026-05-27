@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -13,6 +14,7 @@ use crate::{
     repository::EmpleadoRepository,
 };
 
+#[instrument(name = "empleado.create", skip(state, body), fields(dni = body.dni), err)]
 pub async fn create_empleado_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateEmpleadoRequest>,
@@ -29,6 +31,7 @@ pub async fn create_empleado_handler(
     Ok(Json(EmpleadoResponse::from(empleado)))
 }
 
+#[instrument(name = "empleado.get", skip(state), fields(dni = id), err)]
 pub async fn get_empleado_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
@@ -37,6 +40,7 @@ pub async fn get_empleado_handler(
     Ok(Json(EmpleadoResponse::from(empleado)))
 }
 
+#[instrument(name = "empleado.list", skip(state), err)]
 pub async fn get_empleados_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<EmpleadoResponse>>, ApiError> {
@@ -45,6 +49,7 @@ pub async fn get_empleados_handler(
         empleados.into_iter().map(EmpleadoResponse::from).collect(),
     ))
 }
+#[instrument(name = "empleado.update", skip(state, body), fields(dni = id), err)]
 #[axum::debug_handler]
 pub async fn update_empleado_handler(
     State(state): State<AppState>,
@@ -57,6 +62,7 @@ pub async fn update_empleado_handler(
     Ok(Json(EmpleadoResponse::from(empleado)))
 }
 
+#[instrument(name = "empleado.delete", skip(state), fields(dni = id), err)]
 pub async fn delete_empleado_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,

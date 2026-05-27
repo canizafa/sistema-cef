@@ -1,5 +1,6 @@
 use axum::extract::Path;
 use axum::{Json, extract::State};
+use tracing::instrument;
 
 use crate::domain::asistencia::Asistencia;
 use crate::{
@@ -9,6 +10,7 @@ use crate::{
     repository::AsistenciaRepository,
 };
 
+#[instrument(name = "asistencia.create", skip(pool, request), err)]
 pub async fn create_asistencia_handler(
     State(pool): State<AppState>,
     Json(request): Json<CreateAsistenciaRequest>,
@@ -19,6 +21,7 @@ pub async fn create_asistencia_handler(
     Ok(Json(AsistenciaResponse::from(created)))
 }
 
+#[instrument(name = "asistencia.get", skip(pool), fields(id = %id), err)]
 pub async fn get_asistencia_by_id_handler(
     State(pool): State<AppState>,
     Path(id): Path<String>,
@@ -27,6 +30,7 @@ pub async fn get_asistencia_by_id_handler(
     Ok(Json(AsistenciaResponse::from(asistencia)))
 }
 
+#[instrument(name = "asistencia.update", skip(pool, request), fields(id = %id), err)]
 pub async fn update_asistencia_handler(
     State(pool): State<AppState>,
     Path(id): Path<String>,
@@ -38,6 +42,7 @@ pub async fn update_asistencia_handler(
     Ok(Json(AsistenciaResponse::from(updated)))
 }
 
+#[instrument(name = "asistencia.delete", skip(pool), fields(id = %id), err)]
 pub async fn delete_asistencia_handler(
     State(pool): State<AppState>,
     Path(id): Path<String>,
@@ -46,6 +51,7 @@ pub async fn delete_asistencia_handler(
     Ok(Json(AsistenciaResponse::from(deleted)))
 }
 
+#[instrument(name = "asistencia.list", skip(pool), err)]
 pub async fn get_asistencias_handler(
     State(pool): State<AppState>,
 ) -> Result<Json<Vec<AsistenciaResponse>>, ApiError> {
