@@ -28,7 +28,7 @@ async fn main() -> Result<(), AppError> {
         .execute(&db)
         .await?;
 
-    let mailer = Mailer::new()?;
+    let mailer = Mailer::new().map_err(|e| AppError::Api(e))?;
 
     let app_state = AppState {
         db,

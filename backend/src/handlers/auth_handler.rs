@@ -29,31 +29,25 @@ pub async fn login_handler(
             return Err(ApiError::UserNotFound);
         }
         let usuario = usuario_empleado.unwrap();
-        let token = generar_token(
-            usuario.get_dni(),
-            usuario.get_rol().clone(),
-            &state.jwt_secret,
-        )
-        .map_err(|_| ApiError::JwtTokenError)?;
+        let rol = usuario.get_rol();
+        let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)
+            .map_err(|_| ApiError::JwtTokenError)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: usuario.get_rol(),
+            rol,
         }))
     } else {
         let usuario = usuario_cliente.unwrap();
-        let token = generar_token(
-            usuario.get_dni(),
-            usuario.get_rol().clone(),
-            &state.jwt_secret,
-        )
-        .map_err(|_| ApiError::JwtTokenError)?;
+        let rol = usuario.get_rol();
+        let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)
+            .map_err(|_| ApiError::JwtTokenError)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: usuario.get_rol(),
+            rol,
         }))
     }
 }
@@ -78,7 +72,7 @@ pub async fn register_cliente_handler(
         dni: cliente.get_dni().to_string(),
         email: cliente.get_email(),
         access_token: token,
-        rol: cliente.get_rol().clone(),
+        rol: cliente.get_rol(),
     }))
 }
 
@@ -102,7 +96,7 @@ pub async fn register_empleado_handler(
         dni: empleado.get_dni().to_string(),
         email: empleado.get_email(),
         access_token: token,
-        rol: empleado.get_rol().clone(),
+        rol: empleado.get_rol(),
     }))
 }
 
@@ -117,7 +111,8 @@ pub async fn reset_password_handler(
             return Err(ApiError::UserNotFound);
         }
         let mut empleado = usuario_empleado.unwrap();
-        let new_password = generate_random_password(empleado.get_dni() as usize);
+        let new_password = hash_password(&generate_random_password(empleado.get_dni() as usize))?;
+
         empleado.update_password(&new_password)?;
         EmpleadoRepository::update_empleado(&state.db, empleado.get_dni(), &empleado).await?;
 
@@ -134,7 +129,7 @@ pub async fn reset_password_handler(
     } else {
         let mut cliente = usuario_cliente.unwrap();
 
-        let new_password = generate_random_password(cliente.get_dni() as usize);
+        let new_password = hash_password(&generate_random_password(cliente.get_dni() as usize))?;
         cliente.update_password(&new_password)?;
         ClienteRepository::update_cliente(&state.db, cliente.get_dni(), &cliente).await?;
 

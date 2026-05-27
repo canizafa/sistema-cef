@@ -7,13 +7,18 @@ use axum::{
 use serde::Serialize;
 use thiserror::Error;
 
+#[derive(Debug, Serialize)]
+pub struct ErrorResponse {
+    pub error: String,
+}
+
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("Hubo un error en la base de datos")]
     DatabaseError(#[from] sqlx::Error),
 
-    #[error("Hubo error en la API")]
-    Api(ApiError),
+    #[error(transparent)]
+    Api(#[from] ApiError),
     #[error("Hubo un error interno del servidor")]
     InternalServerError,
     #[error("Hubo un error en la migración de la base de datos")]
@@ -22,8 +27,41 @@ pub enum AppError {
     EnvironmentVariableNotFound,
 }
 
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let status = match self {
+            AppError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+
+            AppError::Api(api_error) => {
+                return api_error.into_response();
+            }
+
+            AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+
+            AppError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+
+            AppError::EnvironmentVariableNotFound => StatusCode::INTERNAL_SERVER_ERROR,
+        };
+
+        let body = Json(ErrorResponse {
+            error: self.to_string(),
+        });
+
+        (status, body).into_response()
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum ApiError {
+    #[error("error smtp")]
+    SmtpError(#[from] lettre::transport::smtp::Error),
+
+    #[error("error de email")]
+    AddressError(#[from] lettre::address::AddressError),
+
+    #[error("error construyendo email")]
+    MessageError(#[from] lettre::error::Error),
+
     #[error("asistencia inválida")]
     InvalidAsistencia,
 
@@ -96,14 +134,28 @@ pub enum ApiError {
     PasswordHashError,
 }
 
-#[derive(Debug, Serialize)]
-pub struct ErrorResponse {
-    pub error: String,
+impl From<AppError> for Response {
+    fn from(error: AppError) -> Self {
+        let status = match error {
+            AppError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::Api(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::EnvironmentVariableNotFound => StatusCode::INTERNAL_SERVER_ERROR,
+        };
+        Json(ErrorResponse {
+            error: error.to_string(),
+        })
+        .into_response()
+    }
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
+            ApiError::SmtpError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::AddressError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::MessageError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidAsistencia => StatusCode::BAD_REQUEST,
             ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,
 
