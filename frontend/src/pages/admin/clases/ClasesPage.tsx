@@ -46,13 +46,14 @@ export default function ClasesAdminPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {clases.map((clase) => (
-          <ClaseCardRecepcionista
+<ClaseCardRecepcionista
   key={clase.id_clase}
   idClase={clase.id_clase}
   dia={clase.dia}
   horario={clase.horario}
   estado={clase.estado}
   descripcion={clase.descripcion}
+  lleno={clase.lleno}
   onEditar={() => console.log('Editar clase id:', clase.id_clase)}
   onVerReservas={() => console.log('Ver reservas de clase id:', clase.id_clase)}
 />

@@ -10,7 +10,7 @@ const allNavItems = [
   { to: '/admin/clases',      label: 'Clases',      roles: ['duenio', 'empleado'] },
   { to: '/admin/empleados',   label: 'Empleados',   roles: ['duenio'] },
   { to: '/admin/asistencias', label: 'Asistencias', roles: ['duenio', 'empleado'] },
-  { to: '/admin/reportes',    label: 'Reportes',    roles: ['duenio', 'empleado'] },
+  { to: '/admin/reportes',    label: 'Reportes',    roles: ['duenio'] },
 ]
 
 export function AdminLayout() {

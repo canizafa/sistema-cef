@@ -1,4 +1,4 @@
-import { Clock, Calendar } from 'lucide-react'
+import { Clock, Calendar, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -10,6 +10,7 @@ interface ClaseCardRecepcionistaProps {
   horario: string
   estado: EstadoClase
   descripcion: string
+  lleno: boolean
   onEditar?: () => void
   onVerReservas?: () => void
 }
@@ -19,6 +20,7 @@ export function ClaseCardRecepcionista({
   horario,
   estado,
   descripcion,
+  lleno,
   onEditar,
   onVerReservas,
 }: ClaseCardRecepcionistaProps) {
@@ -28,9 +30,9 @@ export function ClaseCardRecepcionista({
         <div className="flex items-start justify-between">
           <p className="text-sm font-medium text-primary">{descripcion}</p>
           {estado === 'alta' ? (
-            <Badge className="bg-success text-white">Activa</Badge>
+            <Badge className="bg-success text-white">Alta</Badge>
           ) : (
-            <Badge variant="outline">Inactiva</Badge>
+            <Badge variant="outline">Baja</Badge>
           )}
         </div>
       </CardHeader>
@@ -43,6 +45,10 @@ export function ClaseCardRecepcionista({
         <div className="flex items-center gap-2 text-sm text-primary">
           <Clock className="w-4 h-4 text-destructive" />
           {horario}
+        </div>
+        <div className="flex items-center gap-2 text-sm text-primary">
+          <Users className="w-4 h-4 text-destructive" />
+          {lleno ? 'Sin lugares' : 'Con lugares'}
         </div>
       </CardContent>
 
