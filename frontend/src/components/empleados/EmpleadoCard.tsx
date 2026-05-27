@@ -2,10 +2,10 @@ import { Mail, IdCard, User } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
- 
-type EstadoEmpleado = 'activo' | 'inactivo'
-type RolEmpleado = 'recepcionista' | 'dueño'
- 
+
+type EstadoEmpleado = 'alta' | 'baja'
+type RolEmpleado = 'duenio' | 'empleado' | 'profesor'
+
 interface EmpleadoCardProps {
   dni: number
   nombreApellido: string
@@ -16,7 +16,7 @@ interface EmpleadoCardProps {
   onEditar?: () => void
   onDesactivar?: () => void
 }
- 
+
 export function EmpleadoCard({
   dni,
   nombreApellido,
@@ -35,18 +35,17 @@ export function EmpleadoCard({
             <h3 className="text-xl font-semibold text-primary">{nombreApellido}</h3>
             <p className="text-sm text-muted">DNI: {dni}</p>
           </div>
-          {estado === 'activo' ? (
+          {estado === 'alta' ? (
             <Badge className="bg-success text-white">Activo</Badge>
           ) : (
             <Badge variant="outline">Inactivo</Badge>
           )}
         </div>
-        {/* El rol se muestra como tag igual que el tipo en ClaseCardRecepcionista */}
         <span className="inline-block mt-2 text-xs font-medium px-2 py-0.5 rounded border border-brand text-brand bg-brand/10">
           {rol}
         </span>
       </CardHeader>
- 
+
       <CardContent className="space-y-1.5 pb-3">
         <div className="flex items-center gap-2 text-sm text-primary">
           <Mail className="w-4 h-4 text-destructive" />
@@ -61,7 +60,7 @@ export function EmpleadoCard({
           DNI: {dni}
         </div>
       </CardContent>
- 
+
       <CardFooter className="gap-2 pt-0">
         <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
           Editar

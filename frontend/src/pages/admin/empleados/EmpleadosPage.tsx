@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
 
-type EstadoEmpleado = 'activo' | 'inactivo'
-type RolEmpleado = 'recepcionista' | 'dueño'
+type EstadoEmpleado = 'alta' | 'baja'
+type RolEmpleado = 'duenio' | 'empleado' | 'profesor'
 
 interface Empleado {
   dni: number
@@ -19,24 +19,24 @@ const empleadosIniciales: Empleado[] = [
     nombreApellido: 'Ana García',
     mail: 'ana.garcia@cef.com',
     genero: 'Femenino',
-    estado: 'activo',
-    rol: 'recepcionista',
+    estado: 'alta',
+    rol: 'empleado',
   },
   {
     dni: 23456789,
     nombreApellido: 'Carlos López',
     mail: 'carlos.lopez@cef.com',
     genero: 'Masculino',
-    estado: 'activo',
-    rol: 'recepcionista',
+    estado: 'alta',
+    rol: 'empleado',
   },
   {
     dni: 34567890,
     nombreApellido: 'María Fernández',
     mail: 'maria.fernandez@cef.com',
     genero: 'Femenino',
-    estado: 'inactivo',
-    rol: 'recepcionista',
+    estado: 'baja',
+    rol: 'empleado',
   },
 ]
 
@@ -44,12 +44,10 @@ export function EmpleadosPage() {
   const navigate = useNavigate()
 
   const handleEditar = (dni: number) => {
-    // Aquí iría la navegación a /admin/empleados/:dni/editar
     console.log('Editar empleado dni:', dni)
   }
 
   const handleDesactivar = (dni: number) => {
-    // Aquí iría la llamada al backend para desactivar el empleado
     console.log('Desactivar empleado dni:', dni)
   }
 
