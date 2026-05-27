@@ -8,7 +8,10 @@ use tracing::instrument;
 
 use crate::{
     app_state::AppState,
-    auth::{generar_token, generate_random_password, password::hash_password},
+    auth::{
+        generar_token, generate_random_password,
+        password::{hash_password, verify_password},
+    },
     domain::{Cliente, Empleado},
     dtos::{
         AuthResponse, CreateChangePasswordRequest, CreateClienteRequest, CreateEmpleadoRequest,
@@ -157,9 +160,7 @@ pub async fn change_password_handler(
     let usuario_empleado = EmpleadoRepository::get_by_dni(&state.db, dni).await;
     if usuario_cliente.is_ok() {
         let mut cliente = usuario_cliente.unwrap();
-        if !cliente.get_password_hash().eq(&body.old_password) {
-            return Err(ApiError::InvalidCredentials);
-        }
+        verify_password(&body.old_password, &cliente.get_password_hash())?;
         let new_password = hash_password(&body.new_password)?;
         cliente.update_password(&new_password)?;
 
@@ -168,9 +169,7 @@ pub async fn change_password_handler(
         Ok(StatusCode::OK)
     } else if usuario_empleado.is_ok() {
         let mut empleado = usuario_empleado.unwrap();
-        if !empleado.get_password_hash().eq(&body.old_password) {
-            return Err(ApiError::InvalidCredentials);
-        }
+        verify_password(&body.old_password, &empleado.get_password_hash())?;
         let new_password_hash = hash_password(&body.new_password)?;
         empleado.update_password(&new_password_hash)?;
         EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;

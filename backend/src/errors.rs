@@ -136,7 +136,7 @@ pub enum ApiError {
 
 impl From<AppError> for Response {
     fn from(error: AppError) -> Self {
-        let status = match error {
+        let _status = match error {
             AppError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Api(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
