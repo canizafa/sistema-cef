@@ -29,11 +29,7 @@ pub async fn get_clase_handler(
     Path(id): Path<String>,
 ) -> Result<Json<ClaseResponse>, ApiError> {
     let clase = ClaseRepository::get_by_id(&state.db, &id).await?;
-    if let Some(c) = clase {
-        Ok(Json(ClaseResponse::from(c)))
-    } else {
-        Err(ApiError::NotFound)
-    }
+    Ok(Json(ClaseResponse::from(clase)))
 }
 
 #[instrument(name = "clase.update", skip(state, request), fields(id = %id), err)]
