@@ -34,6 +34,7 @@ pub async fn login_handler(
             return Err(ApiError::UserNotFound);
         }
         let usuario = usuario_empleado.unwrap();
+        verify_password(&body.password, &usuario.get_password_hash())?;
         let rol = usuario.get_rol();
         let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)?;
         Ok(Json(AuthResponse {
@@ -44,6 +45,7 @@ pub async fn login_handler(
         }))
     } else {
         let usuario = usuario_cliente.unwrap();
+        verify_password(&body.password, &usuario.get_password_hash())?;
         let rol = usuario.get_rol();
         let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)?;
         Ok(Json(AuthResponse {

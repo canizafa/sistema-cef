@@ -90,7 +90,7 @@ impl ClaseRepository {
         clases
     }
 
-    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Clase>, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         let row = sqlx::query!(
             "SELECT
                 id_clase,
@@ -107,32 +107,29 @@ impl ClaseRepository {
             WHERE id_clase = ?",
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Some(Clase::new(
-                row.id_clase.unwrap(),
-                row.dia.parse::<NaiveDate>().unwrap(),
-                row.horario,
-                row.descripcion.unwrap(),
-                row.cupo_profe.unwrap(),
-                row.cupo_maximo,
-                Estado::from(row.estado),
-                row.id_sala,
-                row.dni_profesor.unwrap(),
-                row.id_actividad,
-            ))),
-            None => Ok(None),
-        }
+        Ok(Clase::new(
+            row.id_clase.unwrap(),
+            row.dia.parse::<NaiveDate>().unwrap(),
+            row.horario,
+            row.descripcion.unwrap(),
+            row.cupo_profe.unwrap(),
+            row.cupo_maximo,
+            Estado::from(row.estado),
+            row.id_sala,
+            row.dni_profesor.unwrap(),
+            row.id_actividad,
+        ))
     }
 
     pub async fn update_clase(
         pool: &SqlitePool,
         id: &str,
         clase: &Clase,
-    ) -> Result<Option<Clase>, ApiError> {
+    ) -> Result<Clase, ApiError> {
         let dia = clase.get_dia();
         let horario = clase.get_horario();
         let cupo_profe = clase.get_cupo_profe();
@@ -171,7 +168,7 @@ impl ClaseRepository {
         Self::get_by_id(pool, id).await
     }
 
-    pub async fn delete_clase(pool: &SqlitePool, id: &str) -> Result<Option<Clase>, ApiError> {
+    pub async fn delete_clase(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         let clase = Self::get_by_id(pool, id).await?;
 
         sqlx::query!("DELETE FROM clase WHERE id_clase = ?", id)
