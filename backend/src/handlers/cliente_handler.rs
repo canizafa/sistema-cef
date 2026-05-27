@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -13,6 +14,7 @@ use crate::{
     repository::ClienteRepository,
 };
 
+#[instrument(name = "cliente.create", skip(state, request), fields(dni = request.dni), err)]
 pub async fn create_cliente_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClienteRequest>,
@@ -29,6 +31,7 @@ pub async fn create_cliente_handler(
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
+#[instrument(name = "cliente.get", skip(state), fields(dni = id), err)]
 pub async fn get_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
@@ -37,6 +40,7 @@ pub async fn get_cliente_handler(
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
+#[instrument(name = "cliente.update", skip(state, request), fields(dni = id), err)]
 pub async fn update_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
@@ -48,6 +52,7 @@ pub async fn update_cliente_handler(
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
+#[instrument(name = "cliente.delete", skip(state), fields(dni = id), err)]
 pub async fn delete_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
@@ -56,6 +61,7 @@ pub async fn delete_cliente_handler(
     Ok(StatusCode::OK)
 }
 
+#[instrument(name = "cliente.list", skip(state), err)]
 pub async fn get_clientes_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<ClienteResponse>>, ApiError> {

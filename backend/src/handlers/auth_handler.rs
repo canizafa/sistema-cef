@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -17,6 +18,7 @@ use crate::{
     repository::{ClienteRepository, EmpleadoRepository},
 };
 
+#[instrument(name = "auth.login", skip(state, body), fields(email = %body.email), err)]
 pub async fn login_handler(
     State(state): State<AppState>,
     Json(body): Json<LoginRequest>,
@@ -52,6 +54,7 @@ pub async fn login_handler(
     }
 }
 
+#[instrument(name = "auth.register_cliente", skip(state, body), fields(dni = body.dni), err)]
 pub async fn register_cliente_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateClienteRequest>,
@@ -76,6 +79,7 @@ pub async fn register_cliente_handler(
     }))
 }
 
+#[instrument(name = "auth.register_empleado", skip(state, body), fields(dni = body.dni), err)]
 pub async fn register_empleado_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateEmpleadoRequest>,
@@ -100,6 +104,7 @@ pub async fn register_empleado_handler(
     }))
 }
 
+#[instrument(name = "auth.reset_password", skip(state, body), fields(email = %body.email), err)]
 pub async fn reset_password_handler(
     State(state): State<AppState>,
     Json(body): Json<ResetPasswordRequest>,
@@ -119,8 +124,7 @@ pub async fn reset_password_handler(
         state
             .mailer
             .send_new_password(&body.email, &new_password)
-            .await
-            .map_err(|_| ApiError::InternalServerError)?;
+            .await?;
 
         Ok((
             StatusCode::OK,
@@ -136,8 +140,7 @@ pub async fn reset_password_handler(
         state
             .mailer
             .send_new_password(&body.email, &new_password)
-            .await
-            .map_err(|_| ApiError::InternalServerError)?;
+            .await?;
 
         Ok((
             StatusCode::OK,
@@ -146,6 +149,7 @@ pub async fn reset_password_handler(
     }
 }
 
+#[instrument(name = "auth.change_password", skip(state, body), fields(dni = dni), err)]
 pub async fn change_password_handler(
     State(state): State<AppState>,
     Path(dni): Path<i64>,

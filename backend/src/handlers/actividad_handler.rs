@@ -1,4 +1,5 @@
 use axum::{Json, extract::Path, extract::State};
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -8,6 +9,7 @@ use crate::{
     repository::ActividadRepository,
 };
 
+#[instrument(name = "actividad.create", skip(state, request), err)]
 pub async fn create_actividad_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateActividadRequest>,
@@ -18,6 +20,7 @@ pub async fn create_actividad_handler(
     Ok(Json(ActividadResponse::from(actividad)))
 }
 
+#[instrument(name = "actividad.get", skip(state), fields(id = %id), err)]
 pub async fn get_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -26,6 +29,7 @@ pub async fn get_actividad_handler(
     Ok(Json(ActividadResponse::from(actividad)))
 }
 
+#[instrument(name = "actividad.list", skip(state), err)]
 pub async fn get_actividades_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<ActividadResponse>>, ApiError> {
@@ -38,6 +42,7 @@ pub async fn get_actividades_handler(
     ))
 }
 
+#[instrument(name = "actividad.delete", skip(state), fields(id = %id), err)]
 pub async fn delete_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -46,6 +51,7 @@ pub async fn delete_actividad_handler(
     Ok(Json(ActividadResponse::from(actividad)))
 }
 
+#[instrument(name = "actividad.update", skip(state, request), fields(id = %id), err)]
 pub async fn update_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,

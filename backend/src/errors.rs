@@ -20,7 +20,7 @@ pub enum AppError {
     #[error(transparent)]
     Api(#[from] ApiError),
     #[error("Hubo un error interno del servidor")]
-    InternalServerError,
+    InternalServerError(String),
     #[error("Hubo un error en la migración de la base de datos")]
     MigrationError(#[from] sqlx::migrate::MigrateError),
     #[error("Variable de entorno no encontrada")]
@@ -36,7 +36,7 @@ impl IntoResponse for AppError {
                 return api_error.into_response();
             }
 
-            AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 
             AppError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 
@@ -139,7 +139,7 @@ impl From<AppError> for Response {
         let status = match error {
             AppError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Api(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            AppError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::EnvironmentVariableNotFound => StatusCode::INTERNAL_SERVER_ERROR,
         };
