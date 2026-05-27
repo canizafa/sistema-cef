@@ -9,6 +9,7 @@ interface ClaseCardRecepcionistaProps {
   dia: string
   horario: string
   estado: EstadoClase
+  descripcion: string
   onEditar?: () => void
   onVerReservas?: () => void
 }
@@ -17,13 +18,15 @@ export function ClaseCardRecepcionista({
   dia,
   horario,
   estado,
+  descripcion,
   onEditar,
   onVerReservas,
 }: ClaseCardRecepcionistaProps) {
   return (
     <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-end">
+        <div className="flex items-start justify-between">
+          <p className="text-sm font-medium text-primary">{descripcion}</p>
           {estado === 'alta' ? (
             <Badge className="bg-success text-white">Activa</Badge>
           ) : (

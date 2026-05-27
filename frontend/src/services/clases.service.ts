@@ -39,10 +39,10 @@ export type NuevaListaEsperaData = {
 
 export const clasesService = {
     async getClases(): Promise<ClaseDTO[]> {
-        const response = await api.get('/clase/get-all');
-        return response.data.clases;
-    },
-
+    const response = await api.get('/clase/get-all');
+    console.log('response.data:', response.data);
+    return response.data.clases ?? response.data;
+},
     async crearClase(data: NuevaClaseData) {
         const response = await api.post('/clase/create', data);
         return response.data;

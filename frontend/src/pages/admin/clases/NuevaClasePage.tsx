@@ -68,124 +68,54 @@ export function NuevaClasePage() {
 
                     <div className="space-y-1">
                         <Label htmlFor="dia">Fecha</Label>
-                        <Input
-                            id="dia"
-                            name="dia"
-                            type="date"
-                            value={form.dia}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="dia" name="dia" type="date" value={form.dia} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="horario">Horario</Label>
-                        <Input
-                            id="horario"
-                            name="horario"
-                            type="time"
-                            value={form.horario}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="horario" name="horario" type="time" value={form.horario} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="cupo_maximo">Cupo máximo</Label>
-                        <Input
-                            id="cupo_maximo"
-                            name="cupo_maximo"
-                            type="number"
-                            min="1"
-                            placeholder="15"
-                            value={form.cupo_maximo}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="cupo_maximo" name="cupo_maximo" type="number" min="1" placeholder="15" value={form.cupo_maximo} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="cupo_profe">Cupo reservado para profesor</Label>
-                        <Input
-                            id="cupo_profe"
-                            name="cupo_profe"
-                            type="number"
-                            min="0"
-                            placeholder="1"
-                            value={form.cupo_profe}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="cupo_profe" name="cupo_profe" type="number" min="0" placeholder="1" value={form.cupo_profe} onChange={handleChange} required />
                         <p className="text-xs text-muted">Lugares reservados fuera del cupo general</p>
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="descripcion">Descripción</Label>
-                        <Input
-                            id="descripcion"
-                            name="descripcion"
-                            placeholder="Ej: Clase de yoga para principiantes"
-                            value={form.descripcion}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="descripcion" name="descripcion" placeholder="Ej: Clase de yoga para principiantes" value={form.descripcion} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="id_actividad">ID de actividad</Label>
-                        <Input
-                            id="id_actividad"
-                            name="id_actividad"
-                            type="number"
-                            min="1"
-                            placeholder="1"
-                            value={form.id_actividad}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="id_actividad" name="id_actividad" placeholder="act-001" value={form.id_actividad} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="id_sala">ID de sala</Label>
-                        <Input
-                            id="id_sala"
-                            name="id_sala"
-                            type="number"
-                            min="1"
-                            placeholder="1"
-                            value={form.id_sala}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="id_sala" name="id_sala" placeholder="sala-001" value={form.id_sala} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label htmlFor="dni_profesor">DNI del profesor</Label>
-                        <Input
-                            id="dni_profesor"
-                            name="dni_profesor"
-                            type="number"
-                            min="1000000"
-                            placeholder="30123456"
-                            value={form.dni_profesor}
-                            onChange={handleChange}
-                            required
-                        />
+                        <Input id="dni_profesor" name="dni_profesor" type="number" min="1000000" placeholder="30123456" value={form.dni_profesor} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
                         <Label>Estado</Label>
-                        <Select
-                            value={form.estado}
-                            onValueChange={(v) => handleSelect('estado', v)}
-                            required
-                        >
+                        <Select value={form.estado} onValueChange={(v) => handleSelect('estado', v)} required>
                             <SelectTrigger>
                                 <SelectValue placeholder="Seleccioná un estado" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="activa">Activa</SelectItem>
-                                <SelectItem value="inactiva">Inactiva</SelectItem>
+                                <SelectItem value="alta">Alta</SelectItem>
+                                <SelectItem value="baja">Baja</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
