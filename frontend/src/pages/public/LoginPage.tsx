@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, type Rol } from '@/context/AuthContext';
 import { authService } from '@/services/auth.service';
 
 export function LoginPage() {
@@ -20,13 +20,13 @@ export function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      const data = await authService.login({ email, password, rol: 'cliente' });
+      const data = await authService.login({ email, password });
 
       const user = {
         id: Number(data.dni),
         nombre: data.email,
         email: data.email,
-        rol: data.rol as 'dueno' | 'recepcionista' | 'cliente',
+        rol: data.rol as Rol,
         dni: Number(data.dni),
       };
 
@@ -37,8 +37,12 @@ export function LoginPage() {
 
       if (data.rol === 'cliente') {
         navigate('/');
-      } else {
+      } else if (data.rol === 'duenio') {
+        navigate('/admin');
+      } else if (data.rol === 'empleado' ) {
         navigate('/admin/clientes');
+      } else {
+        navigate('/admin');
       }
     } catch {
       setError('Email o contraseña incorrectos');

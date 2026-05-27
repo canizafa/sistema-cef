@@ -5,7 +5,7 @@ import { createContext, useContext, useReducer, type ReactNode } from 'react';
 
 // --- Tipos ---
 
-export type Rol = 'dueno' | 'recepcionista' | 'cliente';
+export type Rol = 'duenio' | 'empleado'  | 'cliente' | 'profesor';
 
 export type User = {
     id: number;

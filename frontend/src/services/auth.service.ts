@@ -3,7 +3,12 @@ import api from './api';
 export interface LoginData {
     email: string;
     password: string;
-    rol: string;
+}
+
+export interface ChangePasswordData {
+    dni_cliente: number;
+    old_password: string;
+    new_password: string;
 }
 
 export interface CreateFichaMedicaRequest {
@@ -65,9 +70,14 @@ export const authService = {
     },
 
     async forgotPassword(data: { email: string }): Promise<void> {
-
         await api.post('/auth/reset-password', data);
+    },
 
+    async changePassword(data: ChangePasswordData): Promise<void> {
+        await api.put(`/auth/change-password/${data.dni_cliente}`, {
+            old_password: data.old_password,
+            new_password: data.new_password,
+        });
     },
 
     logout(): void {

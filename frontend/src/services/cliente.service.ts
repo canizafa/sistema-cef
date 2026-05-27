@@ -18,9 +18,18 @@ export interface ClienteResponse {
     ficha_medica: FichaMedicaResponse;
 }
 
+export interface UpdateClienteRequest {
+    nombre_apellido: string;
+    fecha_nacimiento: string;
+}
+
 export const clienteService = {
     async getPerfil(dni: number): Promise<ClienteResponse> {
         const response = await api.get<ClienteResponse>(`/clientes/get-cliente/${dni}`);
         return response.data;
+    },
+
+    async updatePerfil(dni: number, data: UpdateClienteRequest): Promise<void> {
+        await api.put(`/clientes/update-cliente/${dni}`, data);
     },
 };

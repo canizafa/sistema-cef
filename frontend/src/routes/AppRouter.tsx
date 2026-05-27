@@ -20,7 +20,6 @@ import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
 
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import AdminPage from '@/pages/admin/AdminPage'
 // Admin - Clases
 import AdminClasesPage from '@/pages/admin/clases/ClasesPage';
 import { NuevaClasePage } from '@/pages/admin/clases/NuevaClasePage';
@@ -59,9 +58,11 @@ export const AppRouter = () => {
             <Route path="/pago/pendiente" element={<PagoPendientePage />} />
 
             {/* Rutas de administración: requieren rol admin o dueño */}
-            <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminPage />} />
-
+            <Route path="/admin" element={
+            <ProtectedRoute>
+               <AdminLayout />
+            </ProtectedRoute>
+                                          }>
                 {/* Clases */}
                 <Route path="clases" element={<AdminClasesPage />} />
                 <Route path="clases/nueva" element={<NuevaClasePage />} />
