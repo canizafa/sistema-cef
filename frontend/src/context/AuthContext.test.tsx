@@ -8,7 +8,7 @@ const initialState = { user: null, token: null };
 
 describe('authReducer', () => {
     it('LOGIN guarda el usuario y el token en el estado', () => {
-        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const }; // 'as const' le dice a TypeScript que 'cliente' es un valor exacto, no un string genérico.
+        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const, dni: 1 };
         const newState = authReducer(initialState,{
             type: 'LOGIN',
             payload: { user, token: 'abc123' },
@@ -19,7 +19,7 @@ describe('authReducer', () => {
 
     it('LOGOUT pone user y token en null', () => {
         const startState = {
-            user: { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const },
+            user: { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const, dni: 1 },
             token: 'abc123',
         };
         const newState = authReducer(startState, { type: 'LOGOUT' });
@@ -29,16 +29,16 @@ describe('authReducer', () => {
 
     it('UPDATE_USER actualiza el usuario si hay uno logueado', () =>{
         const startState = {
-            user: {id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const },
+            user: { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const, dni: 1 },
             token: 'abc123',
         };
-        const updated = { id: 1, nombre: 'Juan Editado', email: 'juan@cef.com', rol: 'cliente' as const };
+        const updated = { id: 1, nombre: 'Juan Editado', email: 'juan@cef.com', rol: 'cliente' as const, dni: 1 };
         const newState = authReducer(startState, { type: 'UPDATE_USER', payload: { user: updated } });
         expect(newState.user).toEqual(updated);
     });
 
     it('UPDATE_USER no modifica el estado si no hay usuario logueado', () => {
-        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const };
+        const user = { id: 1, nombre: 'Juan', email: 'juan@cef.com', rol: 'cliente' as const, dni: 1 };
         const newState = authReducer(initialState, { type: 'UPDATE_USER', payload: { user } });
         expect(newState.user).toBeNull();
     });
