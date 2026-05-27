@@ -20,7 +20,7 @@ export function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      const data = await authService.login({ email, password, rol: 'cliente' });
+      const data = await authService.login({ email, password });
 
       const user = {
         id: Number(data.dni),

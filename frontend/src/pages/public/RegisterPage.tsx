@@ -1,6 +1,7 @@
 // Formulario de registro para nuevos clientes. Solo clientes se auto-registran; los empleados los crea el dueño.
 // Llama a authService.register() y redirige al login al completarse.
 import { useState } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { authService } from '@/services/auth.service';
@@ -33,6 +34,14 @@ export function RegisterPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
+
+        const hoy = new Date();
+        const fechaMinima = new Date(hoy.getFullYear() - 14, hoy.getMonth(), hoy.getDate());
+        if (new Date(form.fecha_nacimiento) > fechaMinima) {
+            setError('Edad insuficiente.');
+            return;
+        }
+
         setLoading(true);
         try {
             await authService.register({
@@ -50,8 +59,12 @@ export function RegisterPage() {
                 },
             });
             navigate('/login');
-        } catch {
-            setError('Error al crear la cuenta. Revisá los datos.');
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 409) {
+                setError('Usuario ya registrado en el sistema.');
+            } else {
+                setError('Error al crear la cuenta. Revisá los datos.');
+            }
         } finally {
             setLoading(false);
         }
