@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClaseCardRecepcionista } from '@/components/clases/ClaseCardRecepcionista'
 import { type ClaseDTO } from '@/services/clases.service'
@@ -15,9 +15,9 @@ const clasesMock: ClaseDTO[] = [
 
 export default function ClasesAdminPage() {
   const navigate = useNavigate()
-  const [clases, setClases] = useState<ClaseDTO[]>(MOCK_CLASES ? clasesMock : [])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [clases] = useState<ClaseDTO[]>(MOCK_CLASES ? clasesMock : [])
+  const loading = false
+  const error: string | null = null
 
   if (loading) return <p className="p-8 text-muted text-sm">Cargando clases...</p>
   if (error)   return <p className="p-8 text-destructive text-sm">{error}</p>
