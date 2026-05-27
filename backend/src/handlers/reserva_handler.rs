@@ -3,6 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
@@ -12,6 +13,7 @@ use crate::{
     repository::ReservaRepository,
 };
 
+#[instrument(name = "reserva.create", skip(state, body), err)]
 pub async fn create_reserva_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateReservaRequest>,
@@ -22,6 +24,7 @@ pub async fn create_reserva_handler(
     Ok(Json(ReservaResponse::from(reserva)))
 }
 
+#[instrument(name = "reserva.get", skip(state), fields(id = %id), err)]
 pub async fn get_reserva_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -30,6 +33,7 @@ pub async fn get_reserva_handler(
     Ok(Json(ReservaResponse::from(reserva)))
 }
 
+#[instrument(name = "reserva.update", skip(state, body), fields(id = %id), err)]
 pub async fn update_reserva_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -41,6 +45,7 @@ pub async fn update_reserva_handler(
     Ok(Json(ReservaResponse::from(reserva)))
 }
 
+#[instrument(name = "reserva.delete", skip(state), fields(id = %id), err)]
 pub async fn delete_reserva_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -49,6 +54,7 @@ pub async fn delete_reserva_handler(
     Ok(StatusCode::OK)
 }
 
+#[instrument(name = "reserva.list", skip(state), err)]
 pub async fn get_reservas_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<ReservaResponse>>, ApiError> {

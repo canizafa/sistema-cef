@@ -4,10 +4,11 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
+use tracing::instrument;
 
 use crate::{
     app_state::AppState,
-    auth::{generar_token, generate_random_password},
+    auth::{generar_token, generate_random_password, password::hash_password},
     domain::{Cliente, Empleado},
     dtos::{
         AuthResponse, CreateChangePasswordRequest, CreateClienteRequest, CreateEmpleadoRequest,
@@ -17,6 +18,7 @@ use crate::{
     repository::{ClienteRepository, EmpleadoRepository},
 };
 
+#[instrument(name = "auth.login", skip(state, body), fields(email = %body.email), err)]
 pub async fn login_handler(
     State(state): State<AppState>,
     Json(body): Json<LoginRequest>,
@@ -29,35 +31,28 @@ pub async fn login_handler(
             return Err(ApiError::UserNotFound);
         }
         let usuario = usuario_empleado.unwrap();
-        let token = generar_token(
-            usuario.get_dni(),
-            usuario.get_rol().clone(),
-            &state.jwt_secret,
-        )
-        .map_err(|_| ApiError::JwtTokenError)?;
+        let rol = usuario.get_rol();
+        let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: usuario.get_rol(),
+            rol,
         }))
     } else {
         let usuario = usuario_cliente.unwrap();
-        let token = generar_token(
-            usuario.get_dni(),
-            usuario.get_rol().clone(),
-            &state.jwt_secret,
-        )
-        .map_err(|_| ApiError::JwtTokenError)?;
+        let rol = usuario.get_rol();
+        let token = generar_token(usuario.get_dni(), rol.clone(), &state.jwt_secret)?;
         Ok(Json(AuthResponse {
             dni: usuario.get_dni().to_string(),
             email: usuario.get_email().to_string(),
             access_token: token,
-            rol: usuario.get_rol(),
+            rol,
         }))
     }
 }
 
+#[instrument(name = "auth.register_cliente", skip(state, body), fields(dni = body.dni), err)]
 pub async fn register_cliente_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateClienteRequest>,
@@ -71,17 +66,17 @@ pub async fn register_cliente_handler(
         cliente.get_dni(),
         cliente.get_rol().clone(),
         &state.jwt_secret,
-    )
-    .map_err(|_| ApiError::InternalServerError)?;
+    )?;
 
     Ok(Json(AuthResponse {
         dni: cliente.get_dni().to_string(),
         email: cliente.get_email(),
         access_token: token,
-        rol: cliente.get_rol().clone(),
+        rol: cliente.get_rol(),
     }))
 }
 
+#[instrument(name = "auth.register_empleado", skip(state, body), fields(dni = body.dni), err)]
 pub async fn register_empleado_handler(
     State(state): State<AppState>,
     Json(body): Json<CreateEmpleadoRequest>,
@@ -95,17 +90,17 @@ pub async fn register_empleado_handler(
         empleado.get_dni(),
         empleado.get_rol().clone(),
         &state.jwt_secret,
-    )
-    .map_err(|_| ApiError::InternalServerError)?;
+    )?;
 
     Ok(Json(AuthResponse {
         dni: empleado.get_dni().to_string(),
         email: empleado.get_email(),
         access_token: token,
-        rol: empleado.get_rol().clone(),
+        rol: empleado.get_rol(),
     }))
 }
 
+#[instrument(name = "auth.reset_password", skip(state, body), fields(email = %body.email), err)]
 pub async fn reset_password_handler(
     State(state): State<AppState>,
     Json(body): Json<ResetPasswordRequest>,
@@ -117,15 +112,16 @@ pub async fn reset_password_handler(
             return Err(ApiError::UserNotFound);
         }
         let mut empleado = usuario_empleado.unwrap();
-        let new_password = generate_random_password(empleado.get_dni() as usize);
-        empleado.update_password(&new_password)?;
+        let new_password = generate_random_password();
+        let hashed_password = hash_password(&new_password)?;
+
+        empleado.update_password(&hashed_password)?;
         EmpleadoRepository::update_empleado(&state.db, empleado.get_dni(), &empleado).await?;
 
         state
             .mailer
             .send_new_password(&body.email, &new_password)
-            .await
-            .map_err(|_| ApiError::InternalServerError)?;
+            .await?;
 
         Ok((
             StatusCode::OK,
@@ -134,15 +130,15 @@ pub async fn reset_password_handler(
     } else {
         let mut cliente = usuario_cliente.unwrap();
 
-        let new_password = generate_random_password(cliente.get_dni() as usize);
-        cliente.update_password(&new_password)?;
+        let new_password = generate_random_password();
+        let hashed_password = hash_password(&new_password)?;
+        cliente.update_password(&hashed_password)?;
         ClienteRepository::update_cliente(&state.db, cliente.get_dni(), &cliente).await?;
 
         state
             .mailer
             .send_new_password(&body.email, &new_password)
-            .await
-            .map_err(|_| ApiError::InternalServerError)?;
+            .await?;
 
         Ok((
             StatusCode::OK,
@@ -151,11 +147,12 @@ pub async fn reset_password_handler(
     }
 }
 
+#[instrument(name = "auth.change_password", skip(state, body), fields(dni = dni), err)]
 pub async fn change_password_handler(
     State(state): State<AppState>,
     Path(dni): Path<i64>,
     Json(body): Json<CreateChangePasswordRequest>,
-) -> Result<(StatusCode), ApiError> {
+) -> Result<StatusCode, ApiError> {
     let usuario_cliente = ClienteRepository::get_by_dni(&state.db, dni).await;
     let usuario_empleado = EmpleadoRepository::get_by_dni(&state.db, dni).await;
     if usuario_cliente.is_ok() {
@@ -163,7 +160,9 @@ pub async fn change_password_handler(
         if !cliente.get_password_hash().eq(&body.old_password) {
             return Err(ApiError::InvalidCredentials);
         }
-        cliente.update_password(&body.new_password)?;
+        let new_password = hash_password(&body.new_password)?;
+        cliente.update_password(&new_password)?;
+
         ClienteRepository::update_cliente(&state.db, dni, &cliente).await?;
 
         Ok(StatusCode::OK)
@@ -172,7 +171,8 @@ pub async fn change_password_handler(
         if !empleado.get_password_hash().eq(&body.old_password) {
             return Err(ApiError::InvalidCredentials);
         }
-        empleado.update_password(&body.new_password)?;
+        let new_password_hash = hash_password(&body.new_password)?;
+        empleado.update_password(&new_password_hash)?;
         EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;
 
         Ok(StatusCode::OK)

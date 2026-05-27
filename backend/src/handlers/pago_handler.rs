@@ -7,7 +7,9 @@ use crate::{
     services::mercado_pago_service,
 };
 use axum::{Json, extract::State};
+use tracing::instrument;
 
+#[instrument(name = "pago.create", skip(state, payload), fields(monto = payload.monto), err)]
 pub async fn crear_pago_handler(
     State(state): State<AppState>,
     Json(payload): Json<CreatePagoRequest>,
