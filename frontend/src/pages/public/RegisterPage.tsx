@@ -63,7 +63,7 @@ export function RegisterPage() {
             if (axios.isAxiosError(err) && err.response?.status === 409) {
                 setError('Usuario ya registrado en el sistema.');
             } else {
-                setError('Error al crear la cuenta. Revisá los datos.');
+                setError('Usuario ya registrado en el sistema.');
             }
         } finally {
             setLoading(false);
