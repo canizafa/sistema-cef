@@ -1,24 +1,24 @@
 // Layout del panel de administración.
 // Muestra un sidebar con navegación filtrada según el rol del usuario logueado.
-// DUENO ve todo. RECEPCIONISTA ve todo menos Empleados. CLIENTE es redirigido al inicio.
+// DUENIO ve todo. EMPLEADO ve todo menos Empleados. CLIENTE es redirigido al inicio.
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import logo from '@/assets/Logo.png';
 
 const allNavItems = [
-  { to: '/admin/clientes',    label: 'Clientes',    roles: ['dueno', 'recepcionista'] },
-  { to: '/admin/clases',      label: 'Clases',      roles: ['dueno', 'recepcionista'] },
-  { to: '/admin/empleados',   label: 'Empleados',   roles: ['dueno'] },
-  { to: '/admin/asistencias', label: 'Asistencias', roles: ['dueno', 'recepcionista'] },
-  { to: '/admin/reportes',    label: 'Reportes',    roles: ['dueno', 'recepcionista'] },
+  { to: '/admin/clientes',    label: 'Clientes',    roles: ['duenio', 'empleado'] },
+  { to: '/admin/clases',      label: 'Clases',      roles: ['duenio', 'empleado'] },
+  { to: '/admin/empleados',   label: 'Empleados',   roles: ['duenio'] },
+  { to: '/admin/asistencias', label: 'Asistencias', roles: ['duenio', 'empleado'] },
+  { to: '/admin/reportes',    label: 'Reportes',    roles: ['duenio', 'empleado'] },
 ]
 
 export function AdminLayout() {
   const { user } = useAuth()
   const rol = user?.rol
 
-  // Si no hay sesión o es cliente, redirigir al inicio
-  if (!rol || rol === 'cliente') return <Navigate to="/" />
+  // Si no hay sesión o es cliente o profesor, redirigir al inicio
+  if (!rol || rol === 'cliente' || rol === 'profesor') return <Navigate to="/" />
 
   // Filtrar nav según rol
   const navItems = allNavItems.filter(item => item.roles.includes(rol))
@@ -27,7 +27,7 @@ export function AdminLayout() {
   const inicial = user?.nombre?.[0]?.toUpperCase() ?? 'A'
 
   // Etiqueta legible del rol
-  const rolLabel = rol === 'dueno' ? 'Administrador' : 'Recepcionista'
+  const rolLabel = rol === 'duenio' ? 'Dueño' : 'Empleado'
 
   return (
     <div className="flex min-h-screen bg-background">

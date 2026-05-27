@@ -8,6 +8,6 @@ import type { ReactNode } from 'react';
 export function AdminRoute({ children }: { children: ReactNode }){
     const { token, user } = useAuth(); // token = hay sesión?, user = datos del usuario logueado
     if( !token ) return <Navigate to="/login" replace />; // No hay sesión → al login
-    if( user?.rol !== 'dueno' ) return <Navigate to="/clases" replace />; // Hay sesión pero no es dueño → a clases
+    if( user?.rol !== 'duenio' ) return <Navigate to="/clases" replace />; // Hay sesión pero no es dueño → a clases
     return <>{children}</> // Es dueño → mostrá la página de admin
 }
