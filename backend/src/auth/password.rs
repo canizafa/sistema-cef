@@ -26,10 +26,10 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
         .is_ok())
 }
 
-pub fn generate_random_password(length: usize) -> String {
+pub fn generate_random_password() -> String {
     const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
     let mut rng = rand::thread_rng();
-    (0..length)
+    (0..16)
         .map(|_| CHARSET[rng.gen_range(0..CHARSET.len())] as char)
         .collect()
 }

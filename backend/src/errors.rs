@@ -53,13 +53,13 @@ impl IntoResponse for AppError {
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("error smtp")]
+    #[error("no se pudo enviar el correo (SMTP): {0}")]
     SmtpError(#[from] lettre::transport::smtp::Error),
 
-    #[error("error de email")]
+    #[error("dirección de correo inválida: {0}")]
     AddressError(#[from] lettre::address::AddressError),
 
-    #[error("error construyendo email")]
+    #[error("no se pudo armar el mensaje de correo: {0}")]
     MessageError(#[from] lettre::error::Error),
 
     #[error("asistencia inválida")]
@@ -123,7 +123,7 @@ pub enum ApiError {
     ServerStartupError,
 
     // ========= JWT =========
-    #[error("error generando token")]
+    #[error("error al generar o validar el token JWT: {0}")]
     JwtError(#[from] jsonwebtoken::errors::Error),
 
     #[error("Error en el token generado")]
@@ -153,8 +153,8 @@ impl From<AppError> for Response {
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
-            ApiError::SmtpError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::AddressError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::SmtpError(_) => StatusCode::BAD_GATEWAY,
+            ApiError::AddressError(_) => StatusCode::BAD_REQUEST,
             ApiError::MessageError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidAsistencia => StatusCode::BAD_REQUEST,
             ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,

@@ -1,6 +1,7 @@
 use lettre::{
-    AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor, message::header::ContentType,
-    transport::smtp::authentication::Credentials,
+    AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
+    message::header::ContentType,
+    transport::smtp::{SMTP_PORT, authentication::Credentials},
 };
 use std::env;
 
@@ -20,9 +21,14 @@ impl Mailer {
 
         let creds = Credentials::new(smtp_user, smtp_pass);
 
-        let transport = AsyncSmtpTransport::<Tokio1Executor>::relay(&smtp_host)
+        let smtp_port: u16 = env::var("SMTP_PORT")
+            .map(|p| p.parse().unwrap_or(SMTP_PORT))
+            .unwrap_or(SMTP_PORT);
+
+        let transport = AsyncSmtpTransport::<Tokio1Executor>::starttls_relay(&smtp_host)
             .map_err(|e| ApiError::SmtpError(lettre::transport::smtp::Error::from(e)))?
             .credentials(creds)
+            .port(smtp_port)
             .build();
 
         Ok(Self {
@@ -33,20 +39,20 @@ impl Mailer {
 
     pub async fn send_new_password(&self, to: &str, new_password: &str) -> Result<(), ApiError> {
         let email = Message::builder()
-            .from(self.from.parse().map_err(|e| ApiError::AddressError(lettre::address::AddressError::from(e)))?)
-            .to(to.parse().map_err(|e| ApiError::AddressError(lettre::address::AddressError::from(e)))?)
+            .from(self.from.parse().map_err(ApiError::AddressError)?)
+            .to(to.parse().map_err(ApiError::AddressError)?)
             .subject("Tu nueva contraseña")
             .header(ContentType::TEXT_PLAIN)
             .body(format!(
                 "Hola,\n\nTu nueva contraseña temporal es:\n\n  {}\n\nTe recomendamos cambiarla al iniciar sesión.\n",
                 new_password
             ))
-            .map_err(|_| ApiError::InternalServerError)?;
+            .map_err(ApiError::MessageError)?;
 
         self.transport
             .send(email)
             .await
-            .map_err(|_| ApiError::InternalServerError)?;
+            .map_err(ApiError::SmtpError)?;
 
         Ok(())
     }
