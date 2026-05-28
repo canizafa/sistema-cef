@@ -137,6 +137,25 @@ impl EmpleadoRepository {
             None => Err(ApiError::NotFound),
         }
     }
+    pub async fn update_password(
+        pool: &SqlitePool,
+        email: &str,
+        password_hash: &str,
+    ) -> Result<(), ApiError> {
+        sqlx::query!(
+            r#"
+                UPDATE empleado
+                SET password = ?
+                WHERE mail = ?
+                "#,
+            password_hash,
+            email,
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e))?;
+        Ok(())
+    }
     pub async fn update_empleado(
         pool: &SqlitePool,
         dni: i64,
@@ -149,7 +168,6 @@ impl EmpleadoRepository {
                 SET
                     nombre_apellido = ?,
                     mail = ?,
-                    password = ?,
                     genero = ?,
                     estado = ?,
                     rol = ?
@@ -157,7 +175,6 @@ impl EmpleadoRepository {
                 "#,
             empleado.nombre_apellido,
             empleado.mail,
-            empleado.password_hash,
             empleado.genero,
             empleado.estado,
             rol,

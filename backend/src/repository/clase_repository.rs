@@ -10,7 +10,7 @@ impl ClaseRepository {
         let id = clase.get_id();
         let dia = clase.get_dia();
         let horario = clase.get_horario();
-        let cupo_profe = clase.get_cupo_profe();
+        let cupo_profe = clase.get_cupo_base();
         let cupo_maximo = clase.get_cupo_maximo();
         let estado = clase.get_estado();
         let descripcion = clase.get_descripcion();
@@ -24,7 +24,7 @@ impl ClaseRepository {
                    id_clase,
                    dia,
                    horario,
-                   cupo_profe,
+                   cupo_base,
                    cupo_maximo,
                    estado,
                    descripcion,
@@ -56,7 +56,7 @@ impl ClaseRepository {
                 id_clase,
                 dia,
                 horario,
-                cupo_profe,
+                cupo_base,
                 cupo_maximo,
                 estado,
                 descripcion,
@@ -77,8 +77,8 @@ impl ClaseRepository {
                     row.dia.parse::<NaiveDate>().unwrap(),
                     row.horario,
                     row.descripcion.unwrap(),
-                    row.cupo_profe.unwrap(),
-                    row.cupo_maximo,
+                    row.cupo_base,
+                    row.cupo_maximo.unwrap(),
                     Estado::from(row.estado),
                     row.id_sala,
                     row.dni_profesor.unwrap(),
@@ -93,18 +93,18 @@ impl ClaseRepository {
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Clase, ApiError> {
         let row = sqlx::query!(
             "SELECT
-                id_clase,
-                dia,
-                horario,
-                cupo_profe,
-                cupo_maximo,
-                estado,
-                descripcion,
-                id_actividad,
-                id_sala,
-                dni_profesor
-            FROM clase
-            WHERE id_clase = ?",
+                        id_clase,
+                        dia,
+                        horario,
+                        cupo_base,
+                        cupo_maximo,
+                        estado,
+                        descripcion,
+                        id_actividad,
+                        id_sala,
+                        dni_profesor
+                    FROM clase
+                    WHERE id_clase = ?",
             id
         )
         .fetch_one(pool)
@@ -116,8 +116,8 @@ impl ClaseRepository {
             row.dia.parse::<NaiveDate>().unwrap(),
             row.horario,
             row.descripcion.unwrap(),
-            row.cupo_profe.unwrap(),
-            row.cupo_maximo,
+            row.cupo_base,
+            row.cupo_maximo.unwrap(),
             Estado::from(row.estado),
             row.id_sala,
             row.dni_profesor.unwrap(),
@@ -132,7 +132,7 @@ impl ClaseRepository {
     ) -> Result<Clase, ApiError> {
         let dia = clase.get_dia();
         let horario = clase.get_horario();
-        let cupo_profe = clase.get_cupo_profe();
+        let cupo_base = clase.get_cupo_base();
         let cupo_maximo = clase.get_cupo_maximo();
         let estado = clase.get_estado();
         let descripcion = clase.get_descripcion();
@@ -144,7 +144,7 @@ impl ClaseRepository {
             SET
                 dia = ?,
                 horario = ?,
-                cupo_profe = ?,
+                cupo_base = ?,
                 cupo_maximo = ?,
                 estado = ?,
                 descripcion = ?,
@@ -153,7 +153,7 @@ impl ClaseRepository {
             WHERE id_clase = ?",
             dia,
             horario,
-            cupo_profe,
+            cupo_base,
             cupo_maximo,
             estado,
             descripcion,
