@@ -8,6 +8,7 @@ export type EstadoReserva = 'disponible' | 'sin-cupo' | 'reservada'
 interface ClaseCardClienteProps {
   idClase: string
   dia: string
+  diaSemana: string
   horario: string
   descripcion: string
   estadoReserva: EstadoReserva
@@ -31,6 +32,7 @@ function getBadge(estado: EstadoReserva) {
 
 export function ClaseCardCliente({
   dia,
+  diaSemana,
   horario,
   descripcion,
   estadoReserva,
@@ -52,8 +54,13 @@ export function ClaseCardCliente({
       <CardContent className="space-y-1.5 pb-3">
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-destructive" />
-          <span className="font-medium text-destructive">Fecha:</span>
+          <span className="font-medium text-destructive">Fecha inicio:</span>
           <span className="text-gray-700">{dia}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Calendar className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Días de la semana:</span>
+          <span className="text-gray-700">{diaSemana}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Clock className="w-4 h-4 text-destructive" />

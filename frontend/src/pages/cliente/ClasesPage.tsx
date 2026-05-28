@@ -103,6 +103,7 @@ export function ClasesPage() {
                 key={clase.id_clase}
                 idClase={clase.id_clase}
                 dia={clase.dia}
+                diaSemana={clase.dia_semana}
                 horario={clase.horario}
                 descripcion={clase.descripcion}
                 estadoReserva={getEstadoReserva(clase)}
