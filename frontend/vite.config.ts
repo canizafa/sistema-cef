@@ -17,6 +17,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["sqvlp6f4-5173.brs.devtunnels.ms"],
+  },
   test: {
     environment: "jsdom",
     globals: true,
