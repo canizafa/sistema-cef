@@ -48,20 +48,17 @@ impl AsistenciaRepository {
                     "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(ApiError::DatabaseError)?;
 
-        match row {
-            Some(row) => Ok(Asistencia::new(
-                row.id_asistencia,
-                NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap_or_default(),
-                row.metodo,
-                row.id_reserva,
-                Vec::new(),
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Asistencia::new(
+            row.id_asistencia,
+            NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap_or_default(),
+            row.metodo,
+            row.id_reserva,
+            Vec::new(),
+        ))
     }
     pub async fn get_all_asistencias(pool: &SqlitePool) -> Result<Vec<Asistencia>, ApiError> {
         let rows = sqlx::query!(

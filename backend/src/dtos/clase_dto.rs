@@ -25,6 +25,7 @@ pub struct ClaseResponse {
     pub lleno: bool,
     pub descripcion: String,
     pub id_actividad: String,
+    pub id_sala: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -42,6 +43,7 @@ impl From<Clase> for ClaseResponse {
             lleno: value.is_lleno(),
             descripcion: value.get_descripcion(),
             id_actividad: value.get_id_actividad(),
+            id_sala: value.get_id_sala().to_string(),
         }
     }
 }

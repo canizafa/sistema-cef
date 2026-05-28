@@ -44,18 +44,15 @@ impl ActividadRepository {
                "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(ApiError::DatabaseError)?;
 
-        match row {
-            Some(row) => Ok(Actividad::new(
-                row.id_actividad,
-                row.nombre,
-                row.descripcion,
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Actividad::new(
+            row.id_actividad,
+            row.nombre,
+            row.descripcion,
+        ))
     }
     pub async fn get_all_actividades(pool: &SqlitePool) -> Result<Vec<Actividad>, ApiError> {
         let rows = sqlx::query!(

@@ -92,22 +92,19 @@ impl PagoRepository {
                    "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Pago::new(
-                row.id_pago,
-                row.monto,
-                chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
-                row.hora,
-                row.sena,
-                row.id_membresia,
-                row.reserva_paga,
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Pago::new(
+            row.id_pago,
+            row.monto,
+            chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
+            row.hora,
+            row.sena,
+            row.id_membresia,
+            row.reserva_paga,
+        ))
     }
     pub async fn delete_pago(pool: &SqlitePool, id: &str) -> Result<Pago, ApiError> {
         let pago = Self::get_pago(pool, id).await?;

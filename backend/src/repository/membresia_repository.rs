@@ -88,21 +88,18 @@ impl MembresiaRepository {
                     "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(ApiError::DatabaseError)?;
 
-        match row {
-            Some(row) => Ok(Membresia::new(
-                row.id_membresia,
-                row.tipo,
-                crate::domain::Estado::from(row.estado),
-                NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
-                row.fecha_fin
-                    .map(|f: String| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Membresia::new(
+            row.id_membresia,
+            row.tipo,
+            crate::domain::Estado::from(row.estado),
+            NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
+            row.fecha_fin
+                .map(|f: String| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
+        ))
     }
     pub async fn update_membresia(
         pool: &SqlitePool,
