@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/context/AuthContext';
-import { clienteService, type ClienteResponse, type UpdateClienteRequest } from '@/services/cliente.service';
+import { clienteService, type ClienteResponse } from '@/services/cliente.service';
 import { authService } from '@/services/auth.service';
 
 function CampoInfo({ label, valor }: { label: string; valor: string }) {
@@ -26,7 +26,7 @@ export function PerfilPage() {
     const [cambiarExito, setCambiarExito] = useState(false);
 
     const [editando, setEditando] = useState(false);
-    const [editForm, setEditForm] = useState<UpdateClienteRequest>({
+    const [editForm, setEditForm] = useState<{ nombre_apellido: string; fecha_nacimiento: string }>({
         nombre_apellido: '', fecha_nacimiento: '',
     });
     const [editLoading, setEditLoading] = useState(false);
@@ -72,7 +72,20 @@ export function PerfilPage() {
 
         setEditLoading(true);
         try {
-            await clienteService.updatePerfil(user.dni, editForm);
+            await clienteService.updatePerfil(user.dni, {
+                dni: perfil!.dni,
+                nombre_apellido: editForm.nombre_apellido,
+                email: perfil!.email,
+                telefono: perfil!.telefono,
+                fecha_nacimiento: editForm.fecha_nacimiento,
+                estado: perfil!.estado,
+                rol: perfil!.rol,
+                ficha_medica: {
+                    enfermedades: perfil!.ficha_medica.enfermedades,
+                    operaciones_quirurgicas: perfil!.ficha_medica.operaciones_quirurgicas,
+                    detalle: perfil!.ficha_medica.detalle,
+                },
+            });
             setPerfil((prev) => prev ? { ...prev, nombre_apellido: editForm.nombre_apellido, fecha_nacimiento: editForm.fecha_nacimiento } : prev);
             setEditando(false);
             setEditExito(true);
@@ -148,7 +161,7 @@ export function PerfilPage() {
                                         <CampoInfo label='DNI' valor={perfil.dni.toString()} />
                                         <CampoInfo label='Email' valor={perfil.email} />
                                         <CampoInfo label='Teléfono' valor={perfil.telefono} />
-                                        <CampoInfo label='Fecha de nacimiento' valor={new Date(perfil.fecha_nacimiento).toLocaleDateString('es-AR')} />
+                                        <CampoInfo label='Fecha de nacimiento' valor={perfil.fecha_nacimiento.slice(0, 10).split('-').reverse().join('/')} />
                                     </>
                                 )}
                             </div>

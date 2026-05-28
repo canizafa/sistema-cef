@@ -19,8 +19,18 @@ export interface ClienteResponse {
 }
 
 export interface UpdateClienteRequest {
+    dni: number;
     nombre_apellido: string;
+    email: string;
+    telefono: string;
     fecha_nacimiento: string;
+    estado: string;
+    rol: string;
+    ficha_medica: {
+        enfermedades: boolean;
+        operaciones_quirurgicas: boolean;
+        detalle: string;
+    };
 }
 
 export const clienteService = {
