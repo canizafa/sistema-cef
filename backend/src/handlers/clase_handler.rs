@@ -20,7 +20,6 @@ pub async fn create_clase_handler(
     let mut clase = Clase::from(request);
     clase.validate_clase()?;
     clase.sala_libre(&ClaseRepository::get_all(&state.db).await?)?;
-    clase.disminuir_cupo()?;
     ClaseRepository::create_clase(&state.db, &clase).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
@@ -45,6 +44,17 @@ pub async fn update_clase_handler(
     ClaseRepository::update_clase(&state.db, &id, &clase).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
+
+// pub async fn disminuir_cupo_handler(
+//     State(state): State<AppState>,
+//     Path(id): Path<String>,
+//     Json
+// ) -> Result<Json<ClaseResponse>, ApiError> {
+//     let mut clase = ClaseRepository::get_by_id(&state.db, &id).await?;
+//     clase.disminuir_cupo()?;
+//     ClaseRepository::update_clase(&state.db, &id, &clase).await?;
+//     Ok(Json(ClaseResponse::from(clase)))
+// }
 
 #[instrument(name = "clase.delete", skip(state), fields(id = %id), err)]
 pub async fn delete_clase_handler(
