@@ -17,9 +17,12 @@ pub async fn crear_preferencia(
             unit_price: monto,
         }],
         back_urls: BackUrls {
-            success: "http://localhost:5173/pago/exito".to_string(),
-            failure: "http://localhost:5173/pago/fallo".to_string(),
-            pending: "http://localhost:5173/pago/pendiente".to_string(),
+            success: env::var("FRONT_URL").unwrap_or("http://localhost:5173".to_string())
+                + "/pago/exito",
+            failure: env::var("FRONT_URL").unwrap_or("http://localhost:5173".to_string())
+                + "/pago/fallo",
+            pending: env::var("FRONT_URL").unwrap_or("http://localhost:5173".to_string())
+                + "/pago/pendiente",
         },
         auto_return: "approved".to_string(),
     };
