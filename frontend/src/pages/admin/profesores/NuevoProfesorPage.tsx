@@ -1,17 +1,17 @@
 // Panel del dueño para registrar nuevos profesores.
 // AdminRoute en App.tsx ya garantiza que solo el dueño puede llegar acá.
 import { useState } from 'react';
-import { empleadoService } from '@/services/empleados.service';
+import { profesorService } from '@/services/profesor.service';
 
 export function NuevoProfesorPage() {
     const [form, setForm] = useState({
-        nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino',
+        nombre: '', apellido: '', dni: '',
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }
 
@@ -21,17 +21,14 @@ export function NuevoProfesorPage() {
         setSuccess(null);
         setLoading(true);
         try {
-            await empleadoService.registrarEmpleado({
-                nombre_apellido: `${form.nombre} ${form.apellido}`,
+            await profesorService.crearProfesor({
                 dni: Number(form.dni),
-                mail: form.mail,
-                password: form.password,
-                genero: form.genero,
+                nombre_completo: `${form.nombre} ${form.apellido}`,
+                genero: 'otro',
                 estado: 'alta',
-                rol: 'profesor',
             });
-            setSuccess('Profesor registrado correctamente');
-            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino' });
+            setSuccess('Profesor dado de alta en el sistema');
+            setForm({ nombre: '', apellido: '', dni: '' });
         } catch {
             setError('Error al registrar el profesor. Revisá los datos.');
         } finally {
@@ -55,22 +52,6 @@ export function NuevoProfesorPage() {
                     <div className="space-y-1">
                         <label htmlFor="dni" className="text-sm font-medium">DNI</label>
                         <input id="dni" name="dni" placeholder="12345678" value={form.dni} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                        <label htmlFor="mail" className="text-sm font-medium">Email</label>
-                        <input id="mail" name="mail" type="email" placeholder="profesor@cef.com" value={form.mail} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                        <label htmlFor="password" className="text-sm font-medium">Contraseña inicial</label>
-                        <input id="password" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                        <label htmlFor="genero" className="text-sm font-medium">Género</label>
-                        <select id="genero" name="genero" value={form.genero} onChange={handleChange} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                            <option value="masculino">Masculino</option>
-                            <option value="femenino">Femenino</option>
-                            <option value="otro">Otro</option>
-                        </select>
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     {success && <p className="text-sm text-green-600">{success}</p>}
