@@ -1,8 +1,9 @@
 // Página para crear una nueva clase.
 // Solo accesible para recepcionista y dueño (protegido desde App.tsx).
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clasesService, type EstadoClase } from '@/services/clases.service';
+import { profesorService, type Profesor } from '@/services/profesor.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,11 +21,18 @@ export function NuevaClasePage() {
         dni_profesor: '',
         descripcion: '',
     });
+    const [profesores, setProfesores] = useState<Profesor[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        profesorService.getProfesores()
+            .then(setProfesores)
+            .catch(() => setError('No se pudieron cargar los profesores'));
+    }, []);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -38,6 +46,16 @@ export function NuevaClasePage() {
         e.preventDefault();
         setError(null);
         setSuccess(null);
+
+        if (!form.dni_profesor) {
+            setError('Seleccioná un profesor');
+            return;
+        }
+        if (!form.estado) {
+            setError('Seleccioná un estado');
+            return;
+        }
+
         setLoading(true);
         try {
             await clasesService.crearClase({
@@ -77,12 +95,12 @@ export function NuevaClasePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <Label htmlFor="cupo_maximo">Cupo máximo</Label>
+                        <Label htmlFor="cupo_maximo">Cupo base</Label>
                         <Input id="cupo_maximo" name="cupo_maximo" type="number" min="1" placeholder="15" value={form.cupo_maximo} onChange={handleChange} required />
                     </div>
 
                     <div className="space-y-1">
-                        <Label htmlFor="cupo_profe">Cupo reservado para profesor</Label>
+                        <Label htmlFor="cupo_profe">Cupo máximo</Label>
                         <Input id="cupo_profe" name="cupo_profe" type="number" min="0" placeholder="1" value={form.cupo_profe} onChange={handleChange} required />
                         <p className="text-xs text-muted">Lugares reservados fuera del cupo general</p>
                     </div>
@@ -103,13 +121,27 @@ export function NuevaClasePage() {
                     </div>
 
                     <div className="space-y-1">
-                        <Label htmlFor="dni_profesor">DNI del profesor</Label>
-                        <Input id="dni_profesor" name="dni_profesor" type="number" min="1000000" placeholder="30123456" value={form.dni_profesor} onChange={handleChange} required />
+                        <Label>Profesor</Label>
+                        <Select
+                            value={form.dni_profesor}
+                            onValueChange={(v) => handleSelect('dni_profesor', v)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Seleccioná un profesor" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {profesores.map((p) => (
+                                    <SelectItem key={p.dni} value={String(p.dni)}>
+                                        {p.nombre_completo}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="space-y-1">
                         <Label>Estado</Label>
-                        <Select value={form.estado} onValueChange={(v) => handleSelect('estado', v)} required>
+                        <Select value={form.estado} onValueChange={(v) => handleSelect('estado', v)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Seleccioná un estado" />
                             </SelectTrigger>
@@ -119,12 +151,12 @@ export function NuevaClasePage() {
                             </SelectContent>
                         </Select>
                     </div>
-
+                                    
                     {error && <p className="text-xs text-destructive">{error}</p>}
                     {success && <p className="text-xs text-success">{success}</p>}
 
                     <Button type="submit" disabled={loading} className="w-full bg-brand text-white">
-                        {loading ? 'Creando...' : 'Crear clase'}
+                        {loading ? 'Creando...' : 'Dar de alta la clase'}
                     </Button>
 
                 </form>

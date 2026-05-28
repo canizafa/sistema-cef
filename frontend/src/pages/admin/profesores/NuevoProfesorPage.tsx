@@ -1,11 +1,11 @@
-// Panel del dueño para registrar nuevos empleados.
+// Panel del dueño para registrar nuevos profesores.
 // AdminRoute en App.tsx ya garantiza que solo el dueño puede llegar acá.
 import { useState } from 'react';
 import { empleadoService } from '@/services/empleados.service';
 
-export function NuevoEmpleadoPage() {
+export function NuevoProfesorPage() {
     const [form, setForm] = useState({
-        nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'empleado'
+        nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino',
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -28,12 +28,12 @@ export function NuevoEmpleadoPage() {
                 password: form.password,
                 genero: form.genero,
                 estado: 'alta',
-                rol: 'empleado',
+                rol: 'profesor',
             });
-            setSuccess('Empleado registrado correctamente');
-            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'empleado' });
+            setSuccess('Profesor registrado correctamente');
+            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino' });
         } catch {
-            setError('Error al registrar el empleado. Revisá los datos.');
+            setError('Error al registrar el profesor. Revisá los datos.');
         } finally {
             setLoading(false);
         }
@@ -42,7 +42,7 @@ export function NuevoEmpleadoPage() {
     return (
         <main className="flex-1 flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-sm">
-                <h1 className="text-2xl font-bold mb-6 text-center">Registrar empleado</h1>
+                <h1 className="text-2xl font-bold mb-6 text-center">Registrar profesor</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
                         <label htmlFor="nombre" className="text-sm font-medium">Nombre</label>
@@ -58,7 +58,7 @@ export function NuevoEmpleadoPage() {
                     </div>
                     <div className="space-y-1">
                         <label htmlFor="mail" className="text-sm font-medium">Email</label>
-                        <input id="mail" name="mail" type="email" placeholder="empleado@cef.com" value={form.mail} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                        <input id="mail" name="mail" type="email" placeholder="profesor@cef.com" value={form.mail} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                     </div>
                     <div className="space-y-1">
                         <label htmlFor="password" className="text-sm font-medium">Contraseña inicial</label>
@@ -75,7 +75,7 @@ export function NuevoEmpleadoPage() {
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     {success && <p className="text-sm text-green-600">{success}</p>}
                     <button type="submit" disabled={loading} className="w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50">
-                        {loading ? 'Registrando...' : 'Registrar empleado'}
+                        {loading ? 'Registrando...' : 'Registrar profesor'}
                     </button>
                 </form>
             </div>

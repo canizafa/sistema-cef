@@ -30,6 +30,8 @@ import { EmpleadosPage } from '@/pages/admin/empleados/EmpleadosPage';
 import { NuevoEmpleadoPage } from '@/pages/admin/empleados/NuevoEmpleadoPage';
 import { EditarEmpleadoPage } from '@/pages/admin/empleados/EditarEmpleadoPage';
 
+//Admin - Profesores
+import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
 import { NuevoClientePage } from '@/pages/admin/clientes/NuevoClientePage';
@@ -72,7 +74,10 @@ export const AppRouter = () => {
                 <Route path="empleados" element={<EmpleadosPage />} />
                 <Route path="empleados/nuevo" element={<NuevoEmpleadoPage />} />
                 <Route path="empleados/:id/editar" element={<EditarEmpleadoPage />} />
-
+              
+                {/* Profesores - solo dueño */}
+                 <Route path="profesores" element={<ProfesoresPage />} />          
+                                
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
                 <Route path="clientes/nuevo" element={<NuevoClientePage />} />
