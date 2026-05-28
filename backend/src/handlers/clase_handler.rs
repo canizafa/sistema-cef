@@ -17,7 +17,7 @@ pub async fn create_clase_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClaseRequest>,
 ) -> Result<Json<ClaseResponse>, ApiError> {
-    let mut clase = Clase::from(request);
+    let clase = Clase::from(request);
     clase.validate_clase()?;
     clase.sala_libre(&ClaseRepository::get_all(&state.db).await?)?;
     ClaseRepository::create_clase(&state.db, &clase).await?;
