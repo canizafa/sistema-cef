@@ -1,5 +1,8 @@
 use crate::{
-    auth::password::hash_password, domain::Rol, dtos::CreateEmpleadoRequest, errors::ApiError,
+    auth::password::hash_password,
+    domain::Rol,
+    dtos::{CreateEmpleadoRequest, empleado_dto::UpdateEmpleadoRequest},
+    errors::ApiError,
 };
 
 #[derive(Debug, Clone)]
@@ -82,6 +85,19 @@ impl From<CreateEmpleadoRequest> for Empleado {
             dni_empleado: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash,
+            mail: request.mail,
+            genero: request.genero,
+            estado: request.estado,
+            rol: request.rol,
+        }
+    }
+}
+impl From<UpdateEmpleadoRequest> for Empleado {
+    fn from(request: UpdateEmpleadoRequest) -> Self {
+        Self {
+            dni_empleado: request.dni,
+            nombre_apellido: request.nombre_apellido,
+            password_hash: "".to_string(),
             mail: request.mail,
             genero: request.genero,
             estado: request.estado,
