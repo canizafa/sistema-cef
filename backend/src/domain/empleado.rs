@@ -71,9 +71,6 @@ impl Empleado {
         if !self.mail.contains('@') {
             return Err(ApiError::InvalidEmail);
         }
-        if self.password_hash.len() < 5 {
-            return Err(ApiError::WeakPassword);
-        }
         Ok(())
     }
 }
