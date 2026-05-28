@@ -18,9 +18,10 @@ interface ReservaModalProps {
   abierto: boolean
   onCancelar: () => void
   onConfirmar: () => void
+  loading?: boolean
 }
 
-export function ReservaModal({ clase, abierto, onCancelar, onConfirmar }: ReservaModalProps) {
+export function ReservaModal({ clase, abierto, onCancelar, onConfirmar, loading }: ReservaModalProps) {
   return (
     <Dialog open={abierto} onOpenChange={onCancelar}>
       <DialogContent className="max-w-md">
@@ -49,8 +50,8 @@ export function ReservaModal({ clase, abierto, onCancelar, onConfirmar }: Reserv
           <Button variant="outline" onClick={onCancelar}>
             Cancelar
           </Button>
-          <Button variant="default" onClick={onConfirmar}>
-            Pagar con Mercado Pago
+          <Button variant="default" onClick={onConfirmar} disabled={loading}>
+            {loading ? 'Procesando...' : 'Pagar con Mercado Pago'}
           </Button>
         </DialogFooter>
       </DialogContent>
