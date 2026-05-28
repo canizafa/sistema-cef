@@ -138,7 +138,8 @@ pub async fn reset_password_handler(
         let new_password = generate_random_password();
         let hashed_password = hash_password(&new_password)?;
         cliente.update_password(&hashed_password)?;
-        ClienteRepository::update_cliente(&state.db, cliente.get_dni(), &cliente).await?;
+        ClienteRepository::update_password_by_email(&state.db, &body.email, &hashed_password)
+            .await?;
 
         state
             .mailer
@@ -166,7 +167,7 @@ pub async fn change_password_handler(
         let new_password = hash_password(&body.new_password)?;
         cliente.update_password(&new_password)?;
 
-        ClienteRepository::update_cliente(&state.db, dni, &cliente).await?;
+        ClienteRepository::update_password_by_dni(&state.db, dni, &body.new_password).await?;
 
         Ok(StatusCode::OK)
     } else if usuario_empleado.is_ok() {
