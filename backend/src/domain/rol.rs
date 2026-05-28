@@ -19,6 +19,7 @@ pub enum Rol {
 pub enum Estado {
     Alta,
     Baja,
+    SinCupo,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -34,6 +35,7 @@ pub enum Genero {
 impl From<String> for Estado {
     fn from(s: String) -> Self {
         match s.to_lowercase().as_str() {
+            "sin_cupo" => Estado::SinCupo,
             "alta" => Estado::Alta,
             "baja" => Estado::Baja,
             _ => Estado::Alta,
@@ -78,6 +80,7 @@ impl ToString for Rol {
 impl ToString for Estado {
     fn to_string(&self) -> String {
         match self {
+            Estado::SinCupo => "sin_cupo".to_string(),
             Estado::Alta => "alta".to_string(),
             Estado::Baja => "baja".to_string(),
         }

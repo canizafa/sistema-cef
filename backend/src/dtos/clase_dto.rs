@@ -7,8 +7,8 @@ use chrono::NaiveDate;
 pub struct CreateClaseRequest {
     pub dia: NaiveDate,
     pub horario: String,
-    pub cupo_profe: i64,
     pub cupo_maximo: i64,
+    pub cupo_base: i64,
     pub estado: Estado,
     pub id_actividad: String,
     pub id_sala: String,
