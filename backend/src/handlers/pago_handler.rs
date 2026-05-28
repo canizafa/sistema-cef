@@ -18,11 +18,11 @@ pub async fn crear_pago_handler(
     pago.validate_pago()?;
     let mp_response = mercado_pago_service::crear_preferencia(payload.titulo, payload.monto)
         .await
-        .map_err(|_| ApiError::InternalServerError)?;
+        .map_err(|e| ApiError::MpError(e.to_string()))?;
 
     PagoRepository::create_pago(&state.db, &pago)
         .await
-        .map_err(|_| ApiError::InternalServerError)?;
+        .map_err(|e| ApiError::MpError(e.to_string()))?;
 
     Ok(Json(PagoResponse {
         init_point: mp_response.init_point,
