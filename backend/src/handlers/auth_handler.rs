@@ -121,7 +121,8 @@ pub async fn reset_password_handler(
         let hashed_password = hash_password(&new_password)?;
 
         empleado.update_password(&hashed_password)?;
-        EmpleadoRepository::update_empleado(&state.db, empleado.get_dni(), &empleado).await?;
+        EmpleadoRepository::update_password_by_email(&state.db, &body.email, &hashed_password)
+            .await?;
 
         state
             .mailer
@@ -167,7 +168,7 @@ pub async fn change_password_handler(
         let new_password = hash_password(&body.new_password)?;
         cliente.update_password(&new_password)?;
 
-        ClienteRepository::update_password_by_dni(&state.db, dni, &body.new_password).await?;
+        ClienteRepository::update_password_by_dni(&state.db, dni, &new_password).await?;
 
         Ok(StatusCode::OK)
     } else if usuario_empleado.is_ok() {
@@ -175,7 +176,7 @@ pub async fn change_password_handler(
         verify_password(&body.old_password, &empleado.get_password_hash())?;
         let new_password_hash = hash_password(&body.new_password)?;
         empleado.update_password(&new_password_hash)?;
-        EmpleadoRepository::update_empleado(&state.db, dni, &empleado).await?;
+        EmpleadoRepository::update_password_by_dni(&state.db, dni, &new_password_hash).await?;
 
         Ok(StatusCode::OK)
     } else {
