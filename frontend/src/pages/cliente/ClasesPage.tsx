@@ -106,6 +106,8 @@ export function ClasesPage() {
                 horario={clase.horario}
                 descripcion={clase.descripcion}
                 estadoReserva={getEstadoReserva(clase)}
+                idActividad={clase.id_actividad}
+                idSala={clase.id_sala}
                 onReservar={() => handleReservar(clase)}
                 onCancelar={() => handleCancelar(clase.id_clase)}
                 onListaEspera={() => handleListaEspera(clase)}
