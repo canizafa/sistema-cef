@@ -9,8 +9,8 @@ pub struct Clase {
     dia: NaiveDate,
     horario: String,
     descripcion: String,
-    cupo_profe: i64,
     cupo_maximo: i64,
+    cupo_base: i64,
     estado: Estado,
     id_sala: String,
     dni_profesor: i64,
@@ -23,7 +23,7 @@ impl Clase {
         dia: NaiveDate,
         horario: String,
         descripcion: String,
-        cupo_profe: i64,
+        cupo_base: i64,
         cupo_maximo: i64,
         estado: Estado,
         id_sala: String,
@@ -35,7 +35,7 @@ impl Clase {
             dia,
             horario,
             descripcion,
-            cupo_profe,
+            cupo_base,
             cupo_maximo,
             estado,
             id_sala,
@@ -53,8 +53,8 @@ impl Clase {
     pub fn get_horario(&self) -> String {
         self.horario.clone()
     }
-    pub fn get_cupo_profe(&self) -> i64 {
-        self.cupo_profe
+    pub fn get_cupo_base(&self) -> i64 {
+        self.cupo_base
     }
     pub fn get_cupo_maximo(&self) -> i64 {
         self.cupo_maximo
@@ -77,12 +77,12 @@ impl Clase {
     }
 
     pub fn validate_clase(&self) -> Result<(), ApiError> {
-        if self.cupo_profe > self.cupo_maximo {
+        if self.cupo_base > self.cupo_maximo {
             return Err(ApiError::BadRequest(
                 "El cupo del profesor excede el cupo máximo".to_string(),
             ));
         }
-        if self.cupo_profe < 0 {
+        if self.cupo_base < 0 {
             return Err(ApiError::BadRequest(
                 "El cupo del profesor no puede ser negativo".to_string(),
             ));
@@ -122,8 +122,19 @@ impl Clase {
         Ok(())
     }
 
+    pub fn disminui_cupo(&mut self) {
+        if self.cupo_base > 0 {
+            self.cupo_base -= 1;
+        } else {
+            self.estado = Estado::SinCupo;
+        }
+    }
+
     pub fn is_lleno(&self) -> bool {
-        self.cupo_profe >= self.cupo_maximo
+        match self.estado {
+            Estado::Alta | Estado::SinCupo => self.cupo_base >= self.cupo_maximo,
+            Estado::Baja => false,
+        }
     }
 }
 
@@ -135,7 +146,7 @@ impl From<CreateClaseRequest> for Clase {
             dia: value.dia,
             horario: value.horario,
             descripcion: value.descripcion,
-            cupo_profe: value.cupo_profe,
+            cupo_base: value.cupo_base,
             cupo_maximo: value.cupo_maximo,
             estado: value.estado,
             id_sala: value.id_sala,
