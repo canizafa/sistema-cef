@@ -1,4 +1,6 @@
-use chrono::NaiveDate;
+use std::str::FromStr;
+
+use chrono::{NaiveDate, NaiveTime};
 use uuid::Uuid;
 
 use crate::{domain::Estado, dtos::CreateClaseRequest, errors::ApiError};
@@ -76,6 +78,23 @@ impl Clase {
         self.dni_profesor
     }
 
+    pub fn sala_libre(&self, otras_clases: &[Clase]) -> Result<(), ApiError> {
+        if otras_clases.iter().any(|c| {
+            // si no hay una diferencia de 2 horas entre los horarios
+            c.id_sala == self.id_sala
+                && NaiveTime::from_str(&c.get_horario())
+                    .unwrap()
+                    .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
+                    .abs()
+                    < chrono::Duration::hours(2)
+                && c.get_dia() == self.dia
+        }) {
+            Err(ApiError::BadRequest("La sala ya está tomada".to_string()))
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn validate_clase(&self) -> Result<(), ApiError> {
         if self.cupo_base > self.cupo_maximo {
             return Err(ApiError::BadRequest(
@@ -122,12 +141,14 @@ impl Clase {
         Ok(())
     }
 
-    pub fn disminui_cupo(&mut self) {
+    pub fn disminuir_cupo(&mut self) -> Result<(), ApiError> {
         if self.cupo_base > 0 {
             self.cupo_base -= 1;
         } else {
             self.estado = Estado::SinCupo;
+            return Err(ApiError::BadRequest("No hay cupo disponible".to_string()));
         }
+        Ok(())
     }
 
     pub fn is_lleno(&self) -> bool {
