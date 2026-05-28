@@ -48,19 +48,16 @@ impl ProfesorRepository {
                     "#,
             dni
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Profesor::new(
-                row.dni_profesor,
-                row.nombre,
-                crate::domain::Genero::from(row.genero),
-                crate::domain::Estado::from(row.estado),
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Profesor::new(
+            row.dni_profesor,
+            row.nombre,
+            crate::domain::Genero::from(row.genero),
+            crate::domain::Estado::from(row.estado),
+        ))
     }
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Profesor>, ApiError> {
         let rows = sqlx::query!(
