@@ -6,6 +6,7 @@ use chrono::NaiveDate;
 #[derive(Debug, Deserialize)]
 pub struct CreateClaseRequest {
     pub dia: NaiveDate,
+    pub dia_semana: String,
     pub horario: String,
     pub cupo_maximo: i64,
     pub cupo_base: i64,
@@ -20,6 +21,7 @@ pub struct CreateClaseRequest {
 pub struct ClaseResponse {
     pub id_clase: String,
     pub dia: NaiveDate,
+    pub dia_semana: String,
     pub horario: String,
     pub estado: Estado,
     pub lleno: bool,
@@ -38,6 +40,7 @@ impl From<Clase> for ClaseResponse {
         Self {
             id_clase: value.get_id().to_string(),
             dia: value.get_dia(),
+            dia_semana: value.get_dia().format("%A").to_string(),
             horario: value.get_horario(),
             estado: value.get_estado(),
             lleno: value.is_lleno(),
