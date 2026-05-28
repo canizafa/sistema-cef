@@ -84,9 +84,16 @@ export function EmpleadosPage() {
     }
   }
 
+  const todosActivos = empleados.length > 0 && empleados.every((e) => e.estado === 'alta')
+
   const empleadosFiltrados = soloActivos
     ? empleados.filter((e) => e.estado === 'alta')
     : empleados
+
+  function handleToggleFiltro() {
+    if (!soloActivos && todosActivos) return
+    setSoloActivos((prev) => !prev)
+  }
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
@@ -105,18 +112,25 @@ export function EmpleadosPage() {
 
       <div className="mb-4">
         <button
-          onClick={() => setSoloActivos((prev) => !prev)}
+          onClick={handleToggleFiltro}
           className="bg-brand text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
         >
           {soloActivos ? 'Listar todos los empleados' : 'Listar empleados activos'}
         </button>
+        {!soloActivos && todosActivos && (
+          <p className="text-sm  mt-2">Todos los empleados están activos.</p>
+        )}
       </div>
 
       {loading && <p className="text-sm text-muted">Cargando empleados...</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {!loading && !error && empleadosFiltrados.length === 0 && (
-        <p className="text-sm text-muted">No hay empleados registrados en el sistema.</p>
+      {!loading && !error && empleados.length === 0 && (
+        <p className="text-sm ">No hay empleados registrados en el sistema.</p>
+      )}
+
+      {!loading && !error && soloActivos && empleadosFiltrados.length === 0 && (
+        <p className="text-sm ">No hay empleados activos.</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -126,7 +140,6 @@ export function EmpleadosPage() {
             dni={empleado.dni}
             nombreApellido={empleado.nombreApellido}
             mail={empleado.mail}
-           
             estado={empleado.estado}
             rol={empleado.rol}
             onEditar={() => handleEditar(empleado.dni)}
