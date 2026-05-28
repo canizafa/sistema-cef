@@ -9,7 +9,7 @@ use tracing::instrument;
 use crate::{
     app_state::AppState,
     domain::Empleado,
-    dtos::{CreateEmpleadoRequest, EmpleadoResponse},
+    dtos::{CreateEmpleadoRequest, EmpleadoResponse, empleado_dto::UpdateEmpleadoRequest},
     errors::ApiError,
     repository::EmpleadoRepository,
 };
@@ -54,7 +54,7 @@ pub async fn get_empleados_handler(
 pub async fn update_empleado_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-    Json(body): Json<CreateEmpleadoRequest>,
+    Json(body): Json<UpdateEmpleadoRequest>,
 ) -> Result<Json<EmpleadoResponse>, ApiError> {
     let empleado = Empleado::from(body);
     empleado.validate_empleado()?;
