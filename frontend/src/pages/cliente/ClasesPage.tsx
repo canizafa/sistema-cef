@@ -4,6 +4,7 @@ import { ClaseCardCliente, type EstadoReserva } from '@/components/clases/ClaseC
 import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
 import { clasesService, type ClaseDTO } from '@/services/clases.service'
+import { pagosService } from '@/services/pagos.service'
 
 export function ClasesPage() {
   const { user } = useAuth()
@@ -13,6 +14,7 @@ export function ClasesPage() {
   const [error, setError] = useState<string | null>(null)
   const [claseSeleccionada, setClaseSeleccionada] = useState<ClaseDTO | null>(null)
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [loadingPago, setLoadingPago] = useState(false)
 
   useEffect(() => {
     async function cargar() {
@@ -39,12 +41,25 @@ export function ClasesPage() {
     setModalAbierto(true)
   }
 
-  function handleConfirmar() {
+  async function handleConfirmar() {
     if (!claseSeleccionada) return
-    // TODO: redirigir a MP cuando el back esté listo
-    setReservadas((prev) => new Set(prev).add(claseSeleccionada.id_clase))
-    setModalAbierto(false)
-    setClaseSeleccionada(null)
+    setLoadingPago(true)
+    try {
+      const data = await pagosService.crearPago({
+        titulo: `Reserva: ${claseSeleccionada.descripcion}`,
+        monto: 5000,
+        fecha: new Date().toISOString().split('T')[0],
+        hora: claseSeleccionada.horario,
+        sena: false,
+        id_membresia: '',
+        reserva_paga: '',
+      })
+      window.location.href = data.sandbox_init_point
+    } catch {
+      // TODO: mostrar error en el modal
+    } finally {
+      setLoadingPago(false)
+    }
   }
 
   function handleCancelarModal() {
@@ -104,6 +119,7 @@ export function ClasesPage() {
           abierto={modalAbierto}
           onCancelar={handleCancelarModal}
           onConfirmar={handleConfirmar}
+          loading={loadingPago}
         />
       </main>
     </div>
