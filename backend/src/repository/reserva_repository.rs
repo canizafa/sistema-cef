@@ -87,22 +87,19 @@ impl ReservaRepository {
             "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Reserva::new(
-                row.id_reserva,
-                crate::domain::Estado::from(row.estado),
-                row.tipo,
-                chrono::NaiveDate::parse_from_str(&row.fecha_reserva, "%Y-%m-%d")
-                    .unwrap_or(chrono::NaiveDate::from_ymd_opt(1970, 1, 1).unwrap()),
-                row.dni_cliente,
-                row.id_clase,
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Reserva::new(
+            row.id_reserva,
+            crate::domain::Estado::from(row.estado),
+            row.tipo,
+            chrono::NaiveDate::parse_from_str(&row.fecha_reserva, "%Y-%m-%d")
+                .unwrap_or(chrono::NaiveDate::from_ymd_opt(1970, 1, 1).unwrap()),
+            row.dni_cliente,
+            row.id_clase,
+        ))
     }
     pub async fn update_reserva(
         pool: &SqlitePool,

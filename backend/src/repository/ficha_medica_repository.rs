@@ -49,19 +49,16 @@ impl FichaMedicaRepository {
                    "#,
             id_ficha
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(FichaMedica::new(
-                row.id_ficha,
-                row.enfermedades,
-                row.operaciones_quirurgicas,
-                row.detalles,
-            )),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(FichaMedica::new(
+            row.id_ficha,
+            row.enfermedades,
+            row.operaciones_quirurgicas,
+            row.detalles,
+        ))
     }
     pub async fn update_ficha_medica(
         pool: &SqlitePool,

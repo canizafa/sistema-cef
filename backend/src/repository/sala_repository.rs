@@ -41,14 +41,11 @@ impl SalaRepository {
                     "#,
             id
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(ApiError::DatabaseError)?;
 
-        match row {
-            Some(row) => Ok(Sala::new(row.id_sala, row.numero, row.capacidad_maxima)),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Sala::new(row.id_sala, row.numero, row.capacidad_maxima))
     }
     pub async fn get_all_salas(pool: &SqlitePool) -> Result<Vec<Sala>, ApiError> {
         let rows = sqlx::query!(

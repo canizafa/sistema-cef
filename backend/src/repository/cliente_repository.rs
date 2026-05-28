@@ -149,36 +149,30 @@ impl ClienteRepository {
             "#,
             dni
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => {
-                let ficha = FichaMedica::new(
-                    row.id_ficha,
-                    row.enfermedades,
-                    row.operaciones_quirurgicas,
-                    row.detalles,
-                );
+        let ficha = FichaMedica::new(
+            row.id_ficha,
+            row.enfermedades,
+            row.operaciones_quirurgicas,
+            row.detalles,
+        );
 
-                let cliente = Cliente::new(
-                    row.dni_cliente,
-                    row.nombre_completo,
-                    row.password,
-                    row.email,
-                    row.telefono,
-                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
-                    Estado::from(row.estado),
-                    ficha,
-                    Rol::Cliente,
-                );
+        let cliente = Cliente::new(
+            row.dni_cliente,
+            row.nombre_completo,
+            row.password,
+            row.email,
+            row.telefono,
+            row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
+            Estado::from(row.estado),
+            ficha,
+            Rol::Cliente,
+        );
 
-                Ok(cliente)
-            }
-
-            None => Err(ApiError::NotFound),
-        }
+        Ok(cliente)
     }
 
     pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
