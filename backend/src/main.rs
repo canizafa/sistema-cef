@@ -1,3 +1,4 @@
+use backend::feed_database;
 use backend::mailer::Mailer;
 use backend::routes::root;
 use backend::{app_state::AppState, errors::AppError, telemetry};
@@ -44,6 +45,7 @@ async fn main() -> Result<(), AppError> {
         .map_err(|e| AppError::MigrationError(e))?;
 
     tracing::info!(port = config.port, "Servidor iniciado");
+    feed_database::seed_database(&app_state.db).await?;
 
     let app = root::router()
         .with_state(app_state)
