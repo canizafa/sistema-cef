@@ -18,6 +18,9 @@ frontend/lerna-debug.log*
 .env
 .DS_Store
 
+# Ignorar database
+backend/database.db*
+
 # Archivos personales (facu-l)
 .superpowers/
 docs/
