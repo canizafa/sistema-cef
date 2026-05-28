@@ -36,10 +36,23 @@ pub struct ClaseListResponse {
 
 impl From<Clase> for ClaseResponse {
     fn from(value: Clase) -> Self {
+        let dia_semana_castellano = match value.get_dia().format("%A").to_string().as_str() {
+            "Monday" => "Lunes",
+            "Tuesday" => "Martes",
+            "Wednesday" => "Miércoles",
+            "Thursday" => "Jueves",
+            "Friday" => "Viernes",
+            "Saturday" => "Sábado",
+            "Sunday" => "Domingo",
+            _ => panic!(
+                "Invalid day of the week: {}",
+                value.get_dia().format("%A").to_string()
+            ),
+        };
         Self {
             id_clase: value.get_id().to_string(),
             dia: value.get_dia(),
-            dia_semana: value.get_dia().format("%A").to_string(),
+            dia_semana: dia_semana_castellano.to_string(),
             horario: value.get_horario(),
             estado: value.get_estado(),
             lleno: value.is_lleno(),
