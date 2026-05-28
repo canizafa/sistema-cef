@@ -2,6 +2,7 @@ use sqlx::SqlitePool;
 
 use crate::domain::Empleado;
 use crate::errors::ApiError;
+
 pub struct EmpleadoRepository;
 
 impl EmpleadoRepository {
@@ -37,6 +38,7 @@ impl EmpleadoRepository {
 
         Ok(empleado.clone())
     }
+
     pub async fn get_empleados(pool: &SqlitePool) -> Result<Vec<Empleado>, ApiError> {
         let rows = sqlx::query!(
             r#"
@@ -87,23 +89,21 @@ impl EmpleadoRepository {
                 "#,
             email
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Empleado {
-                dni_empleado: row.dni_empleado,
-                nombre_apellido: row.nombre_apellido,
-                mail: row.mail,
-                password_hash: row.password,
-                genero: row.genero,
-                estado: row.estado,
-                rol: crate::domain::Rol::from(row.rol),
-            }),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Empleado {
+            dni_empleado: row.dni_empleado,
+            nombre_apellido: row.nombre_apellido,
+            mail: row.mail,
+            password_hash: row.password,
+            genero: row.genero,
+            estado: row.estado,
+            rol: crate::domain::Rol::from(row.rol),
+        })
     }
+
     pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Empleado, ApiError> {
         let row = sqlx::query!(
             r#"
@@ -120,24 +120,22 @@ impl EmpleadoRepository {
                 "#,
             dni
         )
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e))?;
 
-        match row {
-            Some(row) => Ok(Empleado {
-                dni_empleado: row.dni_empleado,
-                nombre_apellido: row.nombre_apellido,
-                mail: row.mail,
-                password_hash: row.password,
-                genero: row.genero,
-                estado: row.estado,
-                rol: crate::domain::Rol::from(row.rol),
-            }),
-            None => Err(ApiError::NotFound),
-        }
+        Ok(Empleado {
+            dni_empleado: row.dni_empleado,
+            nombre_apellido: row.nombre_apellido,
+            mail: row.mail,
+            password_hash: row.password,
+            genero: row.genero,
+            estado: row.estado,
+            rol: crate::domain::Rol::from(row.rol),
+        })
     }
-    pub async fn update_password(
+
+    pub async fn update_password_by_email(
         pool: &SqlitePool,
         email: &str,
         password_hash: &str,
@@ -156,6 +154,27 @@ impl EmpleadoRepository {
         .map_err(|e| ApiError::DatabaseError(e))?;
         Ok(())
     }
+
+    pub async fn update_password_by_dni(
+        pool: &SqlitePool,
+        dni: i64,
+        password_hash: &str,
+    ) -> Result<(), ApiError> {
+        sqlx::query!(
+            r#"
+                UPDATE empleado
+                SET password = ?
+                WHERE dni_empleado = ?
+                "#,
+            password_hash,
+            dni,
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e))?;
+        Ok(())
+    }
+
     pub async fn update_empleado(
         pool: &SqlitePool,
         dni: i64,
@@ -186,6 +205,7 @@ impl EmpleadoRepository {
 
         Self::get_by_dni(pool, dni).await
     }
+
     pub async fn delete_empleado(pool: &SqlitePool, dni: i64) -> Result<Empleado, ApiError> {
         let empleado = Self::get_by_dni(pool, dni).await?;
 
