@@ -20,7 +20,7 @@ pub async fn create_clase_handler(
     let mut clase = Clase::from(request);
     clase.validate_clase()?;
     clase.sala_libre(&ClaseRepository::get_all(&state.db).await?)?;
-    clase.disminuir_cupo();
+    clase.disminuir_cupo()?;
     ClaseRepository::create_clase(&state.db, &clase).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }

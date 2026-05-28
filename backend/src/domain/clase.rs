@@ -132,12 +132,14 @@ impl Clase {
         Ok(())
     }
 
-    pub fn disminuir_cupo(&mut self) {
+    pub fn disminuir_cupo(&mut self) -> Result<(), ApiError> {
         if self.cupo_base > 0 {
             self.cupo_base -= 1;
         } else {
             self.estado = Estado::SinCupo;
+            return Err(ApiError::BadRequest("No hay cupo disponible".to_string()));
         }
+        Ok(())
     }
 
     pub fn is_lleno(&self) -> bool {
