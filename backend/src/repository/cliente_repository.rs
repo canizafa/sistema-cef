@@ -235,6 +235,25 @@ impl ClienteRepository {
             None => Err(ApiError::NotFound),
         }
     }
+    pub async fn update_password(
+        pool: &SqlitePool,
+        email: &str,
+        password_hash: &str,
+    ) -> Result<(), ApiError> {
+        sqlx::query!(
+            r#"
+                UPDATE cliente
+                SET password = ?
+                WHERE email = ?
+                "#,
+            password_hash,
+            email,
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e))?;
+        Ok(())
+    }
     pub async fn update_cliente(
         pool: &SqlitePool,
         id: i64,
@@ -245,7 +264,6 @@ impl ClienteRepository {
         let telefono = cliente.get_telefono();
         let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
         let estado = cliente.get_estado().to_string();
-        let password = cliente.get_password_hash();
 
         let ficha = cliente.get_ficha_medica();
         let id_ficha = ficha.get_id_ficha();
@@ -281,8 +299,7 @@ impl ClienteRepository {
                     email = ?,
                     telefono = ?,
                     fecha_nacimiento = ?,
-                    estado = ?,
-                    password = ?
+                    estado = ?
                 WHERE dni_cliente = ?
                 "#,
             nombre,
@@ -290,7 +307,6 @@ impl ClienteRepository {
             telefono,
             fecha_nacimiento,
             estado,
-            password,
             id
         )
         .execute(pool)
