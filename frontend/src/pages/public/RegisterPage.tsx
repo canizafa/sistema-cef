@@ -60,8 +60,15 @@ export function RegisterPage() {
             });
             navigate('/login');
         } catch (err) {
-            if (axios.isAxiosError(err) && err.response?.status === 409) {
-                setError('Usuario ya registrado en el sistema.');
+            if (axios.isAxiosError(err)) {
+                const msg: string = err.response?.data?.error ?? '';
+                if (msg.includes('dni_cliente')) {
+                    setError('El DNI ya está registrado.');
+                } else if (msg.includes('email')) {
+                    setError('El email ya está registrado.');
+                } else {
+                    setError('Error al crear la cuenta. Revisá los datos.');
+                }
             } else {
                 setError('Usuario ya registrado en el sistema.');
             }
