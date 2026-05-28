@@ -1,7 +1,5 @@
-use chrono::NaiveDate;
-
 use crate::{dtos::CreatePagoRequest, errors::ApiError};
-
+use chrono::NaiveDate;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -14,6 +12,7 @@ pub struct Pago {
     id_membresia: Option<String>,
     reserva_paga: Option<String>,
 }
+
 impl Pago {
     pub fn new(
         id_pago: String,
@@ -62,6 +61,7 @@ impl Pago {
     pub fn get_reserva_paga(&self) -> Option<&String> {
         self.reserva_paga.as_ref()
     }
+
     pub fn validate_pago(&self) -> Result<(), ApiError> {
         if self.monto <= 0.0 {
             return Err(ApiError::BadRequest(
@@ -80,8 +80,16 @@ impl From<CreatePagoRequest> for Pago {
             fecha: request.fecha,
             hora: request.hora,
             sena: request.sena,
-            id_membresia: Some(request.id_membresia),
-            reserva_paga: Some(request.reserva_paga),
+            id_membresia: if request.id_membresia.is_empty() {
+                None
+            } else {
+                Some(request.id_membresia)
+            },
+            reserva_paga: if request.reserva_paga.is_empty() {
+                None
+            } else {
+                Some(request.reserva_paga)
+            },
         }
     }
 }

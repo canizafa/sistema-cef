@@ -13,6 +13,16 @@ pub struct CreateEmpleadoRequest {
     pub rol: Rol,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateEmpleadoRequest {
+    pub dni: i64,
+    pub nombre_apellido: String,
+    pub mail: String,
+    pub genero: String,
+    pub estado: String,
+    pub rol: Rol,
+}
+
 #[derive(Debug, Serialize)]
 pub struct EmpleadoResponse {
     pub dni: i64,
