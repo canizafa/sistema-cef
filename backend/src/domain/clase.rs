@@ -132,7 +132,7 @@ impl Clase {
         Ok(())
     }
 
-    pub fn disminui_cupo(&mut self) {
+    pub fn disminuir_cupo(&mut self) {
         if self.cupo_base > 0 {
             self.cupo_base -= 1;
         } else {
