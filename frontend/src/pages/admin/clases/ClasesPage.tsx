@@ -42,7 +42,7 @@ export default function ClasesAdminPage() {
       </div>
 
       {clases.length === 0 ? (
-        <p className="text-sm text-muted">No hay clases cargadas.</p>
+        <p className="text-sm ">No hay clases cargadas.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {clases.map((clase) => (
