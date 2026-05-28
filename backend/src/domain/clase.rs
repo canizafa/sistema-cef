@@ -94,6 +94,23 @@ impl Clase {
             Ok(())
         }
     }
+    pub fn profesor_libre(&self, otras_clases: &[Clase]) -> Result<(), ApiError> {
+        if otras_clases.iter().any(|c| {
+            c.get_dni_profesor() == self.dni_profesor
+                && c.get_dia() == self.dia
+                && NaiveTime::from_str(&c.get_horario())
+                    .unwrap()
+                    .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
+                    .abs()
+                    < chrono::Duration::hours(2)
+        }) {
+            Err(ApiError::BadRequest(
+                "El profesor ya está tomado".to_string(),
+            ))
+        } else {
+            Ok(())
+        }
+    }
 
     pub fn validate_clase(&self) -> Result<(), ApiError> {
         if self.cupo_base > self.cupo_maximo {
