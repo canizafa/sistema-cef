@@ -10,12 +10,20 @@ export interface RegistrarEmpleado {
     rol: string;
 }
 
+export interface UpdateEmpleado {
+    dni: number;
+    nombre_apellido: string;
+    mail: string;
+    genero: string;
+    estado: string;
+    rol: string;
+}
 
 export const empleadoService = {
     async registrarEmpleado(data: RegistrarEmpleado): Promise<void> {
         await api.post('/auth/register-empleado', data);
     },
-    
+
     async getEmpleado(params: unknown) {
         const response = await api.get('/empleados/get-empleado', { params });
         return response.data;
@@ -26,13 +34,21 @@ export const empleadoService = {
         return response.data;
     },
 
-    async actualizarEmpleado(data: unknown) {
-        const response = await api.post('/empleados/update-empleado', data);
+    async actualizarEmpleado(dni: number, data: UpdateEmpleado) {
+        const response = await api.put(`/empleados/update-empleado/${dni}`, data);
         return response.data;
     },
 
-    async eliminarEmpleado(data: unknown) {
-        const response = await api.post('/empleados/delete-empleado', data);
+    async desactivarEmpleado(empleado: UpdateEmpleado) {
+        return this.actualizarEmpleado(empleado.dni, { ...empleado, estado: 'baja' });
+    },
+
+    async activarEmpleado(empleado: UpdateEmpleado) {
+        return this.actualizarEmpleado(empleado.dni, { ...empleado, estado: 'alta' });
+    },
+
+    async eliminarEmpleado(dni: number) {
+        const response = await api.delete(`/empleados/delete-empleado/${dni}`);
         return response.data;
     },
 };

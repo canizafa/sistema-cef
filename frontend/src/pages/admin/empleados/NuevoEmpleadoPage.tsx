@@ -5,7 +5,7 @@ import { empleadoService } from '@/services/empleados.service';
 
 export function NuevoEmpleadoPage() {
     const [form, setForm] = useState({
-        nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'empleado'
+        nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado'
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -26,12 +26,12 @@ export function NuevoEmpleadoPage() {
                 dni: Number(form.dni),
                 mail: form.mail,
                 password: form.password,
-                genero: form.genero,
+                genero: 'otro',
                 estado: 'alta',
                 rol: 'empleado',
             });
-            setSuccess('Empleado registrado correctamente');
-            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', genero: 'masculino', rol: 'empleado' });
+            setSuccess('Empleado dado de alta en el sistema');
+            setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado' });
         } catch {
             setError('Error al registrar el empleado. Revisá los datos.');
         } finally {
@@ -63,14 +63,6 @@ export function NuevoEmpleadoPage() {
                     <div className="space-y-1">
                         <label htmlFor="password" className="text-sm font-medium">Contraseña inicial</label>
                         <input id="password" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                        <label htmlFor="genero" className="text-sm font-medium">Género</label>
-                        <select id="genero" name="genero" value={form.genero} onChange={handleChange} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                            <option value="masculino">Masculino</option>
-                            <option value="femenino">Femenino</option>
-                            <option value="otro">Otro</option>
-                        </select>
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     {success && <p className="text-sm text-green-600">{success}</p>}
