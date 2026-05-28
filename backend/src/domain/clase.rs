@@ -96,7 +96,7 @@ impl Clase {
     }
 
     pub fn validate_clase(&self) -> Result<(), ApiError> {
-        if self.cupo_base > self.cupo_maximo {
+        if self.cupo_base < self.cupo_maximo {
             return Err(ApiError::BadRequest(
                 "El cupo del profesor excede el cupo máximo".to_string(),
             ));
