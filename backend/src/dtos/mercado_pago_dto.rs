@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct MercadoPagoPreferenceRequest {
     pub items: Vec<MercadoPagoItem>,
     pub back_urls: BackUrls,
+    pub auto_return: String,
 }
 
 #[derive(Serialize)]
