@@ -65,6 +65,9 @@ pub enum ApiError {
     #[error("asistencia inválida")]
     InvalidAsistencia,
 
+    #[error("error de Mercado Pago: {0}")]
+    MpError(String),
+
     #[error("not found")]
     NotFound,
 
