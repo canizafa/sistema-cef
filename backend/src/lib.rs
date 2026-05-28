@@ -1,12 +1,13 @@
 pub mod app_state;
 pub mod auth;
 pub mod config;
-pub mod telemetry;
 pub mod domain;
 pub mod dtos;
 pub mod errors;
+pub mod feed_database;
 pub mod handlers;
 pub mod mailer;
 pub mod repository;
 pub mod routes;
 pub mod services;
+pub mod telemetry;
