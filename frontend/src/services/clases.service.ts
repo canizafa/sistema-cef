@@ -10,12 +10,13 @@ export type ClaseDTO = {
     lleno: boolean;
     descripcion: string;
     id_actividad: string;
+    id_sala: string;
 };
 
 export type NuevaClaseData = {
     dia: string;
     horario: string;
-    cupo_profe: number;
+    cupo_base: number;
     cupo_maximo: number;
     estado: EstadoClase;
     id_actividad: string;
@@ -39,10 +40,10 @@ export type NuevaListaEsperaData = {
 
 export const clasesService = {
     async getClases(): Promise<ClaseDTO[]> {
-    const response = await api.get('/clase/get-all');
-    console.log('response.data:', response.data);
-    return response.data.clases ?? response.data;
-},
+        const response = await api.get('/clase/get-all');
+        console.log('response.data:', response.data);
+        return response.data.clases ?? response.data;
+    },
     async crearClase(data: NuevaClaseData) {
         const response = await api.post('/clase/create', data);
         return response.data;

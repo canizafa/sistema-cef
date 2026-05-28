@@ -29,6 +29,7 @@ import { EditarClasePage } from '@/pages/admin/clases/EditarClasePage';
 import { EmpleadosPage } from '@/pages/admin/empleados/EmpleadosPage';
 import { NuevoEmpleadoPage } from '@/pages/admin/empleados/NuevoEmpleadoPage';
 import { EditarEmpleadoPage } from '@/pages/admin/empleados/EditarEmpleadoPage';
+import { NuevoProfesorPage } from '@/pages/admin/profesores/NuevoProfesorPage';
 
 //Admin - Profesores
 import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
@@ -76,7 +77,8 @@ export const AppRouter = () => {
                 <Route path="empleados/:id/editar" element={<EditarEmpleadoPage />} />
               
                 {/* Profesores - solo dueño */}
-                 <Route path="profesores" element={<ProfesoresPage />} />          
+                 <Route path="profesores" element={<ProfesoresPage />} /> 
+                 <Route path="profesores/nuevo" element={<NuevoProfesorPage />} />         
                                 
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
