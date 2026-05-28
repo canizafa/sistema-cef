@@ -11,6 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+function getDiaSemana(fecha: string): string {
+    if (!fecha) return '';
+    const [year, month, day] = fecha.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return DIAS_SEMANA[date.getDay()];
+}
+
 export function NuevaClasePage() {
     const [form, setForm] = useState({
         dia: '',
@@ -109,6 +118,7 @@ export function NuevaClasePage() {
         try {
             await clasesService.crearClase({
                 dia: form.dia,
+                dia_semana: getDiaSemana(form.dia),
                 horario: form.horario,
                 cupo_base: Number(form.cupo_base),
                 cupo_maximo: Number(form.cupo_maximo),

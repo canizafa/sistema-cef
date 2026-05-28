@@ -5,6 +5,7 @@ export type EstadoClase = 'alta' | 'baja';
 export type ClaseDTO = {
     id_clase: string;
     dia: string;
+    dia_semana: string;
     horario: string;
     estado: EstadoClase;
     lleno: boolean;
@@ -15,6 +16,7 @@ export type ClaseDTO = {
 
 export type NuevaClaseData = {
     dia: string;
+    dia_semana: string;
     horario: string;
     cupo_base: number;
     cupo_maximo: number;
