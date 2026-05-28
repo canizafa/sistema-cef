@@ -76,6 +76,16 @@ impl Clase {
         self.dni_profesor
     }
 
+    pub fn sala_libre(&self, otras_clases: &[Clase]) -> Result<(), ApiError> {
+        if otras_clases.iter().any(|c| {
+            c.id_sala == self.id_sala && c.get_horario() == self.horario && c.get_dia() == self.dia
+        }) {
+            Err(ApiError::BadRequest("La sala ya está tomada".to_string()))
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn validate_clase(&self) -> Result<(), ApiError> {
         if self.cupo_base > self.cupo_maximo {
             return Err(ApiError::BadRequest(

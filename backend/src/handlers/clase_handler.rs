@@ -19,6 +19,7 @@ pub async fn create_clase_handler(
 ) -> Result<Json<ClaseResponse>, ApiError> {
     let clase = Clase::from(request);
     clase.validate_clase()?;
+    clase.sala_libre(&ClaseRepository::get_all(&state.db).await?)?;
     ClaseRepository::create_clase(&state.db, &clase).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
