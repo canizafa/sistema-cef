@@ -1,4 +1,4 @@
-import { Clock, Calendar } from 'lucide-react'
+import { Clock, Calendar, Dumbbell, DoorOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -11,6 +11,8 @@ interface ClaseCardClienteProps {
   horario: string
   descripcion: string
   estadoReserva: EstadoReserva
+  idActividad: string
+  idSala: string
   onReservar?: () => void
   onCancelar?: () => void
   onListaEspera?: () => void
@@ -32,6 +34,8 @@ export function ClaseCardCliente({
   horario,
   descripcion,
   estadoReserva,
+  idActividad,
+  idSala,
   onReservar,
   onCancelar,
   onListaEspera,
@@ -46,13 +50,25 @@ export function ClaseCardCliente({
       </CardHeader>
 
       <CardContent className="space-y-1.5 pb-3">
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-destructive" />
-          {dia}
+          <span className="font-medium text-destructive">Fecha:</span>
+          <span className="text-gray-700">{dia}</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm">
           <Clock className="w-4 h-4 text-destructive" />
-          {horario}
+          <span className="font-medium text-destructive">Hora:</span>
+          <span className="text-gray-700">{horario}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Dumbbell className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Actividad:</span>
+          <span className="text-gray-700">{idActividad}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <DoorOpen className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Sala:</span>
+          <span className="text-gray-700">{idSala}</span>
         </div>
       </CardContent>
 

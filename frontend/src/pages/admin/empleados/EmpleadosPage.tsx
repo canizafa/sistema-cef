@@ -24,14 +24,16 @@ export function EmpleadosPage() {
   useEffect(() => {
     empleadoService.getEmpleados()
       .then((data) => {
-        setEmpleados(data.map((e: any) => ({
-          dni: e.dni,
-          nombreApellido: e.nombre_apellido,
-          mail: e.mail,
-          genero: e.genero,
-          estado: e.estado,
-          rol: e.rol,
-        })))
+        setEmpleados(data
+          .filter((e: any) => e.rol === 'empleado')
+          .map((e: any) => ({
+            dni: e.dni,
+            nombreApellido: e.nombre_apellido,
+            mail: e.mail,
+            genero: e.genero,
+            estado: e.estado,
+            rol: e.rol,
+          })))
       })
       .catch(() => setError('No se pudieron cargar los empleados'))
       .finally(() => setLoading(false))
@@ -50,7 +52,7 @@ export function EmpleadosPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-primary">Gestión de Empleados</h1>
-          <p className="text-sm text-muted mt-1">Administrá el personal del centro</p>
+          <p className="text-sm mt-1">Administrá el personal del centro</p>
         </div>
         <button
           onClick={() => navigate('/admin/empleados/nuevo')}

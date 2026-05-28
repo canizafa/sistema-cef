@@ -15,6 +15,7 @@ interface EmpleadoCardProps {
   rol: RolEmpleado
   onEditar?: () => void
   onDesactivar?: () => void
+  onActivar?: () => void
 }
 
 export function EmpleadoCard({
@@ -26,6 +27,7 @@ export function EmpleadoCard({
   rol,
   onEditar,
   onDesactivar,
+  onActivar,
 }: EmpleadoCardProps) {
   return (
     <Card className="bg-surface border-border relative">
@@ -47,17 +49,20 @@ export function EmpleadoCard({
       </CardHeader>
 
       <CardContent className="space-y-1.5 pb-3">
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm">
           <Mail className="w-4 h-4 text-destructive" />
-          {mail}
+          <span className="font-medium text-destructive">Mail:</span>
+          <span className="text-gray-700">{mail}</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm">
           <User className="w-4 h-4 text-destructive" />
-          {genero}
+          <span className="font-medium text-destructive">Género:</span>
+          <span className="text-gray-700">{genero}</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-primary">
+        <div className="flex items-center gap-2 text-sm">
           <IdCard className="w-4 h-4 text-destructive" />
-          DNI: {dni}
+          <span className="font-medium text-destructive">DNI:</span>
+          <span className="text-gray-700">{dni}</span>
         </div>
       </CardContent>
 
@@ -65,9 +70,15 @@ export function EmpleadoCard({
         <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
           Editar
         </Button>
-        <Button variant="destructive" size="sm" className="flex-1" onClick={onDesactivar}>
-          Desactivar
-        </Button>
+        {estado === 'alta' ? (
+          <Button variant="destructive" size="sm" className="flex-1" onClick={onDesactivar}>
+            Desactivar
+          </Button>
+        ) : (
+          <Button variant="default" size="sm" className="flex-1" onClick={onActivar}>
+            Activar
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )
