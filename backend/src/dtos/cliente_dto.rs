@@ -17,6 +17,18 @@ pub struct CreateClienteRequest {
     pub ficha_medica: CreateFichaMedicaRequest,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateClienteRequest {
+    pub dni: i64,
+    pub nombre_apellido: String,
+    pub email: String,
+    pub telefono: String,
+    pub fecha_nacimiento: NaiveDate,
+    pub estado: Estado,
+    pub rol: Rol,
+    pub ficha_medica: CreateFichaMedicaRequest,
+}
+
 #[derive(Debug, Serialize)]
 pub struct ClienteResponse {
     pub dni: i64,

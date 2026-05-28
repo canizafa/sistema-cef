@@ -3,7 +3,7 @@ use chrono::{Datelike, Local, NaiveDate};
 use crate::{
     auth::password::hash_password,
     domain::{Estado, FichaMedica, Rol},
-    dtos::CreateClienteRequest,
+    dtos::{CreateClienteRequest, cliente_dto::UpdateClienteRequest},
     errors::ApiError,
 };
 
@@ -106,6 +106,22 @@ impl From<CreateClienteRequest> for Cliente {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash,
+            email: request.email,
+            telefono: request.telefono,
+            fecha_nacimiento: request.fecha_nacimiento,
+            estado: request.estado,
+            ficha_medica: request.ficha_medica.into(),
+            rol: Rol::Cliente,
+        }
+    }
+}
+
+impl From<UpdateClienteRequest> for Cliente {
+    fn from(request: UpdateClienteRequest) -> Self {
+        Self {
+            dni: request.dni,
+            nombre_apellido: request.nombre_apellido,
+            password_hash: "".to_string(),
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,

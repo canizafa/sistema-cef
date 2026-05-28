@@ -19,7 +19,7 @@ pub use auth_dto::{
     AuthResponse, CreateChangePasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest,
 };
 pub use clase_dto::{ClaseResponse, CreateClaseRequest};
-pub use cliente_dto::{ClienteResponse, CreateClienteRequest};
+pub use cliente_dto::{ClienteResponse, CreateClienteRequest, UpdateClienteRequest};
 pub use empleado_dto::{CreateEmpleadoRequest, EmpleadoResponse};
 pub use ficha_medica_dto::{CreateFichaMedicaRequest, FichaMedicaResponse};
 pub use lista_espera_dto::{
