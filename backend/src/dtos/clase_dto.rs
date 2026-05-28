@@ -6,7 +6,6 @@ use chrono::NaiveDate;
 #[derive(Debug, Deserialize)]
 pub struct CreateClaseRequest {
     pub dia: NaiveDate,
-    pub dia_semana: String,
     pub horario: String,
     pub cupo_maximo: i64,
     pub cupo_base: i64,
