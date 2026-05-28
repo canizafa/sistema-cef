@@ -121,7 +121,7 @@ impl From<UpdateClienteRequest> for Cliente {
         Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password_hash: "".to_string(),
+            password_hash: "123456".to_string(),
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,

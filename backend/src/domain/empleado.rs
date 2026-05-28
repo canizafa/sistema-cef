@@ -97,7 +97,7 @@ impl From<UpdateEmpleadoRequest> for Empleado {
         Self {
             dni_empleado: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password_hash: "".to_string(),
+            password_hash: "12345".to_string(),
             mail: request.mail,
             genero: request.genero,
             estado: request.estado,
