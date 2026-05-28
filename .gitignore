@@ -20,6 +20,7 @@ frontend/lerna-debug.log*
 
 # Ignorar database
 backend/database.db*
+database.*
 
 # Archivos personales (facu-l)
 .superpowers/
