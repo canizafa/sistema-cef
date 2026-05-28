@@ -65,6 +65,9 @@ pub enum ApiError {
     #[error("asistencia inválida")]
     InvalidAsistencia,
 
+    #[error("error de Mercado Pago: {0}")]
+    MpError(String),
+
     #[error("not found")]
     NotFound,
 
@@ -153,6 +156,8 @@ impl From<AppError> for Response {
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
+            ApiError::MpError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+
             ApiError::SmtpError(_) => StatusCode::BAD_GATEWAY,
             ApiError::AddressError(_) => StatusCode::BAD_REQUEST,
             ApiError::MessageError(_) => StatusCode::INTERNAL_SERVER_ERROR,
