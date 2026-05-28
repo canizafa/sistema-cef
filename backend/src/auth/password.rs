@@ -18,12 +18,11 @@ pub fn hash_password(password: &str) -> Result<String, ApiError> {
     Ok(password_hash)
 }
 
-pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
+pub fn verify_password(password: &str, hash: &str) -> Result<(), ApiError> {
     let parsed_hash = PasswordHash::new(hash).map_err(|_| ApiError::PasswordHashError)?;
-
-    Ok(Argon2::default()
+    Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
-        .is_ok())
+        .map_err(|_| ApiError::InvalidCredentials) // contraseña incorrecta → error
 }
 
 pub fn generate_random_password() -> String {

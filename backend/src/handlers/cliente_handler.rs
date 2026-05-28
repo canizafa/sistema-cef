@@ -9,7 +9,7 @@ use tracing::instrument;
 use crate::{
     app_state::AppState,
     domain::Cliente,
-    dtos::{ClienteResponse, CreateClienteRequest},
+    dtos::{ClienteResponse, CreateClienteRequest, UpdateClienteRequest},
     errors::ApiError,
     repository::ClienteRepository,
 };
@@ -44,7 +44,7 @@ pub async fn get_cliente_handler(
 pub async fn update_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-    Json(request): Json<CreateClienteRequest>,
+    Json(request): Json<UpdateClienteRequest>,
 ) -> Result<Json<ClienteResponse>, ApiError> {
     let cliente = Cliente::from(request);
     cliente.validate_cliente()?;
