@@ -4,11 +4,13 @@ import { ClaseCardCliente, type EstadoReserva } from '@/components/clases/ClaseC
 import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
 import { clasesService, type ClaseDTO } from '@/services/clases.service'
+import { actividadService, type Actividad } from '@/services/actividad.service'
 import { pagosService } from '@/services/pagos.service'
 
 export function ClasesPage() {
   const { user } = useAuth()
   const [clases, setClases] = useState<ClaseDTO[]>([])
+  const [actividades, setActividades] = useState<Actividad[]>([])
   const [reservadas, setReservadas] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -19,8 +21,12 @@ export function ClasesPage() {
   useEffect(() => {
     async function cargar() {
       try {
-        const data = await clasesService.getClases()
-        setClases(data)
+        const [dataClases, dataActividades] = await Promise.all([
+          clasesService.getClases(),
+          actividadService.getActividades(),
+        ])
+        setClases(dataClases)
+        setActividades(dataActividades)
       } catch {
         setError('No se pudieron cargar las clases.')
       } finally {
@@ -29,6 +35,10 @@ export function ClasesPage() {
     }
     cargar()
   }, [])
+
+  function getNombreActividad(idActividad: string): string {
+    return actividades.find((a) => String(a.id) === String(idActividad))?.nombre ?? idActividad
+  }
 
   function getEstadoReserva(clase: ClaseDTO): EstadoReserva {
     if (reservadas.has(clase.id_clase)) return 'reservada'
@@ -68,7 +78,6 @@ export function ClasesPage() {
   }
 
   async function handleCancelar(idClase: string) {
-    // TODO: llamar al back cuando esté listo
     setReservadas((prev) => {
       const next = new Set(prev)
       next.delete(idClase)
@@ -102,13 +111,11 @@ export function ClasesPage() {
               <ClaseCardCliente
                 key={clase.id_clase}
                 idClase={clase.id_clase}
-                dia={clase.dia}
                 diaSemana={clase.dia_semana}
                 horario={clase.horario}
                 descripcion={clase.descripcion}
                 estadoReserva={getEstadoReserva(clase)}
-                idActividad={clase.id_actividad}
-                idSala={clase.id_sala}
+                idActividad={getNombreActividad(clase.id_actividad)}
                 onReservar={() => handleReservar(clase)}
                 onCancelar={() => handleCancelar(clase.id_clase)}
                 onListaEspera={() => handleListaEspera(clase)}

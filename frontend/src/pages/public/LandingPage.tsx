@@ -3,12 +3,18 @@ import { Header } from '@/components/layout/Header';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 // Array con las disciplinas para renderizarlas dinámicamente
   const clases = ['FUNCIONAL', 'PILATES', 'CROSSFIT', 'YOGA'];
 
 export function LandingPage() {
   const { user } = useAuth();
+
+      // Si es admin o empleado, redirigir directo al panel
+  if (user?.rol === 'duenio' || user?.rol === 'empleado') {
+    return <Navigate to="/pages/admin/clases/ClasesPage" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-800">
