@@ -63,6 +63,11 @@ export function PerfilPage() {
         setEditError(null);
         setEditExito(false);
 
+        if (!editForm.nombre_apellido.trim()) {
+            setEditError('El nombre y apellido es obligatorio.');
+            return;
+        }
+
         const hoy = new Date();
         const fechaMinima = new Date(hoy.getFullYear() - 14, hoy.getMonth(), hoy.getDate());
         if (new Date(editForm.fecha_nacimiento) > fechaMinima) {
@@ -74,7 +79,7 @@ export function PerfilPage() {
         try {
             await clienteService.updatePerfil(user.dni, {
                 dni: perfil!.dni,
-                nombre_apellido: editForm.nombre_apellido,
+                nombre_apellido: editForm.nombre_apellido.trim(),
                 email: perfil!.email,
                 telefono: perfil!.telefono,
                 fecha_nacimiento: editForm.fecha_nacimiento,
@@ -86,7 +91,7 @@ export function PerfilPage() {
                     detalle: perfil!.ficha_medica.detalle,
                 },
             });
-            setPerfil((prev) => prev ? { ...prev, nombre_apellido: editForm.nombre_apellido, fecha_nacimiento: editForm.fecha_nacimiento } : prev);
+            setPerfil((prev) => prev ? { ...prev, nombre_apellido: editForm.nombre_apellido.trim(), fecha_nacimiento: editForm.fecha_nacimiento } : prev);
             setEditando(false);
             setEditExito(true);
         } catch {
@@ -97,19 +102,26 @@ export function PerfilPage() {
     }
 
     function handleClickEditar() {
-        if (editando) {
-            handleGuardarPerfil();
-        } else {
-            if (perfil) {
-                setEditForm({
-                    nombre_apellido: perfil.nombre_apellido,
-                    fecha_nacimiento: perfil.fecha_nacimiento.slice(0, 10),
-                });
-            }
-            setEditExito(false);
-            setEditError(null);
-            setEditando(true);
+        if (perfil) {
+            setEditForm({
+                nombre_apellido: perfil.nombre_apellido,
+                fecha_nacimiento: perfil.fecha_nacimiento.slice(0, 10),
+            });
         }
+        setEditExito(false);
+        setEditError(null);
+        setEditando(true);
+    }
+
+    function handleCancelarEdicion() {
+        if (perfil) {
+            setEditForm({
+                nombre_apellido: perfil.nombre_apellido,
+                fecha_nacimiento: perfil.fecha_nacimiento.slice(0, 10),
+            });
+        }
+        setEditError(null);
+        setEditando(false);
     }
 
     useEffect(() => {
@@ -120,6 +132,11 @@ export function PerfilPage() {
             .catch(() => setError('No se pudo cargar el perfil.'))
             .finally(() => setLoading(false));
     }, [user]);
+
+    const hayCambios = perfil
+        ? editForm.nombre_apellido.trim() !== perfil.nombre_apellido ||
+          editForm.fecha_nacimiento !== perfil.fecha_nacimiento.slice(0, 10)
+        : false;
 
     return (
         <div className='min-h-screen flex flex-col'>
@@ -182,14 +199,35 @@ export function PerfilPage() {
                             </div>
 
                             <div className='space-y-2'>
-                                <button
-                                    type='button'
-                                    onClick={handleClickEditar}
-                                    disabled={editLoading}
-                                    className='w-full border border-[#C8102E] text-[#C8102E] rounded-md h-10 text-sm font-medium hover:bg-red-50 disabled:opacity-50'
-                                >
-                                    {editLoading ? 'Guardando...' : 'Editar Datos'}
-                                </button>
+                                {editando ? (
+                                    <div className='flex gap-2'>
+                                        <button
+                                            type='button'
+                                            onClick={handleCancelarEdicion}
+                                            disabled={editLoading}
+                                            className='flex-1 border border-gray-300 text-gray-700 rounded-md h-10 text-sm font-medium hover:bg-gray-50 disabled:opacity-50'
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            type='button'
+                                            onClick={handleGuardarPerfil}
+                                            disabled={editLoading || !hayCambios}
+                                            className='flex-1 bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'
+                                        >
+                                            {editLoading ? 'Guardando...' : 'Guardar cambios'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type='button'
+                                        onClick={handleClickEditar}
+                                        disabled={editLoading}
+                                        className='w-full border border-[#C8102E] text-[#C8102E] rounded-md h-10 text-sm font-medium hover:bg-red-50 disabled:opacity-50'
+                                    >
+                                        Editar Datos
+                                    </button>
+                                )}
                                 {editError && <p className='text-sm text-red-600'>{editError}</p>}
                                 {editExito && <p className='text-sm text-green-600'>Cambio exitoso.</p>}
                             </div>

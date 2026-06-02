@@ -1,20 +1,19 @@
 import { Clock, Calendar, Users, Dumbbell, DoorOpen } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import type { EstadoClase } from '@/services/clases.service'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 interface ClaseCardRecepcionistaProps {
   idClase: string
   dia: string
   diaSemana: string
   horario: string
-  estado: EstadoClase
   descripcion: string
   lleno: boolean
   idActividad: string
   idSala: string
   onEditar?: () => void
+  onEditarCupo?: () => void
+  onEliminar?: () => void
   onVerReservas?: () => void
 }
 
@@ -22,24 +21,22 @@ export function ClaseCardRecepcionista({
   dia,
   diaSemana,
   horario,
-  estado,
   descripcion,
   lleno,
   idActividad,
   idSala,
   onEditar,
-  onVerReservas,
+  onEditarCupo,
+  onEliminar,
 }: ClaseCardRecepcionistaProps) {
   return (
     <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <p className="text-sm font-medium text-primary">{descripcion}</p>
-          {estado === 'alta' ? (
-            <Badge className="bg-success text-white">Alta</Badge>
-          ) : (
-            <Badge variant="outline">Baja</Badge>
-          )}
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <CardTitle className="text-base font-semibold text-primary">{idActividad}</CardTitle>
+            <CardDescription className="text-sm text-gray-500 mt-0.5">{descripcion}</CardDescription>
+          </div>
         </div>
       </CardHeader>
 
@@ -47,7 +44,7 @@ export function ClaseCardRecepcionista({
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-destructive" />
           <span className="font-medium text-destructive">Fecha inicio:</span>
-          <span className="text-gray-700">{dia}</span>
+          <span className="text-gray-700">{dia ? dia.split('-').reverse().join('/') : '-'}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-destructive" />
@@ -76,13 +73,19 @@ export function ClaseCardRecepcionista({
         </div>
       </CardContent>
 
-      <CardFooter className="gap-2 pt-0">
-        <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-          Editar
+      <CardFooter className="flex flex-col gap-2 pt-0">
+        <div className="flex gap-2 w-full">
+          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
+            Editar clase
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1" onClick={onEditarCupo}>
+            Editar cupo
+          </Button>
+        </div>
+        <Button variant="destructive" size="sm" className="w-full" onClick={onEliminar}>
+          Eliminar clase
         </Button>
-        <Button variant="default" size="sm" className="flex-1" onClick={onVerReservas}>
-          Ver reservas
-        </Button>
+       
       </CardFooter>
     </Card>
   )

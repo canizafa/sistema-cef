@@ -26,7 +26,6 @@ export function NuevaClasePage() {
         horario: '',
         cupo_base: '',
         cupo_maximo: '',
-        estado: '' as EstadoClase | '',
         id_actividad: '',
         id_sala: '',
         dni_profesor: '',
@@ -43,7 +42,7 @@ export function NuevaClasePage() {
 
     useEffect(() => {
         profesorService.getProfesores()
-            .then(setProfesores)
+            .then((data) => setProfesores(data.filter((p) => p.estado === 'alta')))
             .catch(() => setError('No se pudieron cargar los profesores'));
 
         salaService.getSalas()
@@ -72,10 +71,6 @@ export function NuevaClasePage() {
             setError('Seleccioná un profesor');
             return;
         }
-        if (!form.estado) {
-            setError('Seleccioná un estado');
-            return;
-        }
         if (!form.id_sala) {
             setError('Seleccioná una sala');
             return;
@@ -85,8 +80,6 @@ export function NuevaClasePage() {
             return;
         }
 
-        // Escenario 4: cupo base supera capacidad de la sala
-        // Escenario 5: cupo máximo supera capacidad de la sala
         const salaSeleccionada = salas.find((s) => String(s.id) === form.id_sala);
         if (salaSeleccionada) {
             if (Number(form.cupo_base) > salaSeleccionada.capacidad_maxima) {
@@ -99,7 +92,6 @@ export function NuevaClasePage() {
             }
         }
 
-        // Escenario 3: sala ocupada en ese día y horario
         try {
             const clases = await clasesService.getClases();
             const salaOcupada = clases.some(
@@ -122,7 +114,7 @@ export function NuevaClasePage() {
                 horario: form.horario,
                 cupo_base: Number(form.cupo_base),
                 cupo_maximo: Number(form.cupo_maximo),
-                estado: form.estado as EstadoClase,
+                estado: 'alta' as EstadoClase,
                 id_actividad: String(form.id_actividad),
                 id_sala: String(form.id_sala),
                 dni_profesor: Number(form.dni_profesor),
@@ -174,9 +166,10 @@ export function NuevaClasePage() {
                         <Select
                             value={form.id_actividad}
                             onValueChange={(v) => handleSelect('id_actividad', v)}
+                            disabled={actividades.length === 0}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Seleccioná una actividad" />
+                                <SelectValue placeholder={actividades.length === 0 ? 'No hay actividades cargadas' : 'Seleccioná una actividad'} />
                             </SelectTrigger>
                             <SelectContent>
                                 {actividades.map((a) => (
@@ -193,9 +186,10 @@ export function NuevaClasePage() {
                         <Select
                             value={form.id_sala}
                             onValueChange={(v) => handleSelect('id_sala', v)}
+                            disabled={salas.length === 0}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Seleccioná una sala" />
+                                <SelectValue placeholder={salas.length === 0 ? 'No hay salas cargadas' : 'Seleccioná una sala'} />
                             </SelectTrigger>
                             <SelectContent>
                                 {salas.map((s) => (
@@ -212,9 +206,10 @@ export function NuevaClasePage() {
                         <Select
                             value={form.dni_profesor}
                             onValueChange={(v) => handleSelect('dni_profesor', v)}
+                            disabled={profesores.length === 0}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Seleccioná un profesor" />
+                                <SelectValue placeholder={profesores.length === 0 ? 'No hay profesores activos' : 'Seleccioná un profesor'} />
                             </SelectTrigger>
                             <SelectContent>
                                 {profesores.map((p) => (
@@ -226,24 +221,11 @@ export function NuevaClasePage() {
                         </Select>
                     </div>
 
-                    <div className="space-y-1">
-                        <Label>Estado</Label>
-                        <Select value={form.estado} onValueChange={(v) => handleSelect('estado', v)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Seleccioná un estado" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="alta">Alta</SelectItem>
-                                <SelectItem value="baja">Baja</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
                     {error && <p className="text-xs text-destructive">{error}</p>}
                     {success && <p className="text-xs text-success">{success}</p>}
 
                     <Button type="submit" disabled={loading} className="w-full bg-brand text-white">
-                        {loading ? 'Creando...' : 'Dar de alta la clase'}
+                        {loading ? 'Creando...' : 'Crear clase'}
                     </Button>
 
                 </form>
