@@ -67,6 +67,9 @@ export const clasesService = {
     },
 };
 
+
+
+// reservas
 export const reservasService = {
     async crearReserva(data: NuevaReservaData) {
         const response = await api.post('/reservas/create', data);
