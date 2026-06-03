@@ -104,16 +104,23 @@ export function EmpleadosPage() {
     setEmpleadoAEliminar(null)
   }
 
+  const hayBusqueda = busquedaNombre !== '' || busquedaEmail !== ''
+
   const empleadosFiltrados = empleados.filter((e) => {
+    if (hayBusqueda) {
+      const matchNombre = busquedaNombre === '' ||
+        e.nombreApellido.toLowerCase().includes(busquedaNombre.toLowerCase())
+      const matchEmail = busquedaEmail === '' ||
+        e.mail.toLowerCase().includes(busquedaEmail.toLowerCase())
+      return matchNombre && matchEmail
+    }
+
     const matchEstado =
       filtro === 'alta' ? e.estado === 'alta' :
       filtro === 'baja' ? e.estado === 'baja' :
       true
-    const matchNombre = busquedaNombre === '' ||
-      e.nombreApellido.toLowerCase().includes(busquedaNombre.toLowerCase())
-    const matchEmail = busquedaEmail === '' ||
-      e.mail.toLowerCase().includes(busquedaEmail.toLowerCase())
-    return matchEstado && matchNombre && matchEmail
+
+    return matchEstado
   })
 
   const mensajeVacio = () => {
