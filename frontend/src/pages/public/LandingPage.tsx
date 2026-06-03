@@ -13,7 +13,7 @@ export function LandingPage() {
 
       // Si es admin o empleado, redirigir directo al panel
   if (user?.rol === 'duenio' || user?.rol === 'empleado') {
-    return <Navigate to="/pages/admin/clases/ClasesPage" replace />;
+   return <Navigate to="/admin/clases" replace />;
   }
 
   return (

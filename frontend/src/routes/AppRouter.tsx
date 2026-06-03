@@ -37,7 +37,7 @@ import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
 import { NuevoClientePage } from '@/pages/admin/clientes/NuevoClientePage';
-import { EditarClientePage } from '@/pages/admin/clientes/EditarClientePage';
+
 
 // Admin - Asistencias y Reportes
 import { AsistenciasPage } from '@/pages/admin/asistencias/AsistenciasPage';
@@ -85,7 +85,7 @@ export const AppRouter = () => {
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
                 <Route path="clientes/nuevo" element={<NuevoClientePage />} />
-                <Route path="clientes/:id/editar" element={<EditarClientePage />} />
+              
 
                 {/* Asistencias */}
                 <Route path="asistencias" element={<AsistenciasPage />} />

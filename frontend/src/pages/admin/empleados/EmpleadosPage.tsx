@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
+import { EliminarEmpleadoModal } from '@/components/empleados/EliminarEmpleadoModal'
 import { empleadoService } from '@/services/empleados.service'
 
 type EstadoEmpleado = 'alta' | 'baja'
@@ -22,6 +23,10 @@ export function EmpleadosPage() {
   const [error, setError] = useState<string | null>(null)
   const [soloActivos, setSoloActivos] = useState(false)
 
+  // Modal eliminar
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
+  const [empleadoAEliminar, setEmpleadoAEliminar] = useState<Empleado | null>(null)
+
   useEffect(() => {
     empleadoService.getEmpleados()
       .then((data) => {
@@ -41,7 +46,7 @@ export function EmpleadosPage() {
   }, [])
 
   const handleEditar = (dni: number) => {
-    console.log('Editar empleado dni:', dni)
+    navigate(`/admin/empleados/${dni}/editar`)
   }
 
   const handleDesactivar = async (dni: number) => {
@@ -84,6 +89,19 @@ export function EmpleadosPage() {
     }
   }
 
+  const handleEliminar = (dni: number) => {
+    const empleado = empleados.find((e) => e.dni === dni)
+    if (!empleado) return
+    setEmpleadoAEliminar(empleado)
+    setModalEliminarAbierto(true)
+  }
+
+  const handleEliminarConfirmado = () => {
+    if (!empleadoAEliminar) return
+    setEmpleados((prev) => prev.filter((e) => e.dni !== empleadoAEliminar.dni))
+    setEmpleadoAEliminar(null)
+  }
+
   const todosActivos = empleados.length > 0 && empleados.every((e) => e.estado === 'alta')
 
   const empleadosFiltrados = soloActivos
@@ -118,7 +136,7 @@ export function EmpleadosPage() {
           {soloActivos ? 'Listar todos los empleados' : 'Listar empleados activos'}
         </button>
         {!soloActivos && todosActivos && (
-          <p className="text-sm  mt-2">Todos los empleados están activos.</p>
+          <p className="text-sm mt-2">Todos los empleados están activos.</p>
         )}
       </div>
 
@@ -126,11 +144,11 @@ export function EmpleadosPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {!loading && !error && empleados.length === 0 && (
-        <p className="text-sm ">No hay empleados registrados en el sistema.</p>
+        <p className="text-sm">No hay empleados registrados en el sistema.</p>
       )}
 
       {!loading && !error && soloActivos && empleadosFiltrados.length === 0 && (
-        <p className="text-sm ">No hay empleados activos.</p>
+        <p className="text-sm">No hay empleados activos.</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,9 +163,26 @@ export function EmpleadosPage() {
             onEditar={() => handleEditar(empleado.dni)}
             onDesactivar={() => handleDesactivar(empleado.dni)}
             onActivar={() => handleActivar(empleado.dni)}
+            onEliminar={() => handleEliminar(empleado.dni)}
           />
         ))}
       </div>
+
+      {empleadoAEliminar && (
+        <EliminarEmpleadoModal
+          open={modalEliminarAbierto}
+          onOpenChange={setModalEliminarAbierto}
+          empleado={{
+            dni: empleadoAEliminar.dni,
+            nombre_apellido: empleadoAEliminar.nombreApellido,
+            mail: empleadoAEliminar.mail,
+            genero: empleadoAEliminar.genero,
+            estado: empleadoAEliminar.estado,
+            rol: empleadoAEliminar.rol,
+          }}
+          onEliminado={handleEliminarConfirmado}
+        />
+      )}
     </main>
   )
 }
