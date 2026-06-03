@@ -150,8 +150,7 @@ export function EmpleadosPage() {
           <select
             value={filtro}
             onChange={(e) => setFiltro(e.target.value as FiltroEmpleado)}
-            disabled={empleados.length === 0}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary"
           >
             <option value="todos">Todos los empleados</option>
             <option value="alta">Empleados activos</option>
@@ -166,8 +165,7 @@ export function EmpleadosPage() {
             placeholder="Ej: secretariaLaura@gmail.com"
             value={busquedaEmail}
             onChange={(e) => setBusquedaEmail(e.target.value)}
-            disabled={empleados.length === 0}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64"
           />
         </div>
 
@@ -178,8 +176,7 @@ export function EmpleadosPage() {
             placeholder="Ej: Laura Peña"
             value={busquedaNombre}
             onChange={(e) => setBusquedaNombre(e.target.value)}
-            disabled={empleados.length === 0}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64"
           />
         </div>
       </div>
