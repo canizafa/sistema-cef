@@ -1,7 +1,7 @@
-import { IdCard } from 'lucide-react'
+import { IdCard, X, Check, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 type EstadoProfesor = 'alta' | 'baja'
 
@@ -12,6 +12,7 @@ interface ProfesorCardProps {
   onEditar?: () => void
   onDesactivar?: () => void
   onActivar?: () => void
+  onEliminar?: () => void
 }
 
 export function ProfesorCard({
@@ -21,24 +22,22 @@ export function ProfesorCard({
   onEditar,
   onDesactivar,
   onActivar,
+  onEliminar,
 }: ProfesorCardProps) {
   return (
-    <Card className="bg-surface border-border relative">
+    <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-xl font-semibold text-primary">{nombreCompleto}</h3>
-            <p className="text-sm text-muted">DNI: {dni}</p>
+            <CardTitle className="text-base font-semibold text-primary">{nombreCompleto}</CardTitle>
+            <CardDescription className="text-sm text-gray-500 mt-0.5">Profesor</CardDescription>
           </div>
           {estado === 'alta' ? (
             <Badge className="bg-success text-white">Activo</Badge>
           ) : (
-            <Badge variant="outline">Inactivo</Badge>
+            <Badge className="bg-gray-400 text-white">Inactivo</Badge>
           )}
         </div>
-        <span className="inline-block mt-2 text-xs font-medium px-2 py-0.5 rounded border border-brand text-brand bg-brand/10">
-          profesor
-        </span>
       </CardHeader>
 
       <CardContent className="space-y-1.5 pb-3">
@@ -49,19 +48,42 @@ export function ProfesorCard({
         </div>
       </CardContent>
 
-      <CardFooter className="gap-2 pt-0">
-        <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-          Editar
+      <CardFooter className="flex flex-col gap-2 pt-0 border-none">
+        <div className="flex gap-2 w-full">
+          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
+            Editar
+          </Button>
+          {estado === 'alta' ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
+              onClick={onDesactivar}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Desactivar
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={onActivar}
+            >
+              <Check className="w-4 h-4 mr-2" />
+              Activar
+            </Button>
+          )}
+        </div>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="w-full"
+          onClick={onEliminar}
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          Eliminar profesor
         </Button>
-        {estado === 'alta' ? (
-          <Button variant="destructive" size="sm" className="flex-1" onClick={onDesactivar}>
-            Desactivar
-          </Button>
-        ) : (
-          <Button variant="default" size="sm" className="flex-1" onClick={onActivar}>
-            Activar
-          </Button>
-        )}
       </CardFooter>
     </Card>
   )
