@@ -1,4 +1,3 @@
-// EditarEmpleadoPage.tsx
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { empleadoService } from '@/services/empleados.service'
@@ -89,11 +88,9 @@ export function EditarEmpleadoPage() {
             <input
               id="nombre"
               name="nombre"
-              placeholder="Ana"
               value={form.nombre}
-              onChange={handleChange}
-              required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              disabled
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm opacity-50 cursor-not-allowed"
             />
           </div>
           <div className="space-y-1">
@@ -101,11 +98,9 @@ export function EditarEmpleadoPage() {
             <input
               id="apellido"
               name="apellido"
-              placeholder="García"
               value={form.apellido}
-              onChange={handleChange}
-              required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              disabled
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm opacity-50 cursor-not-allowed"
             />
           </div>
           <div className="space-y-1">

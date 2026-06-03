@@ -88,7 +88,7 @@ export function LoginPage() {
               disabled={loading}
               className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {loading ? 'Ingresando...' : 'Iniciar Sesión'}
             </button>
           </form>
           <p className="text-sm text-center text-gray-500 mt-4">
