@@ -76,25 +76,18 @@ export function ProfesoresPage() {
   }
 
   const profesoresFiltrados = profesores.filter((p) => {
-    const matchEstado =
-      filtro === 'alta' ? p.estado === 'alta' :
-      filtro === 'baja' ? p.estado === 'baja' :
-      true
-
-    if (busquedaNombre.trim() === '') {
-      return matchEstado
+    if (busquedaNombre.trim() !== '') {
+      return normalizar(p.nombreCompleto)
+        .startsWith(normalizar(busquedaNombre.trim()))
     }
 
-    const matchNombre = normalizar(p.nombreCompleto)
-      .startsWith(normalizar(busquedaNombre.trim()))
-
-    return matchEstado && matchNombre
+    return filtro === 'alta' ? p.estado === 'alta' :
+           filtro === 'baja' ? p.estado === 'baja' :
+           true
   })
 
   const mensajeVacio = () => {
     if (busquedaNombre.trim() !== '') {
-      if (filtro === 'alta') return 'No existe un profesor activo con ese nombre y apellido.'
-      if (filtro === 'baja') return 'No existe un profesor inactivo con ese nombre y apellido.'
       return 'No existe un profesor con ese nombre y apellido.'
     }
     if (filtro === 'alta') return 'No existen profesores activos en el sistema.'
@@ -139,10 +132,15 @@ export function ProfesoresPage() {
           <button
             key={tab.value}
             onClick={() => setFiltro(tab.value)}
+            disabled={busquedaNombre.trim() !== ''}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
-              ${filtro === tab.value
+              ${filtro === tab.value && busquedaNombre.trim() === ''
                 ? 'bg-brand text-white'
-                : 'bg-border text-gray-500 hover:bg-muted hover:text-white'
+                : 'bg-border text-gray-500'
+              }
+              ${busquedaNombre.trim() !== ''
+                ? 'opacity-40 cursor-not-allowed'
+                : 'hover:bg-muted hover:text-white'
               }`}
           >
             {tab.label}

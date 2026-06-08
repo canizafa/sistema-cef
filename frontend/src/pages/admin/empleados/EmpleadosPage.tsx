@@ -108,25 +108,18 @@ export function EmpleadosPage() {
   }
 
   const empleadosFiltrados = empleados.filter((e) => {
-    const matchEstado =
-      filtro === 'alta' ? e.estado === 'alta' :
-      filtro === 'baja' ? e.estado === 'baja' :
-      true
-
-    if (busquedaNombre.trim() === '') {
-      return matchEstado
+    if (busquedaNombre.trim() !== '') {
+      return normalizar(e.nombreApellido)
+        .startsWith(normalizar(busquedaNombre.trim()))
     }
 
-    const matchNombre = normalizar(e.nombreApellido)
-      .startsWith(normalizar(busquedaNombre.trim()))
-
-    return matchEstado && matchNombre
+    return filtro === 'alta' ? e.estado === 'alta' :
+           filtro === 'baja' ? e.estado === 'baja' :
+           true
   })
 
   const mensajeVacio = () => {
     if (busquedaNombre.trim() !== '') {
-      if (filtro === 'alta') return 'No existe un empleado activo con ese nombre y apellido.'
-      if (filtro === 'baja') return 'No existe un empleado inactivo con ese nombre y apellido.'
       return 'No existe un empleado con ese nombre y apellido.'
     }
     if (filtro === 'alta') return 'No existen empleados activos en el sistema.'
@@ -171,10 +164,15 @@ export function EmpleadosPage() {
           <button
             key={tab.value}
             onClick={() => setFiltro(tab.value)}
+            disabled={busquedaNombre.trim() !== ''}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
-              ${filtro === tab.value
+              ${filtro === tab.value && busquedaNombre.trim() === ''
                 ? 'bg-brand text-white'
-                : 'bg-border text-gray-500 hover:bg-muted hover:text-white'
+                : 'bg-border text-gray-500'
+              }
+              ${busquedaNombre.trim() !== ''
+                ? 'opacity-40 cursor-not-allowed'
+                : 'hover:bg-muted hover:text-white'
               }`}
           >
             {tab.label}
