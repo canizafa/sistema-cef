@@ -12,7 +12,6 @@ interface ClaseCardRecepcionistaProps {
   idActividad: string
   idSala: string
   onEditar?: () => void
-  onEditarCupo?: () => void
   onEliminar?: () => void
   onVerReservas?: () => void
 }
@@ -26,7 +25,6 @@ export function ClaseCardRecepcionista({
   idActividad,
   idSala,
   onEditar,
-  onEditarCupo,
   onEliminar,
 }: ClaseCardRecepcionistaProps) {
   return (
@@ -74,18 +72,12 @@ export function ClaseCardRecepcionista({
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 pt-0">
-        <div className="flex gap-2 w-full">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-            Editar clase
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1" onClick={onEditarCupo}>
-            Editar cupo
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" className="w-full" onClick={onEditar}>
+          Editar clase
+        </Button>
         <Button variant="destructive" size="sm" className="w-full" onClick={onEliminar}>
           Eliminar clase
         </Button>
-       
       </CardFooter>
     </Card>
   )

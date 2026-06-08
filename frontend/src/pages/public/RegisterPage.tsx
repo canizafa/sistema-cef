@@ -1,5 +1,3 @@
-// Formulario de registro para nuevos clientes. Solo clientes se auto-registran; los empleados los crea el dueño.
-// Llama a authService.register() y redirige al login al completarse.
 import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,6 +18,7 @@ export function RegisterPage() {
         detalle: '',
     });
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -34,6 +33,7 @@ export function RegisterPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
 
         const hoy = new Date();
         const fechaMinima = new Date(hoy.getFullYear() - 14, hoy.getMonth(), hoy.getDate());
@@ -58,7 +58,8 @@ export function RegisterPage() {
                     detalle: form.detalle,
                 },
             });
-            navigate('/login');
+            setSuccess('Usuario registrado con éxito.');
+            setTimeout(() => navigate('/login'), 3000);
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 const msg: string = err.response?.data?.error ?? '';
@@ -109,7 +110,6 @@ export function RegisterPage() {
                             <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" value={form.fecha_nacimiento} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                         </div>
 
-                        {/* Ficha médica */}
                         <fieldset className="space-y-3 rounded-md border border-border p-4">
                             <legend className="text-sm font-medium px-1">Ficha médica</legend>
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -127,6 +127,8 @@ export function RegisterPage() {
                         </fieldset>
 
                         {error && <p className="text-sm text-red-600">{error}</p>}
+                        {success && <p className="text-sm text-green-600">{success}</p>}
+
                         <button type="submit" disabled={loading} className="w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50">
                             {loading ? 'Creando cuenta...' : 'Crear cuenta'}
                         </button>

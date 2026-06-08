@@ -38,11 +38,11 @@ export function LoginPage() {
       if (data.rol === 'cliente') {
         navigate('/');
       } else if (data.rol === 'duenio') {
-        navigate('/admin');
-      } else if (data.rol === 'empleado' ) {
+        navigate('/admin/clases');
+      } else if (data.rol === 'empleado') {
         navigate('/admin/clientes');
       } else {
-        navigate('/admin');
+        navigate('/admin/clases');
       }
     } catch {
       setError('Email o contraseña incorrectos');

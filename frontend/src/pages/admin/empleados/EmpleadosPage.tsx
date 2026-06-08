@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
 import { EliminarEmpleadoModal } from '@/components/empleados/EliminarEmpleadoModal'
 import { empleadoService } from '@/services/empleados.service'
@@ -17,6 +18,9 @@ interface Empleado {
   rol: RolEmpleado
 }
 
+const normalizar = (texto: string) =>
+  texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
 export function EmpleadosPage() {
   const navigate = useNavigate()
   const [empleados, setEmpleados] = useState<Empleado[]>([])
@@ -24,7 +28,6 @@ export function EmpleadosPage() {
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<FiltroEmpleado>('todos')
   const [busquedaNombre, setBusquedaNombre] = useState('')
-  const [busquedaEmail, setBusquedaEmail] = useState('')
 
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [empleadoAEliminar, setEmpleadoAEliminar] = useState<Empleado | null>(null)
@@ -104,31 +107,38 @@ export function EmpleadosPage() {
     setEmpleadoAEliminar(null)
   }
 
-  const hayBusqueda = busquedaNombre !== '' || busquedaEmail !== ''
-
   const empleadosFiltrados = empleados.filter((e) => {
-    if (hayBusqueda) {
-      const matchNombre = busquedaNombre === '' ||
-        e.nombreApellido.toLowerCase().includes(busquedaNombre.toLowerCase())
-      const matchEmail = busquedaEmail === '' ||
-        e.mail.toLowerCase().includes(busquedaEmail.toLowerCase())
-      return matchNombre && matchEmail
-    }
-
     const matchEstado =
       filtro === 'alta' ? e.estado === 'alta' :
       filtro === 'baja' ? e.estado === 'baja' :
       true
 
-    return matchEstado
+    if (busquedaNombre.trim() === '') {
+      return matchEstado
+    }
+
+    const matchNombre = normalizar(e.nombreApellido)
+      .startsWith(normalizar(busquedaNombre.trim()))
+
+    return matchEstado && matchNombre
   })
 
   const mensajeVacio = () => {
-    if (busquedaNombre && !busquedaEmail) return 'No hay empleados con el nombre y apellido ingresado.'
-    if (busquedaEmail && !busquedaNombre) return 'No hay empleados con el email ingresado.'
-    if (busquedaNombre && busquedaEmail) return 'No hay empleados con los datos ingresados.'
-    return 'No hay empleados con ese estado.'
+    if (busquedaNombre.trim() !== '') {
+      if (filtro === 'alta') return 'No existe un empleado activo con ese nombre y apellido.'
+      if (filtro === 'baja') return 'No existe un empleado inactivo con ese nombre y apellido.'
+      return 'No existe un empleado con ese nombre y apellido.'
+    }
+    if (filtro === 'alta') return 'No existen empleados activos en el sistema.'
+    if (filtro === 'baja') return 'No existen empleados inactivos en el sistema.'
+    return 'No hay empleados registrados en el sistema.'
   }
+
+  const tabs: { label: string; value: FiltroEmpleado }[] = [
+    { label: 'Todos', value: 'todos' },
+    { label: 'Activos', value: 'alta' },
+    { label: 'Inactivos', value: 'baja' },
+  ]
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
@@ -145,50 +155,37 @@ export function EmpleadosPage() {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6 items-end">
-        <div>
-          <select
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value as FiltroEmpleado)}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary"
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Buscar empleado por nombre y apellido"
+          value={busquedaNombre}
+          onChange={(e) => setBusquedaNombre(e.target.value)}
+          className="w-full border-2 border-brand rounded-lg pl-9 pr-4 h-10 text-sm bg-background text-primary placeholder:text-gray-400"
+        />
+      </div>
+
+      <div className="flex gap-2 mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setFiltro(tab.value)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
+              ${filtro === tab.value
+                ? 'bg-brand text-white'
+                : 'bg-border text-gray-500 hover:bg-muted hover:text-white'
+              }`}
           >
-            <option value="todos">Todos los empleados</option>
-            <option value="alta">Empleados activos</option>
-            <option value="baja">Empleados inactivos</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-sm" style={{ color: '#4B5563' }}>Búsqueda por email</label>
-          <input
-            type="text"
-            placeholder="Ej: secretariaLaura@gmail.com"
-            value={busquedaEmail}
-            onChange={(e) => setBusquedaEmail(e.target.value)}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-sm" style={{ color: '#4B5563' }}>Búsqueda por nombre y apellido</label>
-          <input
-            type="text"
-            placeholder="Ej: Laura Peña"
-            value={busquedaNombre}
-            onChange={(e) => setBusquedaNombre(e.target.value)}
-            className="border-2 border-brand rounded-lg px-3 h-10 text-sm bg-background text-primary placeholder:text-gray-400 w-full md:w-64"
-          />
-        </div>
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {loading && <p className="text-sm text-muted">Cargando empleados...</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {!loading && !error && empleados.length === 0 && (
-        <p className="text-sm" style={{ color: '#4B5563' }}>No hay empleados registrados en el sistema.</p>
-      )}
-
-      {!loading && !error && empleadosFiltrados.length === 0 && empleados.length > 0 && (
+      {!loading && !error && empleadosFiltrados.length === 0 && (
         <p className="text-sm" style={{ color: '#4B5563' }}>{mensajeVacio()}</p>
       )}
 
