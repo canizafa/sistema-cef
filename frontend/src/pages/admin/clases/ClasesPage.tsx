@@ -67,7 +67,6 @@ export default function ClasesPage() {
               idActividad={getNombreActividad(clase.id_actividad)}
               idSala={clase.id_sala}
               onEditar={() => navigate(`/admin/clases/editar/${clase.id_clase}`)}
-              onEditarCupo={() => console.log('Editar cupo clase id:', clase.id_clase)}
               onEliminar={() => console.log('Eliminar clase id:', clase.id_clase)}
             />
           ))}
