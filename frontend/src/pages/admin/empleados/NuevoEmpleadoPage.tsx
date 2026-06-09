@@ -30,7 +30,7 @@ export function NuevoEmpleadoPage() {
                 estado: 'alta',
                 rol: 'empleado',
             });
-            setSuccess('Empleado dado de alta en el sistema. Redirigiendo...');
+            setSuccess('Empleado dado de alta en el sistema.');
             setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado' });
             setTimeout(() => navigate('/admin/empleados'), 2000);
         } catch {
