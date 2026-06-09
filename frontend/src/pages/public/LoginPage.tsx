@@ -38,11 +38,11 @@ export function LoginPage() {
       if (data.rol === 'cliente') {
         navigate('/');
       } else if (data.rol === 'duenio') {
-        navigate('/admin');
-      } else if (data.rol === 'empleado' ) {
+        navigate('/admin/clases');
+      } else if (data.rol === 'empleado') {
         navigate('/admin/clientes');
       } else {
-        navigate('/admin');
+        navigate('/admin/clases');
       }
     } catch {
       setError('Email o contraseña incorrectos');
@@ -88,7 +88,7 @@ export function LoginPage() {
               disabled={loading}
               className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {loading ? 'Ingresando...' : 'Iniciar Sesión'}
             </button>
           </form>
           <p className="text-sm text-center text-gray-500 mt-4">

@@ -1,9 +1,9 @@
-// Panel del dueño para registrar nuevos empleados.
-// AdminRoute en App.tsx ya garantiza que solo el dueño puede llegar acá.
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { empleadoService } from '@/services/empleados.service';
 
 export function NuevoEmpleadoPage() {
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado'
     });
@@ -30,8 +30,9 @@ export function NuevoEmpleadoPage() {
                 estado: 'alta',
                 rol: 'empleado',
             });
-            setSuccess('Empleado dado de alta en el sistema');
+            setSuccess('Empleado dado de alta en el sistema.');
             setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado' });
+            setTimeout(() => navigate('/admin/empleados'), 2000);
         } catch {
             setError('Error al registrar el empleado. Revisá los datos.');
         } finally {

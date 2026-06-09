@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
+import { EliminarEmpleadoModal } from '@/components/empleados/EliminarEmpleadoModal'
 import { empleadoService } from '@/services/empleados.service'
 
 type EstadoEmpleado = 'alta' | 'baja'
 type RolEmpleado = 'duenio' | 'empleado' | 'profesor'
+type FiltroEmpleado = 'todos' | 'alta' | 'baja'
 
 interface Empleado {
   dni: number
@@ -15,12 +18,19 @@ interface Empleado {
   rol: RolEmpleado
 }
 
+const normalizar = (texto: string) =>
+  texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
 export function EmpleadosPage() {
   const navigate = useNavigate()
   const [empleados, setEmpleados] = useState<Empleado[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [soloActivos, setSoloActivos] = useState(false)
+  const [filtro, setFiltro] = useState<FiltroEmpleado>('todos')
+  const [busquedaNombre, setBusquedaNombre] = useState('')
+
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
+  const [empleadoAEliminar, setEmpleadoAEliminar] = useState<Empleado | null>(null)
 
   useEffect(() => {
     empleadoService.getEmpleados()
@@ -41,7 +51,7 @@ export function EmpleadosPage() {
   }, [])
 
   const handleEditar = (dni: number) => {
-    console.log('Editar empleado dni:', dni)
+    navigate(`/admin/empleados/${dni}/editar`)
   }
 
   const handleDesactivar = async (dni: number) => {
@@ -84,16 +94,44 @@ export function EmpleadosPage() {
     }
   }
 
-  const todosActivos = empleados.length > 0 && empleados.every((e) => e.estado === 'alta')
-
-  const empleadosFiltrados = soloActivos
-    ? empleados.filter((e) => e.estado === 'alta')
-    : empleados
-
-  function handleToggleFiltro() {
-    if (!soloActivos && todosActivos) return
-    setSoloActivos((prev) => !prev)
+  const handleEliminar = (dni: number) => {
+    const empleado = empleados.find((e) => e.dni === dni)
+    if (!empleado) return
+    setEmpleadoAEliminar(empleado)
+    setModalEliminarAbierto(true)
   }
+
+  const handleEliminarConfirmado = () => {
+    if (!empleadoAEliminar) return
+    setEmpleados((prev) => prev.filter((e) => e.dni !== empleadoAEliminar.dni))
+    setEmpleadoAEliminar(null)
+  }
+
+  const empleadosFiltrados = empleados.filter((e) => {
+    if (busquedaNombre.trim() !== '') {
+      return normalizar(e.nombreApellido)
+        .startsWith(normalizar(busquedaNombre.trim()))
+    }
+
+    return filtro === 'alta' ? e.estado === 'alta' :
+           filtro === 'baja' ? e.estado === 'baja' :
+           true
+  })
+
+  const mensajeVacio = () => {
+    if (busquedaNombre.trim() !== '') {
+      return 'No existe un empleado con ese nombre y apellido.'
+    }
+    if (filtro === 'alta') return 'No existen empleados activos en el sistema.'
+    if (filtro === 'baja') return 'No existen empleados inactivos en el sistema.'
+    return 'No hay empleados registrados en el sistema.'
+  }
+
+  const tabs: { label: string; value: FiltroEmpleado }[] = [
+    { label: 'Todos', value: 'todos' },
+    { label: 'Activos', value: 'alta' },
+    { label: 'Inactivos', value: 'baja' },
+  ]
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
@@ -110,27 +148,43 @@ export function EmpleadosPage() {
         </button>
       </div>
 
-      <div className="mb-4">
-        <button
-          onClick={handleToggleFiltro}
-          className="bg-brand text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          {soloActivos ? 'Listar todos los empleados' : 'Listar empleados activos'}
-        </button>
-        {!soloActivos && todosActivos && (
-          <p className="text-sm  mt-2">Todos los empleados están activos.</p>
-        )}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Buscar empleado por nombre y apellido"
+          value={busquedaNombre}
+          onChange={(e) => setBusquedaNombre(e.target.value)}
+          className="w-full border-2 border-brand rounded-lg pl-9 pr-4 h-10 text-sm bg-background text-primary placeholder:text-gray-400"
+        />
+      </div>
+
+      <div className="flex gap-2 mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setFiltro(tab.value)}
+            disabled={busquedaNombre.trim() !== ''}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
+              ${filtro === tab.value && busquedaNombre.trim() === ''
+                ? 'bg-brand text-white'
+                : 'bg-border text-gray-500'
+              }
+              ${busquedaNombre.trim() !== ''
+                ? 'opacity-40 cursor-not-allowed'
+                : 'hover:bg-muted hover:text-white'
+              }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {loading && <p className="text-sm text-muted">Cargando empleados...</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {!loading && !error && empleados.length === 0 && (
-        <p className="text-sm ">No hay empleados registrados en el sistema.</p>
-      )}
-
-      {!loading && !error && soloActivos && empleadosFiltrados.length === 0 && (
-        <p className="text-sm ">No hay empleados activos.</p>
+      {!loading && !error && empleadosFiltrados.length === 0 && (
+        <p className="text-sm" style={{ color: '#4B5563' }}>{mensajeVacio()}</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,9 +199,26 @@ export function EmpleadosPage() {
             onEditar={() => handleEditar(empleado.dni)}
             onDesactivar={() => handleDesactivar(empleado.dni)}
             onActivar={() => handleActivar(empleado.dni)}
+            onEliminar={() => handleEliminar(empleado.dni)}
           />
         ))}
       </div>
+
+      {empleadoAEliminar && (
+        <EliminarEmpleadoModal
+          open={modalEliminarAbierto}
+          onOpenChange={setModalEliminarAbierto}
+          empleado={{
+            dni: empleadoAEliminar.dni,
+            nombre_apellido: empleadoAEliminar.nombreApellido,
+            mail: empleadoAEliminar.mail,
+            genero: empleadoAEliminar.genero,
+            estado: empleadoAEliminar.estado,
+            rol: empleadoAEliminar.rol,
+          }}
+          onEliminado={handleEliminarConfirmado}
+        />
+      )}
     </main>
   )
 }

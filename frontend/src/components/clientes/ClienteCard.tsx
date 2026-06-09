@@ -1,11 +1,9 @@
-import { Mail, IdCard } from 'lucide-react'
+import { Mail, IdCard, X, Check, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export type EstadoCuenta = 'activo' | 'inactivo'
-// PENDIENTE BACK: el back todavía no devuelve estado de membresía
-// (no hay tabla de membresías/pagos). Por ahora se pasa por props desde mock.
 export type EstadoMembresia = 'vigente' | 'vencida' | 'sin-membresia'
 
 interface ClienteCardProps {
@@ -24,7 +22,7 @@ function getBadgeCuenta(estado: EstadoCuenta) {
     case 'activo':
       return <Badge className="bg-success text-white">Activo</Badge>
     case 'inactivo':
-      return <Badge variant="outline" className="text-gray-500">Inactivo</Badge>
+      return <Badge className="bg-gray-400 text-white">Inactivo</Badge>
   }
 }
 
@@ -35,7 +33,7 @@ function getBadgeMembresia(estado: EstadoMembresia) {
     case 'vencida':
       return <Badge className="bg-destructive text-white">Membresía vencida</Badge>
     case 'sin-membresia':
-      return <Badge variant="outline" className="text-gray-500">Sin membresía</Badge>
+      return <Badge className="bg-gray-500 text-white">Sin membresía</Badge>
   }
 }
 
@@ -74,22 +72,40 @@ export function ClienteCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex-col gap-2 pt-0">
+      <CardFooter className="flex-col gap-2 pt-0 border-none">
         <div className="flex gap-2 w-full">
           <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
             Editar cliente
           </Button>
           {activo ? (
-            <Button variant="outline" size="sm" className="flex-1" onClick={onToggleEstado}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
+              onClick={onToggleEstado}
+            >
+              <X className="w-4 h-4 mr-2" />
               Desactivar
             </Button>
           ) : (
-            <Button variant="default" size="sm" className="flex-1" onClick={onToggleEstado}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={onToggleEstado}
+            >
+              <Check className="w-4 h-4 mr-2" />
               Activar
             </Button>
           )}
         </div>
-        <Button variant="destructive" size="sm" className="w-full" onClick={onEliminar}>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="w-full"
+          onClick={onEliminar}
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
           Eliminar cliente
         </Button>
       </CardFooter>

@@ -29,6 +29,11 @@ export function Header() {
                             <Link to="/clases" className="text-sm font-medium hover:text-brand">
                                 Clases
                             </Link>
+                            {user?.rol === 'cliente' && (
+                                <Link to="/mis-reservas" className="text-sm font-medium hover:text-brand">
+                                    Mis Reservas
+                                </Link>
+                            )}
                             <Link to="/perfil" className="text-sm font-medium hover:text-brand">
                                 Mi perfil
                             </Link>
@@ -38,6 +43,7 @@ export function Header() {
                                 </Link>
                             )}
                             <button
+                                type="button"
                                 onClick={handleLogout}
                                 className="text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-100"
                             >

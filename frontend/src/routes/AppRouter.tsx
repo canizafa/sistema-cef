@@ -14,6 +14,7 @@ import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage';
 // Cliente
 import { ClasesPage } from '@/pages/cliente/ClasesPage';
 import { PerfilPage } from '@/pages/cliente/PerfilPage';
+import { ReservasPage } from '@/pages/cliente/ReservasPage';
 import { PagoExitoPage } from '@/pages/cliente/PagoExitoPage';
 import { PagoFalloPage } from '@/pages/cliente/PagoFalloPage';
 import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
@@ -36,7 +37,7 @@ import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
 import { NuevoClientePage } from '@/pages/admin/clientes/NuevoClientePage';
-import { EditarClientePage } from '@/pages/admin/clientes/EditarClientePage';
+
 
 // Admin - Asistencias y Reportes
 import { AsistenciasPage } from '@/pages/admin/asistencias/AsistenciasPage';
@@ -53,6 +54,7 @@ export const AppRouter = () => {
 
             {/* Rutas del cliente: requieren sesión activa */}
             <Route path="/clases" element={<ProtectedRoute><ClasesPage /></ProtectedRoute>} />
+            <Route path="/mis-reservas" element={<ProtectedRoute><ReservasPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
 
             {/* Resultado de pago — públicas porque MP redirige sin token */}
@@ -83,7 +85,7 @@ export const AppRouter = () => {
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
                 <Route path="clientes/nuevo" element={<NuevoClientePage />} />
-                <Route path="clientes/:id/editar" element={<EditarClientePage />} />
+              
 
                 {/* Asistencias */}
                 <Route path="asistencias" element={<AsistenciasPage />} />
