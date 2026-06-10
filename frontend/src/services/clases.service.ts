@@ -12,6 +12,7 @@ export type ClaseDTO = {
     descripcion: string;
     id_actividad: string;
     id_sala: string;
+    dni_profesor: number;  
 };
 
 export type NuevaClaseData = {
@@ -74,8 +75,6 @@ export const clasesService = {
         return response.data;
     },
 };
-
-
 
 // reservas
 export const reservasService = {
