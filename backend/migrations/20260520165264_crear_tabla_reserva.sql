@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS reserva (
     dni_cliente INTEGER not null, --en la tabla cliente se expresa como INTEGER
     id_clase TEXT NOT NULL,
     FOREIGN KEY (dni_cliente) REFERENCES cliente(dni_cliente), -- reserva pertenece a un cliente
-    FOREIGN KEY (id_clase) REFERENCES clase(id_clase), -- reserva pertenece a una clase
+    FOREIGN KEY (id_clase) REFERENCES clase(id_clase) -- reserva pertenece a una clase
 )
