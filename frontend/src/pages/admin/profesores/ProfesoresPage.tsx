@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { toast } from 'sonner'
 import { ProfesorCard } from '@/components/empleados/ProfesorCard'
+import { EliminarProfesorModal } from '@/components/empleados/EliminarProfesorModal'
 import { profesorService } from '@/services/profesor.service'
 
 type EstadoProfesor = 'alta' | 'baja'
@@ -23,6 +25,8 @@ export function ProfesoresPage() {
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<FiltroProfesor>('todos')
   const [busquedaNombre, setBusquedaNombre] = useState('')
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
+  const [profesorAEliminar, setProfesorAEliminar] = useState<Profesor | null>(null)
 
   useEffect(() => {
     profesorService.getProfesores()
@@ -44,7 +48,15 @@ export function ProfesoresPage() {
   const handleDesactivar = async (dni: number) => {
     const profesor = profesores.find((p) => p.dni === dni)
     if (!profesor) return
+
     try {
+      // ✅ Verificar si tiene clases asociadas
+      const tieneClases = await profesorService.tieneClasesAsociadas(dni)
+      if (tieneClases) {
+        toast.error('No se puede desactivar un profesor con clases asociadas')
+        return
+      }
+
       await profesorService.desactivarProfesor({
         dni: profesor.dni,
         nombre_completo: profesor.nombreCompleto,
@@ -53,6 +65,7 @@ export function ProfesoresPage() {
       setProfesores((prev) =>
         prev.map((p) => p.dni === dni ? { ...p, estado: 'baja' as EstadoProfesor } : p)
       )
+      toast.success('Profesor desactivado correctamente')
     } catch {
       setError('No se pudo desactivar el profesor')
     }
@@ -70,9 +83,33 @@ export function ProfesoresPage() {
       setProfesores((prev) =>
         prev.map((p) => p.dni === dni ? { ...p, estado: 'alta' as EstadoProfesor } : p)
       )
+      toast.success('Profesor activado correctamente')
     } catch {
       setError('No se pudo activar el profesor')
     }
+  }
+
+  const handleEliminar = async (dni: number) => {
+    const profesor = profesores.find((p) => p.dni === dni)
+    if (!profesor) return
+    try {
+      // ✅ Verificar si tiene clases asociadas
+      const tieneClases = await profesorService.tieneClasesAsociadas(dni)
+      if (tieneClases) {
+        toast.error('No se puede eliminar un profesor con clases asociadas')
+        return
+      }
+      setProfesorAEliminar(profesor)
+      setModalEliminarAbierto(true)
+    } catch {
+      toast.error('No se pudo verificar el estado del profesor')
+    }
+  }
+
+  const handleEliminarConfirmado = () => {
+    if (!profesorAEliminar) return
+    setProfesores((prev) => prev.filter((p) => p.dni !== profesorAEliminar.dni))
+    setProfesorAEliminar(null)
   }
 
   const profesoresFiltrados = profesores.filter((p) => {
@@ -80,7 +117,6 @@ export function ProfesoresPage() {
       return normalizar(p.nombreCompleto)
         .startsWith(normalizar(busquedaNombre.trim()))
     }
-
     return filtro === 'alta' ? p.estado === 'alta' :
            filtro === 'baja' ? p.estado === 'baja' :
            true
@@ -165,9 +201,23 @@ export function ProfesoresPage() {
             onEditar={() => handleEditar(profesor.dni)}
             onDesactivar={() => handleDesactivar(profesor.dni)}
             onActivar={() => handleActivar(profesor.dni)}
+            onEliminar={() => handleEliminar(profesor.dni)}
           />
         ))}
       </div>
+
+      {profesorAEliminar && (
+        <EliminarProfesorModal
+          open={modalEliminarAbierto}
+          onOpenChange={setModalEliminarAbierto}
+          profesor={{
+            dni: profesorAEliminar.dni,
+            nombre_completo: profesorAEliminar.nombreCompleto,
+            estado: profesorAEliminar.estado,
+          }}
+          onEliminado={handleEliminarConfirmado}
+        />
+      )}
     </main>
   )
 }

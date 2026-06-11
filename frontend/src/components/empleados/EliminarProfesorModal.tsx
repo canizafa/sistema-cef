@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -9,36 +8,41 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Mail, IdCard } from "lucide-react";
-import { empleadoService } from "@/services/empleados.service";
-import type { UpdateEmpleado } from "@/services/empleados.service";
+import { IdCard } from "lucide-react";
+import { profesorService } from "@/services/profesor.service";
 
-interface EliminarEmpleadoModalProps {
+interface EliminarProfesorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  empleado: UpdateEmpleado & { nombre_apellido: string };
+  profesor: {
+    dni: number;
+    nombre_completo: string;
+    estado: string;
+  };
   onEliminado?: () => void;
 }
 
-export function EliminarEmpleadoModal({
+export function EliminarProfesorModal({
   open,
   onOpenChange,
-  empleado,
+  profesor,
   onEliminado,
-}: EliminarEmpleadoModalProps) {
-  const navigate = useNavigate();
+}: EliminarProfesorModalProps) {
   const [loading, setLoading] = useState(false);
 
   async function handleEliminar() {
     setLoading(true);
     try {
-      await empleadoService.eliminarEmpleado(empleado.dni);
+      await profesorService.eliminarProfesor(profesor.dni);
       onOpenChange(false);
       onEliminado?.();
-      toast.success("Empleado eliminado con éxito");
-      navigate("/admin/empleados");
-    } catch {
-      toast.error("No se pudo eliminar el empleado");
+      toast.success("Profesor eliminado con éxito");
+    } catch (error: any) {
+      if (error?.response?.status === 409) {
+        toast.error("No se puede eliminar a un profesor con clases asociadas");
+      } else {
+        toast.error("No se pudo eliminar el profesor");
+      }
     } finally {
       setLoading(false);
     }
@@ -50,24 +54,18 @@ export function EliminarEmpleadoModal({
         <DialogHeader>
           <DialogTitle>Confirmar eliminación</DialogTitle>
           <DialogDescription>
-            Revisá los datos del empleado antes de continuar.
+            Revisá los datos del profesor antes de continuar.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 py-1">
           <p className="font-medium text-base" style={{ color: "#D01F25" }}>
-            {empleado.nombre_apellido}
+            {profesor.nombre_completo}
           </p>
-
           <div className="flex items-center gap-2 text-sm">
-  <IdCard className="w-4 h-4" style={{ color: "#4B5563" }} />
-  <span style={{ color: "#4B5563" }}>{empleado.dni}</span>
-</div>
-
-<div className="flex items-center gap-2 text-sm">
-  <Mail className="w-4 h-4" style={{ color: "#4B5563" }} />
-  <span style={{ color: "#4B5563" }}>{empleado.mail}</span>
-</div>
+            <IdCard className="w-4 h-4" style={{ color: "#4B5563" }} />
+            <span style={{ color: "#4B5563" }}>{profesor.dni}</span>
+          </div>
         </div>
 
         <DialogFooter className="gap-2 pt-2">

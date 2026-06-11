@@ -1,4 +1,4 @@
-import { Clock, Calendar, Users, Dumbbell, DoorOpen } from 'lucide-react'
+import { Clock, Calendar, Users, Dumbbell, DoorOpen, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
@@ -11,6 +11,8 @@ interface ClaseCardRecepcionistaProps {
   lleno: boolean
   idActividad: string
   idSala: string
+  dniProfesor: number
+  nombreProfesor: string
   onEditar?: () => void
   onEliminar?: () => void
   onVerReservas?: () => void
@@ -24,6 +26,8 @@ export function ClaseCardRecepcionista({
   lleno,
   idActividad,
   idSala,
+  dniProfesor,
+  nombreProfesor,
   onEditar,
   onEliminar,
 }: ClaseCardRecepcionistaProps) {
@@ -68,6 +72,11 @@ export function ClaseCardRecepcionista({
           <DoorOpen className="w-4 h-4 text-destructive" />
           <span className="font-medium text-destructive">Sala:</span>
           <span className="text-gray-700">{idSala}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <UserRound className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Profesor:</span>
+          <span className="text-gray-700">{nombreProfesor} — (DNI: {dniProfesor})</span>
         </div>
       </CardContent>
 

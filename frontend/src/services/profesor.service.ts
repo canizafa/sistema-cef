@@ -53,4 +53,10 @@ export const profesorService = {
     async eliminarProfesor(dni: number): Promise<void> {
         await api.delete(`/profesores/delete-profesor/${dni}`);
     },
+
+    async tieneClasesAsociadas(dniProfesor: number): Promise<boolean> {
+        const response = await api.get('/clase/get-all');
+        const clases = response.data;
+        return clases.some((clase: any) => clase.dni_profesor === dniProfesor);
+    },
 };

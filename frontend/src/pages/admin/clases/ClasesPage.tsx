@@ -3,23 +3,27 @@ import { useNavigate } from 'react-router-dom'
 import { ClaseCardRecepcionista } from '@/components/clases/ClaseCardRecepcionista'
 import { clasesService, type ClaseDTO } from '@/services/clases.service'
 import { actividadService, type Actividad } from '@/services/actividad.service'
+import { profesorService, type Profesor } from '@/services/profesor.service'
 
 export default function ClasesPage() {
   const navigate = useNavigate()
   const [clases, setClases] = useState<ClaseDTO[]>([])
   const [actividades, setActividades] = useState<Actividad[]>([])
+  const [profesores, setProfesores] = useState<Profesor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function cargar() {
       try {
-        const [dataClases, dataActividades] = await Promise.all([
+        const [dataClases, dataActividades, dataProfesores] = await Promise.all([
           clasesService.getClases(),
           actividadService.getActividades(),
+          profesorService.getProfesores(),
         ])
         setClases(dataClases)
         setActividades(dataActividades)
+        setProfesores(dataProfesores)
       } catch {
         setError('No se pudieron cargar las clases.')
       } finally {
@@ -31,6 +35,10 @@ export default function ClasesPage() {
 
   function getNombreActividad(idActividad: string): string {
     return actividades.find((a) => String(a.id) === String(idActividad))?.nombre ?? idActividad
+  }
+
+  function getNombreProfesor(dniProfesor: number): string {
+    return profesores.find((p) => p.dni === dniProfesor)?.nombre_completo ?? 'Sin asignar'
   }
 
   if (loading) return <p className="p-8 text-muted text-sm">Cargando clases...</p>
@@ -66,6 +74,8 @@ export default function ClasesPage() {
               lleno={clase.lleno}
               idActividad={getNombreActividad(clase.id_actividad)}
               idSala={clase.id_sala}
+              dniProfesor={clase.dni_profesor}
+              nombreProfesor={getNombreProfesor(clase.dni_profesor)}
               onEditar={() => navigate(`/admin/clases/editar/${clase.id_clase}`)}
               onEliminar={() => console.log('Eliminar clase id:', clase.id_clase)}
             />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { empleadoService } from '@/services/empleados.service';
 
 export function NuevoEmpleadoPage() {
@@ -8,7 +9,6 @@ export function NuevoEmpleadoPage() {
         nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado'
     });
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -18,7 +18,6 @@ export function NuevoEmpleadoPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
-        setSuccess(null);
         setLoading(true);
         try {
             await empleadoService.registrarEmpleado({
@@ -30,9 +29,9 @@ export function NuevoEmpleadoPage() {
                 estado: 'alta',
                 rol: 'empleado',
             });
-            setSuccess('Empleado dado de alta en el sistema.');
+            toast.success('Empleado dado de alta en el sistema.');
             setForm({ nombre: '', apellido: '', dni: '', mail: '', password: '', rol: 'empleado' });
-            setTimeout(() => navigate('/admin/empleados'), 2000);
+            setTimeout(() => navigate('/admin/empleados'), 1000);
         } catch {
             setError('Error al registrar el empleado. Revisá los datos.');
         } finally {
@@ -66,7 +65,6 @@ export function NuevoEmpleadoPage() {
                         <input id="password" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
-                    {success && <p className="text-sm text-green-600">{success}</p>}
                     <button type="submit" disabled={loading} className="w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50">
                         {loading ? 'Registrando...' : 'Registrar empleado'}
                     </button>
