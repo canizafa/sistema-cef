@@ -1,14 +1,16 @@
 // Panel del dueño para registrar nuevos profesores.
 // AdminRoute en App.tsx ya garantiza que solo el dueño puede llegar acá.
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { profesorService } from '@/services/profesor.service';
 
 export function NuevoProfesorPage() {
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         nombre: '', apellido: '', dni: '',
     });
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -18,7 +20,6 @@ export function NuevoProfesorPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
-        setSuccess(null);
         setLoading(true);
         try {
             await profesorService.crearProfesor({
@@ -27,8 +28,9 @@ export function NuevoProfesorPage() {
                 genero: 'otro',
                 estado: 'alta',
             });
-            setSuccess('Profesor dado de alta en el sistema');
+            toast.success('Profesor dado de alta en el sistema.');
             setForm({ nombre: '', apellido: '', dni: '' });
+            setTimeout(() => navigate('/admin/profesores'), 1000);
         } catch {
             setError('Error al registrar el profesor. Revisá los datos.');
         } finally {
@@ -54,7 +56,6 @@ export function NuevoProfesorPage() {
                         <input id="dni" name="dni" placeholder="12345678" value={form.dni} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
-                    {success && <p className="text-sm text-green-600">{success}</p>}
                     <button type="submit" disabled={loading} className="w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50">
                         {loading ? 'Registrando...' : 'Registrar profesor'}
                     </button>
