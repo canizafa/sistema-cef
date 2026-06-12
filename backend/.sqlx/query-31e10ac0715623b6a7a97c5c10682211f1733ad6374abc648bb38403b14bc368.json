@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                    id_espera as \"id_espera!\",\n                            tipo as \"tipo!\",\n                            fecha_ingreso as \"fecha_ingreso!\",\n                            id_clase as \"id_clase!\"\n                    FROM lista_de_espera\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_espera!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "tipo!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_ingreso!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_clase!",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "31e10ac0715623b6a7a97c5c10682211f1733ad6374abc648bb38403b14bc368"
+}

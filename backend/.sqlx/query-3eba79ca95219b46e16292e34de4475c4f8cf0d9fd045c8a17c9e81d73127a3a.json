@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   INSERT INTO pagos (\n                       id_pago,\n                       monto,\n                       fecha,\n                       hora,\n                       sena,\n                       id_membresia,\n                       reserva_paga\n                   )\n                   VALUES (?, ?, ?, ?, ?, ?, ?)\n                   ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "3eba79ca95219b46e16292e34de4475c4f8cf0d9fd045c8a17c9e81d73127a3a"
+}

@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                        id_membresia as \"id_membresia!\",\n                        tipo as \"tipo!\",\n                        estado as \"estado!\",\n                        fecha_inicio as \"fecha_inicio!\",\n                        fecha_fin\n                    FROM membresias\n                    WHERE id_membresia = ?\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_membresia!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "tipo!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "estado!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_inicio!",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_fin",
+        "ordinal": 4,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "bc66bde5d1d6ec1392c3c074486c62386270fb05229a4d0c3440732e4f28204c"
+}

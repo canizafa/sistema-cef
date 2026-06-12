@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    DELETE FROM ficha_medica\n                    WHERE id_ficha = ?\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "215e07ad4e1658fff8a6ccc5fbfcd46c2db32174380aa03bd6223330faa928ca"
+}
