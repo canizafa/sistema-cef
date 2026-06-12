@@ -1,6 +1,7 @@
 pub mod actividad_repository;
 pub mod asistencia_repository;
 pub mod clase_repository;
+pub mod cliente_lista_espera_repository;
 pub mod cliente_repository;
 pub mod empleado_repository;
 pub mod ficha_medica_repository;
