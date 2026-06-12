@@ -1,5 +1,4 @@
-use super::CreateActividadRequest;
-use crate::app::ApiError;
+use super::*;
 #[derive(Debug, Clone)]
 pub struct Actividad {
     pub id: String,
@@ -24,6 +23,7 @@ impl Actividad {
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
+    //Domain no debe conocer appiError
     pub fn validate_actividad(&self) -> Result<(), ApiError> {
         if self.nombre.is_empty() || self.descripcion.is_empty() {
             Err(ApiError::BadRequest(
