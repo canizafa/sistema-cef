@@ -4,7 +4,6 @@ use crate::repository::ClienteRepository;
 use crate::{domain::ListaEspera, errors::ApiError};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
-use tracing::span::Id;
 
 pub struct ClienteListaEsperaRepository;
 impl ClienteListaEsperaRepository {
