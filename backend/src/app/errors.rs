@@ -12,6 +12,7 @@ pub struct FieldError {
     pub field: String,
     pub message: String,
 }
+
 // --------- ERRORES DE LA BASE DE DATOS --------
 #[derive(Debug, Error)]
 pub enum DbError {
@@ -54,10 +55,12 @@ pub enum AppError {
     Unauthorized(String),
     #[error("{0}")]
     Forbidden(String),
-    #[error("error interno del servidor")]
+    #[error("Error interno del servidor")]
     Internal,
-    #[error("servicio no disponible")]
+    #[error("Servicio no disponible")]
     ServiceUnavailable,
+    #[error("Variable de entorno no encontrada")]
+    EnvironmentVariableNotFound,
 }
 impl From<DbError> for AppError {
     fn from(err: DbError) -> Self {
@@ -83,6 +86,10 @@ impl From<sqlx::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, body) = match self {
+            AppError::EnvironmentVariableNotFound => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                json!({ "error": "Variable de entorno no encontrada" }),
+            ),
             AppError::Validation(errors) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 json!({
