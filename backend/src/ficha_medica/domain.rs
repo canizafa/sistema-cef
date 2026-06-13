@@ -1,4 +1,4 @@
-use super::*;
+use super::dto::CreateFichaMedicaRequest;
 
 #[derive(Debug, Clone)]
 pub struct FichaMedica {

@@ -1,4 +1,4 @@
-use super::*;
+use super::domain::FichaMedica;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]

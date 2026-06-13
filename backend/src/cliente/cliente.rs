@@ -1,5 +1,5 @@
 use super::*;
-use crate::app::{Estado, Rol};
+use crate::app::rol::{Estado, Rol};
 use crate::ficha_medica::*;
 use chrono::{Datelike, Local, NaiveDate};
 
