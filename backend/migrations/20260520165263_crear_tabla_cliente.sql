@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS cliente (
     fecha_nacimiento TEXT not null,
     estado VARCHAR(30) not null,
     password VARCHAR(100) not null,
+    motivo_eliminacion VARCHAR(255),
     id_ficha TEXT not null,
     FOREIGN KEY (id_ficha) REFERENCES ficha_medica(id_ficha)
 )
