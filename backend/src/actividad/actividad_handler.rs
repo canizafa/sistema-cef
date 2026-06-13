@@ -45,8 +45,8 @@ pub async fn get_actividades_handler(
 pub async fn delete_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<(StatusCode), AppError> {
-    actividad_service::delete(&state.db, &id).await?;
+) -> Result<StatusCode, AppError> {
+    let _ = actividad_service::delete(&state.db, &id).await?;
     Ok(StatusCode::OK)
 }
 
