@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::app::FieldError;
+use crate::app::{AppError, FieldError};
 
 #[derive(Debug, Error)]
 pub enum ActividadDomainError {
@@ -25,5 +25,10 @@ impl From<ActividadDomainError> for FieldError {
             field: field.to_string(),
             message: message.to_string(),
         }
+    }
+}
+impl From<Vec<ActividadDomainError>> for AppError {
+    fn from(errors: Vec<ActividadDomainError>) -> Self {
+        AppError::Validation(errors.into_iter().map(FieldError::from).collect())
     }
 }

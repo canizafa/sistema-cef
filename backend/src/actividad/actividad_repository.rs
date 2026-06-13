@@ -1,15 +1,10 @@
+use crate::{actividad::Actividad, app::DbError};
 use sqlx::SqlitePool;
-
-use crate::actividad::Actividad;
-use crate::app::ApiError;
 
 pub struct ActividadRepository;
 
 impl ActividadRepository {
-    pub async fn create_actividad(
-        pool: &SqlitePool,
-        actividad: &Actividad,
-    ) -> Result<Actividad, ApiError> {
+    pub async fn create(pool: &SqlitePool, actividad: &Actividad) -> Result<Actividad, DbError> {
         let id = actividad.get_id();
         let nombre = actividad.get_nombre();
         let descripcion = actividad.get_descripcion();
@@ -29,11 +24,11 @@ impl ActividadRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(actividad.clone())
     }
-    pub async fn get_actividad_by_id(pool: &SqlitePool, id: &str) -> Result<Actividad, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Actividad, DbError> {
         let row = sqlx::query!(
             r#"
                SELECT
@@ -47,7 +42,7 @@ impl ActividadRepository {
         )
         .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(Actividad::new(
             row.id_actividad,
@@ -55,7 +50,7 @@ impl ActividadRepository {
             row.descripcion,
         ))
     }
-    pub async fn get_all_actividades(pool: &SqlitePool) -> Result<Vec<Actividad>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Actividad>, DbError> {
         let rows = sqlx::query!(
             r#"
                 SELECT
@@ -67,18 +62,18 @@ impl ActividadRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(rows
             .into_iter()
             .map(|row| Actividad::new(row.id_actividad, row.nombre, row.descripcion))
             .collect())
     }
-    pub async fn update_actividad(
+    pub async fn update(
         pool: &SqlitePool,
         id: &str,
         actividad: &Actividad,
-    ) -> Result<Actividad, ApiError> {
+    ) -> Result<Actividad, DbError> {
         let nombre = actividad.get_nombre();
         let descripcion = actividad.get_descripcion();
 
@@ -96,13 +91,11 @@ impl ActividadRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Self::get_actividad_by_id(pool, id).await
+        Self::get_by_id(pool, id).await
     }
-    pub async fn delete_actividad(pool: &SqlitePool, id: &str) -> Result<Actividad, ApiError> {
-        let actividad = Self::get_actividad_by_id(pool, id).await?;
-
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                 DELETE FROM actividad
@@ -112,8 +105,8 @@ impl ActividadRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(actividad)
+        Ok(())
     }
 }

@@ -23,7 +23,11 @@ impl Actividad {
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
-    pub fn validate_actividad(&self) -> Result<(), Vec<ActividadDomainError>> {
+    pub fn update_actividad(&mut self, other: Self) {
+        self.nombre = other.nombre;
+        self.descripcion = other.descripcion;
+    }
+    pub fn validate_actividad(&self) -> Vec<ActividadDomainError> {
         let mut vec_err = Vec::new();
         if self.nombre.is_empty() {
             vec_err.push(ActividadDomainError::NombreVacio);
@@ -31,11 +35,7 @@ impl Actividad {
         if self.descripcion.is_empty() {
             vec_err.push(ActividadDomainError::DescripcionVacia);
         }
-        if !vec_err.is_empty() {
-            Err(vec_err)
-        } else {
-            Ok(())
-        }
+        vec_err
     }
 }
 
