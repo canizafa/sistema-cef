@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS reserva (
     id_reserva TEXT PRIMARY KEY,
     estado VARCHAR(30) NOT NULL,
-    tipo VARCHAR(50) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,-->representa abono o membresia
     fecha_reserva TEXT not null,
     dni_cliente INTEGER not null, --en la tabla cliente se expresa como INTEGER
     id_clase TEXT NOT NULL,
