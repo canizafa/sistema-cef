@@ -1,9 +1,13 @@
-use super::*;
+use super::{
+    dto::{CreateClienteRequest, UpdateClienteRequest},
+    errors::ClienteDomainError,
+};
 use crate::app::rol::{Estado, Rol};
-use crate::ficha_medica::*;
+use crate::auth::password::hash_password;
+use crate::ficha_medica::domain::FichaMedica;
 use chrono::{Datelike, Local, NaiveDate};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Cliente {
     dni: i64,
     nombre_apellido: String,
@@ -67,32 +71,35 @@ impl Cliente {
     pub fn get_password_hash(&self) -> String {
         self.password_hash.clone()
     }
-    // domain no debe conocer apierror
-    pub fn update_password(&mut self, password: &str) -> Result<(), ApiError> {
+    pub fn update_password(&mut self, password: &str) -> Result<(), ClienteDomainError> {
         if password.len() < 8 {
-            return Err(ApiError::WeakPassword);
+            return Err(ClienteDomainError::WeakPassword);
         }
         self.password_hash = hash_password(password)?;
         Ok(())
     }
-    pub fn validate_cliente(&self) -> Result<(), ApiError> {
+    pub fn update_cliente(&mut self, other: Self) -> Result<(), ClienteDomainError> {
+        todo!()
+    }
+    pub fn validate_cliente(&self) -> Vec<ClienteDomainError> {
+        let mut vec_err = Vec::new();
         if self.dni <= 0 {
-            return Err(ApiError::InvalidDni);
+            vec_err.push(ClienteDomainError::InvalidDni);
         }
         if self.nombre_apellido.is_empty() {
-            return Err(ApiError::InvalidName);
+            vec_err.push(ClienteDomainError::InvalidName);
         }
         if self.email.is_empty() {
-            return Err(ApiError::InvalidEmail);
+            vec_err.push(ClienteDomainError::InvalidEmail);
         }
         if self.telefono.is_empty() {
-            return Err(ApiError::InvalidPhone);
+            vec_err.push(ClienteDomainError::InvalidPhone);
         }
         let now = Local::now().date_naive();
         if now.year() - self.fecha_nacimiento.year() < 14 {
-            return Err(ApiError::InvalidBirthDate);
+            vec_err.push(ClienteDomainError::InvalidBirthDate);
         }
-        Ok(())
+        vec_err
     }
 }
 

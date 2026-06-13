@@ -1,4 +1,4 @@
-mod domain;
+pub mod domain;
 mod dto;
 mod repository;
 
