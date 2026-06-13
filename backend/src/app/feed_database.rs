@@ -1,7 +1,6 @@
-use sqlx::SqlitePool;
-
-use crate::app::DbError;
+use crate::app::errors::DbError;
 use crate::auth::password::hash_password;
+use sqlx::SqlitePool;
 
 pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     // Hash de passwords

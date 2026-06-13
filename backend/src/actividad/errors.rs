@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::app::{AppError, FieldError};
+use crate::app::errors::{AppError, FieldError};
 
 #[derive(Debug, Error)]
 pub enum ActividadDomainError {

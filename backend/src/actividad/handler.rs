@@ -1,5 +1,6 @@
 use super::{dto::ActividadResponse, dto::CreateActividadRequest, service};
-use crate::app::{AppError, AppState};
+use crate::app::errors::AppError;
+use crate::app::state::AppState;
 use axum::{Json, extract::Path, extract::State};
 use reqwest::StatusCode;
 use tracing::instrument;

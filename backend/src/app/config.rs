@@ -1,4 +1,4 @@
-use super::AppError::{self, EnvironmentVariableNotFound};
+use super::errors::AppError::{self, EnvironmentVariableNotFound};
 
 #[derive(Clone)]
 pub struct Config {

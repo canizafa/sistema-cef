@@ -1,4 +1,4 @@
-use crate::{actividad::Actividad, app::DbError};
+use crate::{actividad::Actividad, app::errors::DbError};
 use sqlx::SqlitePool;
 
 pub struct ActividadRepository;

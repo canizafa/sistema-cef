@@ -1,4 +1,4 @@
-use crate::app::AppError;
+use crate::app::errors::AppError;
 use lettre::{
     AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
     message::header::ContentType,

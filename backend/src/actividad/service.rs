@@ -1,6 +1,6 @@
 use super::{dto::CreateActividadRequest, repository::ActividadRepository};
 use crate::actividad::Actividad;
-use crate::app::AppError;
+use crate::app::errors::AppError;
 use sqlx::SqlitePool;
 
 pub async fn create(

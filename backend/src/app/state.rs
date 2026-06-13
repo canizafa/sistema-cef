@@ -1,8 +1,6 @@
-use std::sync::Arc;
-
+use super::mailer::Mailer;
 use sqlx::SqlitePool;
-
-use super::Mailer;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
