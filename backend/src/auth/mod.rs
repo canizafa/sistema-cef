@@ -1,8 +1,15 @@
+pub mod auth;
+pub mod auth_dto;
+pub mod auth_handler;
+pub mod auth_route;
 pub mod claims;
 pub mod jwt;
 pub mod password;
 
-pub use claims::Claims;
-pub use jwt::generar_token;
-pub use jwt::validar_token;
-pub use password::generate_random_password;
+pub use auth::*;
+pub use auth_dto::*;
+pub use auth_handler::*;
+pub use auth_route::*;
+pub use claims::*;
+pub use jwt::*;
+pub use password::*;

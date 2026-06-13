@@ -1,6 +1,5 @@
-use crate::auth::claims::Claims;
-use crate::domain::Rol;
-use crate::errors::ApiError;
+use super::*;
+use crate::app::{ApiError, Rol};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 

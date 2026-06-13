@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   SELECT\n                       id_ficha as \"id_ficha!\",\n                       enfermedades as \"enfermedades!\",\n                       operaciones_quirurgicas as \"operaciones_quirurgicas!\",\n                       detalles as \"detalles!\"\n                   FROM ficha_medica\n                   WHERE id_ficha = ?\n                   ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_ficha!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "enfermedades!",
+        "ordinal": 1,
+        "type_info": "Bool"
+      },
+      {
+        "name": "operaciones_quirurgicas!",
+        "ordinal": 2,
+        "type_info": "Bool"
+      },
+      {
+        "name": "detalles!",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "cafc576b3eb8c3ae46efc1582287fe876776f6e0d19644258567f1eb5c761da5"
+}

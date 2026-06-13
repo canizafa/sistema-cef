@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    UPDATE asistencia\n                    SET\n                        fecha = ?,\n                        metodo = ?,\n                        id_reserva = ?\n                    WHERE id_asistencia = ?\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "aea80a2b299e2bcd668b20675b6c4871560f03af614c6fe5330776941352acbb"
+}

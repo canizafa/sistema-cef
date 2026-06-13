@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO clase\n               (\n                   id_clase,\n                   dia,\n                   horario,\n                   cupo_base,\n                   cupo_maximo,\n                   estado,\n                   descripcion,\n                   id_actividad,\n                   id_sala,\n                   dni_profesor\n               )\n               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "0c5194ba75bd23fe74ac772022650b4a6edd9b57e46e4bc60330a1fa10cf1759"
+}
