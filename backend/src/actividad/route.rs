@@ -1,8 +1,10 @@
+use super::handler::{
+    create_actividad_handler, delete_actividad_handler, get_actividad_handler,
+    get_actividades_handler, update_actividad_handler,
+};
+use crate::app::AppState;
 use axum::routing::{delete, put};
 use axum::{Router, routing::get, routing::post};
-
-use super::*;
-use crate::app::AppState;
 
 pub fn actividad_router() -> Router<AppState> {
     Router::new()

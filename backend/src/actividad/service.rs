@@ -1,4 +1,5 @@
-use crate::actividad::{Actividad, ActividadRepository, CreateActividadRequest};
+use super::{dto::CreateActividadRequest, repository::ActividadRepository};
+use crate::actividad::Actividad;
 use crate::app::AppError;
 use sqlx::SqlitePool;
 

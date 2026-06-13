@@ -1,14 +1,11 @@
-pub mod actividad;
-pub mod actividad_dto;
-pub mod actividad_handler;
-pub mod actividad_repository;
-pub mod actividad_route;
-pub mod actividad_service;
-pub mod errors;
+mod domain;
+mod dto;
+mod errors;
+mod repository;
 
-pub use actividad::*;
-pub use actividad_dto::*;
-pub use actividad_handler::*;
-pub use actividad_repository::*;
-pub use actividad_route::*;
-pub use errors::*;
+pub mod handler;
+pub mod route;
+pub mod service;
+
+pub use domain::Actividad;
+pub use errors::ActividadDomainError;

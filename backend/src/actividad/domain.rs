@@ -1,4 +1,5 @@
-use super::*;
+use super::dto::CreateActividadRequest;
+use super::errors::ActividadDomainError;
 #[derive(Debug, Clone)]
 pub struct Actividad {
     pub id: String,
