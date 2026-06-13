@@ -23,12 +23,16 @@ impl Actividad {
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
-    //Domain no debe conocer appiError
-    pub fn validate_actividad(&self) -> Result<(), ApiError> {
-        if self.nombre.is_empty() || self.descripcion.is_empty() {
-            Err(ApiError::BadRequest(
-                "Nombre y descripción son obligatorios".to_string(),
-            ))
+    pub fn validate_actividad(&self) -> Result<(), Vec<ActividadDomainError>> {
+        let mut vec_err = Vec::new();
+        if self.nombre.is_empty() {
+            vec_err.push(ActividadDomainError::NombreVacio);
+        }
+        if self.descripcion.is_empty() {
+            vec_err.push(ActividadDomainError::DescripcionVacia);
+        }
+        if !vec_err.is_empty() {
+            Err(vec_err)
         } else {
             Ok(())
         }

@@ -1,7 +1,6 @@
-use crate::domain::Cliente;
-use crate::domain::ClienteListaEspera;
-use crate::repository::ClienteRepository;
-use crate::{domain::ListaEspera, errors::ApiError};
+use crate::app::ApiError;
+use crate::cliente::*;
+use crate::lista_espera::*;
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
@@ -32,7 +31,7 @@ impl ClienteListaEsperaRepository {
 
         Ok(lista)
     }
-    pub async fn agregar_cliente(
+    pub async fn add_cliente(
         pool: &SqlitePool,
         id_espera: &str,
         dni_cliente: i64,
@@ -84,10 +83,7 @@ impl ClienteListaEsperaRepository {
             clientes,
         ))
     }
-    pub async fn obtener_clientes(
-        pool: &SqlitePool,
-        id_espera: &str,
-    ) -> Result<Vec<Cliente>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool, id_espera: &str) -> Result<Vec<Cliente>, ApiError> {
         let registros = sqlx::query!(
             r#"
                 SELECT dni_cliente
@@ -113,7 +109,7 @@ impl ClienteListaEsperaRepository {
 
         Ok(clientes)
     }
-    pub async fn obtener_primero(pool: &SqlitePool, id_espera: &str) -> Result<Cliente, ApiError> {
+    pub async fn get_first(pool: &SqlitePool, id_espera: &str) -> Result<Cliente, ApiError> {
         let registro = sqlx::query!(
             r#"
                 SELECT dni_cliente
@@ -131,7 +127,7 @@ impl ClienteListaEsperaRepository {
 
         ClienteRepository::get_by_dni(pool, registro.dni_cliente).await
     }
-    pub async fn eliminar_cliente(
+    pub async fn delete_cliente(
         pool: &SqlitePool,
         id_espera: &str,
         dni_cliente: i64,

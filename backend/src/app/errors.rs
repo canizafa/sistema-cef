@@ -4,6 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
+use serde_json::json;
 use thiserror::Error;
 
 #[derive(Debug, Serialize)]
@@ -11,79 +12,98 @@ pub struct FieldError {
     pub field: String,
     pub message: String,
 }
-
+// --------- ERRORES DE LA BASE DE DATOS --------
 #[derive(Debug, Error)]
-pub enum AppError {
-    #[error("Hubo un error en la base de datos")]
-    DatabaseError(#[from] sqlx::Error),
-    #[error(transparent)]
-    Api(#[from] ApiError),
-    #[error("Hubo un error interno del servidor")]
-    InternalServerError(String),
-    #[error("Hubo un error en la migración de la base de datos")]
-    MigrationError(#[from] sqlx::migrate::MigrateError),
-    #[error("Variable de entorno no encontrada")]
-    EnvironmentVariableNotFound,
+pub enum DbError {
+    #[error("Registro no encontrado")]
+    NotFound,
+    #[error("Violación de unicidad en : {0}")]
+    UniqueViolation(String),
+    #[error("Error en la conexión con la base de datos")]
+    ConnectionError,
+    #[error("Error de query: {0}")]
+    QueryError(sqlx::Error),
 }
 
+impl From<sqlx::Error> for DbError {
+    fn from(error: sqlx::Error) -> Self {
+        match error {
+            sqlx::Error::RowNotFound => DbError::NotFound,
+            sqlx::Error::Database(db_err) => {
+                if db_err.code().as_deref() == Some("2067") {
+                    DbError::UniqueViolation(db_err.message().into())
+                } else {
+                    DbError::QueryError(sqlx::Error::Database(db_err))
+                }
+            }
+            sqlx::Error::PoolTimedOut | sqlx::Error::PoolClosed => DbError::ConnectionError,
+            other => DbError::QueryError(other),
+        }
+    }
+}
+// --------- ERRORES DE LA APP --------
 #[derive(Debug, Error)]
-pub enum ApiError {
-    #[error("no se pudo enviar el correo (SMTP): {0}")]
-    SmtpError(#[from] lettre::transport::smtp::Error),
-    #[error("dirección de correo inválida: {0}")]
-    AddressError(#[from] lettre::address::AddressError),
-    #[error("no se pudo armar el mensaje de correo: {0}")]
-    MessageError(#[from] lettre::error::Error),
-    #[error("asistencia inválida")]
-    InvalidAsistencia,
-    #[error("error de Mercado Pago: {0}")]
-    MpError(String),
-    #[error("not found")]
-    NotFound,
-    #[error("bad request")]
-    BadRequest(String),
-    // ========= AUTH =========
-    #[error("credenciales inválidas")]
-    InvalidCredentials,
-    #[error("token inválido")]
-    InvalidToken,
-    #[error("no autorizado")]
-    Unauthorized,
-    #[error("permiso denegado")]
-    Forbidden,
-    // ========= USER =========
-    #[error("dni inválido")]
-    InvalidDni,
-    #[error("nombre inválido")]
-    InvalidName,
-    #[error("email inválido")]
-    InvalidEmail,
-    #[error("fecha de nacimiento inválida")]
-    InvalidBirthDate,
-    #[error("contraseña inválida")]
-    InvalidPassword,
-    #[error("telefono inválido")]
-    InvalidPhone,
-    #[error("usuario no encontrado")]
-    UserNotFound,
-    #[error("contraseña insegura")]
-    WeakPassword,
-    #[error("email ya registrado")]
-    EmailAlreadyExists,
-    // ========= DATABASE =========
-    #[error("error de base de datos: {0}")]
-    DatabaseError(#[from] sqlx::Error),
-    // ========= SERVER =========
+pub enum AppError {
+    #[error("Error de validacion")]
+    Validation(Vec<FieldError>),
+    #[error("{0}")]
+    Conflict(String),
+    #[error("{0}")]
+    NotFound(String),
+    #[error("{0}")]
+    Unauthorized(String),
+    #[error("{0}")]
+    Forbidden(String),
     #[error("error interno del servidor")]
-    InternalServerError,
-    #[error("error al iniciar servidor")]
-    ServerStartupError,
-    // ========= JWT =========
-    #[error("error al generar o validar el token JWT: {0}")]
-    JwtError(#[from] jsonwebtoken::errors::Error),
-    #[error("Error en el token generado")]
-    JwtTokenError,
-    // ========= HASH =========
-    #[error("error procesando contraseña")]
-    PasswordHashError,
+    Internal,
+    #[error("servicio no disponible")]
+    ServiceUnavailable,
+}
+impl From<DbError> for AppError {
+    fn from(err: DbError) -> Self {
+        match err {
+            DbError::NotFound => AppError::NotFound("El recurso solicitado no existe".into()),
+            DbError::UniqueViolation(_) => {
+                AppError::Conflict("Ya existe un registro con esos datos".into())
+            }
+            DbError::ConnectionError => AppError::ServiceUnavailable,
+            DbError::QueryError(e) => {
+                // Loguear acá el error real sin exponerlo al front
+                tracing::error!("Error de query inesperado: {:?}", e);
+                AppError::Internal
+            }
+        }
+    }
+}
+impl From<sqlx::Error> for AppError {
+    fn from(err: sqlx::Error) -> Self {
+        AppError::from(DbError::from(err))
+    }
+}
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let (status, body) = match self {
+            AppError::Validation(errors) => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                json!({
+                    "error": "errores de validación",
+                    "details": errors
+                }),
+            ),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, json!({ "error": msg })),
+            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, json!({ "error": msg })),
+            AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, json!({ "error": msg })),
+            AppError::Forbidden(msg) => (StatusCode::FORBIDDEN, json!({ "error": msg })),
+            AppError::Internal => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                json!({ "error": "error interno del servidor" }),
+            ),
+            AppError::ServiceUnavailable => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                json!({ "error": "servicio no disponible, intentá más tarde" }),
+            ),
+        };
+
+        (status, Json(body)).into_response()
+    }
 }

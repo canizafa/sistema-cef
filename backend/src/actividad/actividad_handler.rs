@@ -1,8 +1,7 @@
 use axum::{Json, extract::Path, extract::State};
 use tracing::instrument;
 
-use crate::app::ApiError;
-use crate::app::AppState;
+use crate::app::{AppError, AppState};
 
 use super::{Actividad, ActividadRepository, ActividadResponse, CreateActividadRequest};
 
@@ -10,7 +9,7 @@ use super::{Actividad, ActividadRepository, ActividadResponse, CreateActividadRe
 pub async fn create_actividad_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateActividadRequest>,
-) -> Result<Json<ActividadResponse>, ApiError> {
+) -> Result<Json<ActividadResponse>, AppError> {
     let actividad = Actividad::from(request);
     actividad.validate_actividad()?;
     ActividadRepository::create_actividad(&state.db, &actividad).await?;
@@ -21,7 +20,7 @@ pub async fn create_actividad_handler(
 pub async fn get_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<ActividadResponse>, ApiError> {
+) -> Result<Json<ActividadResponse>, AppError> {
     let actividad = ActividadRepository::get_actividad_by_id(&state.db, &id).await?;
     Ok(Json(ActividadResponse::from(actividad)))
 }
@@ -29,7 +28,7 @@ pub async fn get_actividad_handler(
 #[instrument(name = "actividad.list", skip(state), err)]
 pub async fn get_actividades_handler(
     State(state): State<AppState>,
-) -> Result<Json<Vec<ActividadResponse>>, ApiError> {
+) -> Result<Json<Vec<ActividadResponse>>, AppError> {
     let actividades = ActividadRepository::get_all_actividades(&state.db).await?;
     Ok(Json(
         actividades
@@ -43,7 +42,7 @@ pub async fn get_actividades_handler(
 pub async fn delete_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<ActividadResponse>, ApiError> {
+) -> Result<Json<ActividadResponse>, AppError> {
     let actividad = ActividadRepository::delete_actividad(&state.db, &id).await?;
     Ok(Json(ActividadResponse::from(actividad)))
 }
@@ -53,7 +52,7 @@ pub async fn update_actividad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
     Json(request): Json<CreateActividadRequest>,
-) -> Result<Json<ActividadResponse>, ApiError> {
+) -> Result<Json<ActividadResponse>, AppError> {
     let actividad = Actividad::from(request);
     actividad.validate_actividad()?;
     ActividadRepository::update_actividad(&state.db, &id, &actividad).await?;
