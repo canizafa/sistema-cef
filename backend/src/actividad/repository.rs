@@ -1,15 +1,22 @@
 use crate::{actividad::Actividad, app::errors::DbError};
 use sqlx::SqlitePool;
 
-pub struct ActividadRepository;
+#[derive(Debug, sqlx::FromRow)]
+struct ActividadRow {
+    id_actividad: String,
+    nombre: String,
+    descripcion: String,
+}
+impl From<ActividadRow> for Actividad {
+    fn from(row: ActividadRow) -> Self {
+        Self::new(row.id_actividad, row.nombre, row.descripcion)
+    }
+}
 
+pub struct ActividadRepository;
 impl ActividadRepository {
     pub async fn create(pool: &SqlitePool, actividad: &Actividad) -> Result<Actividad, DbError> {
-        let id = actividad.get_id();
-        let nombre = actividad.get_nombre();
-        let descripcion = actividad.get_descripcion();
-
-        sqlx::query!(
+        let row = sqlx::query_as::<_, ActividadRow>(
             r#"
                INSERT INTO actividad (
                    id_actividad,
@@ -18,18 +25,18 @@ impl ActividadRepository {
                )
                VALUES (?, ?, ?)
                "#,
-            id,
-            nombre,
-            descripcion
         )
-        .execute(pool)
+        .bind(actividad.get_id())
+        .bind(actividad.get_nombre())
+        .bind(actividad.get_descripcion())
+        .fetch_one(pool)
         .await
         .map_err(DbError::from)?;
 
-        Ok(actividad.clone())
+        Ok(row.into())
     }
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Actividad, DbError> {
-        let row = sqlx::query!(
+        let row = sqlx::query_as::<_, ActividadRow>(
             r#"
                SELECT
                    id_actividad as "id_actividad!",
@@ -38,46 +45,36 @@ impl ActividadRepository {
                FROM actividad
                WHERE id_actividad = ?
                "#,
-            id
         )
+        .bind(id)
         .fetch_one(pool)
         .await
         .map_err(DbError::from)?;
 
-        Ok(Actividad::new(
-            row.id_actividad,
-            row.nombre,
-            row.descripcion,
-        ))
+        Ok(row.into())
     }
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Actividad>, DbError> {
-        let rows = sqlx::query!(
+        let rows = sqlx::query_as::<_, ActividadRow>(
             r#"
                 SELECT
                     id_actividad as "id_actividad!",
                     nombre,
                     descripcion
                 FROM actividad
-                "#
+                "#,
         )
         .fetch_all(pool)
         .await
         .map_err(DbError::from)?;
 
-        Ok(rows
-            .into_iter()
-            .map(|row| Actividad::new(row.id_actividad, row.nombre, row.descripcion))
-            .collect())
+        Ok(rows.into_iter().map(Actividad::from).collect())
     }
     pub async fn update(
         pool: &SqlitePool,
         id: &str,
         actividad: &Actividad,
     ) -> Result<Actividad, DbError> {
-        let nombre = actividad.get_nombre();
-        let descripcion = actividad.get_descripcion();
-
-        sqlx::query!(
+        let row = sqlx::query_as::<_, ActividadRow>(
             r#"
                UPDATE actividad
                SET
@@ -85,15 +82,15 @@ impl ActividadRepository {
                    descripcion = ?
                WHERE id_actividad = ?
                "#,
-            nombre,
-            descripcion,
-            id
         )
-        .execute(pool)
+        .bind(actividad.get_nombre())
+        .bind(actividad.get_descripcion())
+        .bind(id)
+        .fetch_one(pool)
         .await
         .map_err(DbError::from)?;
 
-        Self::get_by_id(pool, id).await
+        Ok(row.into())
     }
     pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(

@@ -2,7 +2,7 @@ use super::domain::FichaMedica;
 use crate::app::errors::DbError;
 use sqlx::SqlitePool;
 
-#[derive(sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow)]
 struct FichaMedicaRow {
     pub id_ficha: String,
     pub enfermedades: bool,
