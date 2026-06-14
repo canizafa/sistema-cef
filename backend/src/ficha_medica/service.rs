@@ -7,15 +7,14 @@ use sqlx::SqlitePool;
 pub async fn create(
     db: &SqlitePool,
     request: CreateFichaMedicaRequest,
+    id_ficha: &str,
 ) -> Result<FichaMedica, AppError> {
     let ficha_medica = FichaMedica::from(request);
-    let existe = FichaMedicaRepository::get_by_id(db, &ficha_medica.get_id_ficha())
-        .await
-        .is_ok();
+    let existe = FichaMedicaRepository::get_by_id(db, id_ficha).await.is_ok();
     if existe {
         return Err(AppError::Conflict("Ficha medica ya existe".to_string()));
     }
-    FichaMedicaRepository::create(db, &ficha_medica).await?;
+    FichaMedicaRepository::create(db, &ficha_medica, id_ficha).await?;
     Ok(ficha_medica)
 }
 pub async fn get_by_id(db: &SqlitePool, id_ficha: &str) -> Result<FichaMedica, AppError> {

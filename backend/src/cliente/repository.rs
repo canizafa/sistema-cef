@@ -1,47 +1,47 @@
-use super::*;
-use crate::app::{ApiError, Estado, Rol};
-use crate::ficha_medica::*;
+use super::domain::Cliente;
+use crate::app::{
+    errors::DbError,
+    rol::{Estado, Rol},
+};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
-pub struct ClienteRepository;
 
-impl ClienteRepository {
-    pub async fn create_cliente(pool: &SqlitePool, cliente: &Cliente) -> Result<Cliente, ApiError> {
-        let dni = cliente.get_dni();
-        let nombre = cliente.get_nombre_apellido();
-        let email = cliente.get_email();
-        let telefono = cliente.get_telefono();
-        let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
-        let estado = cliente.get_estado();
-        let password = cliente.get_password_hash();
-        let ficha = cliente.get_ficha_medica();
-        let id_ficha = ficha.get_id_ficha();
-        let enfermedades = ficha.get_enfermedades();
-        let operaciones = ficha.get_operaciones_quirurgicas();
-        let detalles = ficha.get_detalles();
-
-        // primero crear ficha médica
-        sqlx::query!(
-            r#"
-            INSERT INTO ficha_medica (
-                id_ficha,
-                enfermedades,
-                operaciones_quirurgicas,
-                detalles
-            )
-            VALUES (?, ?, ?, ?)
-            "#,
-            id_ficha,
-            enfermedades,
-            operaciones,
-            detalles
+#[derive(Debug, sqlx::FromRow)]
+pub struct ClienteRow {
+    dni: i64,
+    nombre: String,
+    email: String,
+    telefono: String,
+    password: String,
+    fecha_nacimiento: NaiveDate,
+    estado: Estado,
+    id_ficha: String,
+    rol: Rol,
+}
+impl From<ClienteRow> for Cliente {
+    fn from(row: ClienteRow) -> Self {
+        Self::new(
+            row.dni,
+            row.nombre,
+            row.email,
+            row.telefono,
+            row.password,
+            row.fecha_nacimiento,
+            row.estado,
+            row.id_ficha,
+            row.rol,
         )
-        .execute(pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+    }
+}
 
-        // después crear cliente
-        sqlx::query!(
+pub struct ClienteRepository;
+impl ClienteRepository {
+    pub async fn create(
+        pool: &SqlitePool,
+        cliente: &Cliente,
+        id_ficha: &str,
+    ) -> Result<Cliente, DbError> {
+        let cliente_row = sqlx::query_as::<_, ClienteRow>(
             r#"
             INSERT INTO cliente (
                 dni_cliente,
@@ -55,24 +55,24 @@ impl ClienteRepository {
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             "#,
-            dni,
-            nombre,
-            email,
-            telefono,
-            fecha_nacimiento,
-            estado,
-            password,
-            id_ficha
         )
-        .execute(pool)
+        .bind(cliente.get_dni())
+        .bind(cliente.get_nombre_apellido())
+        .bind(cliente.get_email())
+        .bind(cliente.get_telefono())
+        .bind(cliente.get_fecha_nacimiento())
+        .bind(cliente.get_estado())
+        .bind(cliente.get_password_hash())
+        .bind(id_ficha)
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(cliente.clone())
+        Ok(cliente_row.into())
     }
 
-    pub async fn list_clientes(pool: &SqlitePool) -> Result<Vec<Cliente>, ApiError> {
-        let rows = sqlx::query!(
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Cliente>, DbError> {
+        let rows = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
                 c.dni_cliente as "dni_cliente!",
@@ -91,41 +91,17 @@ impl ClienteRepository {
             FROM cliente c
             INNER JOIN ficha_medica f
                 ON c.id_ficha = f.id_ficha
-            "#
+            "#,
         )
         .fetch_all(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        let clientes = rows
-            .into_iter()
-            .map(|row| {
-                let ficha = FichaMedica::new(
-                    row.id_ficha,
-                    row.enfermedades,
-                    row.operaciones_quirurgicas,
-                    row.detalles,
-                );
-
-                Cliente::new(
-                    row.dni_cliente,
-                    row.nombre_completo,
-                    row.password,
-                    row.email,
-                    row.telefono,
-                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
-                    Estado::from(row.estado),
-                    ficha,
-                    Rol::Cliente,
-                )
-            })
-            .collect();
-
-        Ok(clientes)
+        Ok(rows.into_iter().map(Cliente::from).collect())
     }
 
-    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
-        let row = sqlx::query!(
+    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
                 c.dni_cliente as "dni_cliente!",
@@ -146,36 +122,17 @@ impl ClienteRepository {
                 ON c.id_ficha = f.id_ficha
             WHERE c.dni_cliente = ?
             "#,
-            dni
         )
+        .bind(dni)
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        let ficha = FichaMedica::new(
-            row.id_ficha,
-            row.enfermedades,
-            row.operaciones_quirurgicas,
-            row.detalles,
-        );
-
-        let cliente = Cliente::new(
-            row.dni_cliente,
-            row.nombre_completo,
-            row.password,
-            row.email,
-            row.telefono,
-            row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
-            Estado::from(row.estado),
-            ficha,
-            Rol::Cliente,
-        );
-
-        Ok(cliente)
+        Ok(row.into())
     }
 
-    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, ApiError> {
-        let row = sqlx::query!(
+    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
                 c.dni_cliente as "dni_cliente!",
@@ -196,44 +153,20 @@ impl ClienteRepository {
                 ON c.id_ficha = f.id_ficha
             WHERE c.email = ?
             "#,
-            email
         )
-        .fetch_optional(pool)
+        .bind(email)
+        .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        match row {
-            Some(row) => {
-                let ficha = FichaMedica::new(
-                    row.id_ficha,
-                    row.enfermedades,
-                    row.operaciones_quirurgicas,
-                    row.detalles,
-                );
-
-                let cliente = Cliente::new(
-                    row.dni_cliente,
-                    row.nombre_completo,
-                    row.password,
-                    row.email,
-                    row.telefono,
-                    row.fecha_nacimiento.parse::<NaiveDate>().unwrap(),
-                    Estado::from(row.estado),
-                    ficha,
-                    Rol::Cliente,
-                );
-
-                Ok(cliente)
-            }
-            None => Err(ApiError::NotFound),
-        }
+        Ok(row.into())
     }
 
-    pub async fn update_password_by_email(
+    pub async fn update_password(
         pool: &SqlitePool,
         email: &str,
         password_hash: &str,
-    ) -> Result<(), ApiError> {
+    ) -> Result<(), DbError> {
         sqlx::query!(
             r#"
             UPDATE cliente
@@ -245,99 +178,57 @@ impl ClienteRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
         Ok(())
     }
-    pub async fn update_password_by_dni(
-        pool: &SqlitePool,
-        dni: i64,
-        password_hash: &str,
-    ) -> Result<(), ApiError> {
-        sqlx::query!(
-            r#"
-                UPDATE cliente
-                SET password = ?
-                WHERE dni_cliente = ?
-                "#,
-            password_hash,
-            dni,
-        )
-        .execute(pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
-        Ok(())
-    }
-    pub async fn update_cliente(
+    pub async fn update_nombre(
         pool: &SqlitePool,
         id: i64,
-        cliente: &Cliente,
-    ) -> Result<Cliente, ApiError> {
-        let nombre = cliente.get_nombre_apellido();
-        let email = cliente.get_email();
-        let telefono = cliente.get_telefono();
-        let fecha_nacimiento = cliente.get_fecha_nacimiento().to_string();
-        let estado = cliente.get_estado().to_string();
-
-        let ficha = cliente.get_ficha_medica();
-        let id_ficha = ficha.get_id_ficha();
-        let enfermedades = ficha.get_enfermedades();
-        let operaciones = ficha.get_operaciones_quirurgicas();
-        let detalles = ficha.get_detalles();
-
-        // 1) actualizar ficha médica
-        sqlx::query!(
-            r#"
-                UPDATE ficha_medica
-                SET
-                    enfermedades = ?,
-                    operaciones_quirurgicas = ?,
-                    detalles = ?
-                WHERE id_ficha = ?
-                "#,
-            enfermedades,
-            operaciones,
-            detalles,
-            id_ficha
-        )
-        .execute(pool)
-        .await
-        .map_err(ApiError::DatabaseError)?;
-
-        // 2) actualizar cliente
-        sqlx::query!(
+        nombre_apellido: &str,
+    ) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
             r#"
                 UPDATE cliente
                 SET
-                    nombre_completo = ?,
-                    email = ?,
-                    telefono = ?,
-                    fecha_nacimiento = ?,
-                    estado = ?
+                    nombre_completo = ?
                 WHERE dni_cliente = ?
                 "#,
-            nombre,
-            email,
-            telefono,
-            fecha_nacimiento,
-            estado,
-            id
         )
-        .execute(pool)
+        .bind(nombre_apellido)
+        .bind(id)
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        // 3) devolver cliente actualizado
-        Self::get_by_dni(pool, id).await
+        Ok(row.into())
     }
-    pub async fn delete_cliente(pool: &SqlitePool, dni: i64) -> Result<Cliente, ApiError> {
-        let cliente = Self::get_by_dni(pool, dni).await?;
+    pub async fn update_estado(
+        pool: &SqlitePool,
+        id: i64,
+        estado: Estado,
+    ) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
+            r#"
+                UPDATE cliente
+                SET estado = ?
+                WHERE dni_cliente = ?
+                "#,
+        )
+        .bind(estado)
+        .bind(id)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
 
+        Ok(row.into())
+    }
+    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
         sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
             .bind(dni)
             .execute(pool)
             .await
-            .map_err(|e| ApiError::DatabaseError(e))?;
+            .map_err(DbError::from)?;
 
-        Ok(cliente)
+        Ok(())
     }
 }

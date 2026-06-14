@@ -1,4 +1,4 @@
-use super::*;
+use crate::auth::dto::RegisterRequest;
 use chrono::NaiveDate;
 
 #[derive(Debug, Clone)]

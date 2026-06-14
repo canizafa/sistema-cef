@@ -1,13 +1,12 @@
-use super::{
-    dto::{CreateClienteRequest, UpdateClienteRequest},
-    errors::ClienteDomainError,
+use super::{dto::CreateClienteRequest, errors::ClienteDomainError};
+use crate::{
+    app::rol::{Estado, Rol},
+    cliente::dto::ClienteRequest,
 };
-use crate::app::rol::{Estado, Rol};
-use crate::auth::password::hash_password;
-use crate::ficha_medica::domain::FichaMedica;
+
 use chrono::{Datelike, Local, NaiveDate};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cliente {
     dni: i64,
     nombre_apellido: String,
@@ -16,7 +15,7 @@ pub struct Cliente {
     telefono: String,
     fecha_nacimiento: NaiveDate,
     estado: Estado,
-    ficha_medica: FichaMedica,
+    id_ficha: String,
     rol: Rol,
 }
 
@@ -29,7 +28,7 @@ impl Cliente {
         telefono: String,
         fecha_nacimiento: NaiveDate,
         estado: Estado,
-        ficha_medica: FichaMedica,
+        id_ficha: String,
         rol: Rol,
     ) -> Self {
         Self {
@@ -40,7 +39,7 @@ impl Cliente {
             telefono,
             fecha_nacimiento,
             estado,
-            ficha_medica,
+            id_ficha,
             rol,
         }
     }
@@ -62,24 +61,56 @@ impl Cliente {
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
     }
-    pub fn get_ficha_medica(&self) -> FichaMedica {
-        self.ficha_medica.clone()
+    pub fn get_id_ficha(&self) -> &str {
+        &self.id_ficha
     }
     pub fn get_rol(&self) -> Rol {
         self.rol.clone()
     }
-    pub fn get_password_hash(&self) -> String {
-        self.password_hash.clone()
+    pub fn get_password_hash(&self) -> &str {
+        &self.password_hash
     }
-    pub fn update_password(&mut self, password: &str) -> Result<(), ClienteDomainError> {
+    pub fn update_password(
+        &mut self,
+        password_verificada: bool,
+        new_password: &str,
+    ) -> Vec<ClienteDomainError> {
+        let mut vec_err = Vec::new();
+        if new_password.len() < 8 {
+            vec_err.push(ClienteDomainError::WeakPassword);
+        }
+        if !password_verificada {
+            vec_err.push(ClienteDomainError::InvalidPassword);
+        }
+        if !vec_err.is_empty() {
+            vec_err
+        } else {
+            self.password_hash = new_password.to_string();
+            vec_err
+        }
+    }
+    pub fn reset_password(&mut self, new_password: &str) {
+        self.password_hash = new_password.to_string();
+    }
+    pub fn update_cliente(&mut self, nombre: &str, apellido: &str) -> Vec<ClienteDomainError> {
+        let mut vec_err = Vec::new();
+        if nombre.is_empty() {
+            vec_err.push(ClienteDomainError::InvalidName);
+        }
+        if apellido.is_empty() {
+            vec_err.push(ClienteDomainError::InvalidName);
+        }
+        if !vec_err.is_empty() {
+            return vec_err;
+        }
+        self.nombre_apellido = format!("{}, {}", nombre, apellido);
+        vec_err
+    }
+    pub fn validate_password_format(password: &str) -> Result<(), ClienteDomainError> {
         if password.len() < 8 {
             return Err(ClienteDomainError::WeakPassword);
         }
-        self.password_hash = hash_password(password)?;
         Ok(())
-    }
-    pub fn update_cliente(&mut self, other: Self) -> Result<(), ClienteDomainError> {
-        todo!()
     }
     pub fn validate_cliente(&self) -> Vec<ClienteDomainError> {
         let mut vec_err = Vec::new();
@@ -88,6 +119,9 @@ impl Cliente {
         }
         if self.nombre_apellido.is_empty() {
             vec_err.push(ClienteDomainError::InvalidName);
+        }
+        if let Err(err) = Self::validate_password_format(&self.password_hash) {
+            vec_err.push(err);
         }
         if self.email.is_empty() {
             vec_err.push(ClienteDomainError::InvalidEmail);
@@ -103,10 +137,13 @@ impl Cliente {
     }
 }
 
-impl From<CreateClienteRequest> for Cliente {
-    fn from(request: CreateClienteRequest) -> Self {
-        let password_hash = hash_password(&request.password).expect("Contraseña no hasheada");
-        Self {
+impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
+    type Error = Vec<ClienteDomainError>;
+
+    fn try_from(
+        (request, password_hash, id_ficha): (CreateClienteRequest, String, String),
+    ) -> Result<Self, Self::Error> {
+        let cliente = Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash,
@@ -114,24 +151,35 @@ impl From<CreateClienteRequest> for Cliente {
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,
             estado: request.estado,
-            ficha_medica: request.ficha_medica.into(),
+            id_ficha,
             rol: Rol::Cliente,
+        };
+        let errors = cliente.validate_cliente();
+        if !errors.is_empty() {
+            return Err(errors);
         }
+        Ok(cliente)
     }
 }
+impl TryFrom<ClienteRequest> for Cliente {
+    type Error = Vec<ClienteDomainError>;
 
-impl From<UpdateClienteRequest> for Cliente {
-    fn from(request: UpdateClienteRequest) -> Self {
-        Self {
+    fn try_from(request: ClienteRequest) -> Result<Self, Self::Error> {
+        let cliente = Self {
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password_hash: "123456".to_string(),
+            password_hash: String::new(),
             email: request.email,
             telefono: request.telefono,
             fecha_nacimiento: request.fecha_nacimiento,
             estado: request.estado,
-            ficha_medica: request.ficha_medica.into(),
+            id_ficha: request.id_ficha,
             rol: Rol::Cliente,
+        };
+        let errors = cliente.validate_cliente();
+        if !errors.is_empty() {
+            return Err(errors);
         }
+        Ok(cliente)
     }
 }

@@ -1,4 +1,4 @@
-use crate::app::Rol;
+use crate::app::rol::Rol;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 

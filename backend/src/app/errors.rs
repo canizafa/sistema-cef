@@ -61,6 +61,10 @@ pub enum AppError {
     ServiceUnavailable,
     #[error("Variable de entorno no encontrada")]
     EnvironmentVariableNotFound,
+    #[error("Error de hash de contraseña")]
+    PasswordHashError,
+    #[error("Credenciales invalidas")]
+    InvalidCredentials,
 }
 impl From<DbError> for AppError {
     fn from(err: DbError) -> Self {
@@ -86,6 +90,14 @@ impl From<sqlx::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, body) = match self {
+            AppError::InvalidCredentials => (
+                StatusCode::UNAUTHORIZED,
+                json!({ "error": "Credenciales invalidas" }),
+            ),
+            AppError::PasswordHashError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                json!({ "error": "Error de hash de contraseña" }),
+            ),
             AppError::EnvironmentVariableNotFound => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 json!({ "error": "Variable de entorno no encontrada" }),

@@ -3,7 +3,7 @@ use crate::app::errors::DbError;
 use sqlx::SqlitePool;
 
 #[derive(Debug, sqlx::FromRow)]
-struct FichaMedicaRow {
+pub struct FichaMedicaRow {
     pub id_ficha: String,
     pub enfermedades: bool,
     pub operaciones_quirurgicas: bool,
@@ -25,6 +25,7 @@ impl FichaMedicaRepository {
     pub async fn create(
         pool: &SqlitePool,
         ficha_medica: &FichaMedica,
+        id_ficha: &str,
     ) -> Result<FichaMedica, DbError> {
         let row = sqlx::query_as::<_, FichaMedicaRow>(
             r#"
@@ -37,7 +38,7 @@ impl FichaMedicaRepository {
                VALUES (?, ?, ?, ?)
                "#,
         )
-        .bind(ficha_medica.get_id_ficha())
+        .bind(id_ficha)
         .bind(ficha_medica.get_enfermedades())
         .bind(ficha_medica.get_operaciones_quirurgicas())
         .bind(ficha_medica.get_detalles())

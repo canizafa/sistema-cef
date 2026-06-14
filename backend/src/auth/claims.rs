@@ -1,4 +1,4 @@
-use crate::app::Rol;
+use crate::app::rol::Rol;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

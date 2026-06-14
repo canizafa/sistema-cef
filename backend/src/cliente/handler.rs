@@ -1,27 +1,24 @@
-use super::*;
-use crate::app::{ApiError, AppState};
+use super::dto::{ClienteResponse, CreateClienteRequest};
+use crate::app::{errors::AppError, state::AppState};
+use crate::cliente;
+use crate::cliente::dto::{ClienteRequest, UpdatePasswordRequest};
 use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
 };
+
 use tracing::instrument;
 
 #[instrument(name = "cliente.create", skip(state, request), fields(dni = request.dni), err)]
 pub async fn create_cliente_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClienteRequest>,
-) -> Result<Json<ClienteResponse>, ApiError> {
-    let cliente = Cliente::from(request);
-    let existe = ClienteRepository::get_by_dni(&state.db, cliente.get_dni())
+) -> Result<Json<ClienteResponse>, AppError> {
+    let cliente = cliente::service::create(&state.db, request)
         .await
-        .is_ok();
-    if existe {
-        return Err(ApiError::EmailAlreadyExists);
-    }
-    cliente.validate_cliente()?;
-    ClienteRepository::create_cliente(&state.db, &cliente).await?;
+        .map_err(AppError::from)?;
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
@@ -29,37 +26,68 @@ pub async fn create_cliente_handler(
 pub async fn get_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-) -> Result<Json<ClienteResponse>, ApiError> {
-    let cliente = ClienteRepository::get_by_dni(&state.db, id).await?;
+) -> Result<Json<ClienteResponse>, AppError> {
+    let cliente = cliente::service::get_by_dni(&state.db, id).await?;
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
 #[instrument(name = "cliente.update", skip(state, request), fields(dni = id), err)]
-pub async fn update_cliente_handler(
+pub async fn update_nombre_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-    Json(request): Json<UpdateClienteRequest>,
-) -> Result<Json<ClienteResponse>, ApiError> {
-    let cliente = Cliente::from(request);
-    cliente.validate_cliente()?;
-    ClienteRepository::update_cliente(&state.db, id, &cliente).await?;
+    Json(request): Json<ClienteRequest>,
+) -> Result<Json<ClienteResponse>, AppError> {
+    let cliente = cliente::service::update_nombre(&state.db, request)
+        .await
+        .map_err(AppError::from)?;
     Ok(Json(ClienteResponse::from(cliente)))
+}
+
+#[instrument(name = "cliente.update_password", skip(state, request), err)]
+pub async fn update_password_handler(
+    State(state): State<AppState>,
+    Json(request): Json<UpdatePasswordRequest>,
+) -> Result<(), AppError> {
+    let cliente = cliente::service::update_password(&state.db, request)
+        .await
+        .map_err(AppError::from)?;
+    Ok(())
+}
+
+pub async fn update_estado_handler(
+    State(state): State<AppState>,
+    Json(request): Json<ClienteRequest>,
+) -> Result<Json<ClienteResponse>, AppError> {
+    let cliente = cliente::service::update_estado(&state.db, request)
+        .await
+        .map_err(AppError::from)?;
+    Ok(Json(ClienteResponse::from(cliente)))
+}
+
+pub async fn reset_password_handler(
+    State(state): State<AppState>,
+    Path(email): Path<String>,
+) -> Result<(), AppError> {
+    cliente::service::reset_password(&state.db, &email, &state.mailer)
+        .await
+        .map_err(AppError::from)?;
+    Ok(())
 }
 
 #[instrument(name = "cliente.delete", skip(state), fields(dni = id), err)]
 pub async fn delete_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-) -> Result<impl IntoResponse, ApiError> {
-    ClienteRepository::delete_cliente(&state.db, id).await?;
+) -> Result<impl IntoResponse, AppError> {
+    cliente::service::delete(&state.db, id).await?;
     Ok(StatusCode::OK)
 }
 
 #[instrument(name = "cliente.list", skip(state), err)]
 pub async fn get_clientes_handler(
     State(state): State<AppState>,
-) -> Result<Json<Vec<ClienteResponse>>, ApiError> {
-    let clientes = ClienteRepository::list_clientes(&state.db).await?;
+) -> Result<Json<Vec<ClienteResponse>>, AppError> {
+    let clientes = cliente::service::get_all(&state.db).await?;
     Ok(Json(
         clientes.into_iter().map(ClienteResponse::from).collect(),
     ))

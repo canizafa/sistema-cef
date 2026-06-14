@@ -1,8 +1,16 @@
 use super::domain::FichaMedica;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateFichaMedicaRequest {
+    pub enfermedades: bool,
+    pub operaciones_quirurgicas: bool,
+    pub detalle: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateFichaMedicaRequest {
+    pub id_ficha: String,
     pub enfermedades: bool,
     pub operaciones_quirurgicas: bool,
     pub detalle: String,

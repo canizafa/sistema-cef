@@ -18,6 +18,8 @@ pub enum ClienteDomainError {
     InvalidPhone,
     #[error("Fecha de nacimiento inválida")]
     InvalidBirthDate,
+    #[error("Contraseña incorrecta")]
+    InvalidPassword,
 }
 
 impl From<ClienteDomainError> for FieldError {
@@ -32,6 +34,10 @@ impl From<ClienteDomainError> for FieldError {
                 ("phone", "Teléfono no puede ser vacío".to_string())
             }
             ClienteDomainError::InvalidBirthDate => ("birth_date", "Edad insuficiente".to_string()),
+            ClienteDomainError::InvalidPassword => (
+                "password",
+                "Clave actual incorrecta, intente nuevamente".to_string(),
+            ),
         };
         FieldError {
             field: field.to_string(),

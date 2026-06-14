@@ -1,6 +1,3 @@
-use super::*;
-use crate::app::{ApiError, AppState};
-use crate::cliente::*;
 use axum::{
     Json,
     extract::{Path, State},
@@ -9,17 +6,21 @@ use axum::{
 };
 use tracing::instrument;
 
+use crate::app::{errors::AppError, state::AppState};
+use crate::cliente::*;
+use crate::empleado::*;
+
 #[instrument(name = "auth.login", skip(state, body), fields(email = %body.email), err)]
 pub async fn login_handler(
     State(state): State<AppState>,
     Json(body): Json<LoginRequest>,
-) -> Result<Json<AuthResponse>, ApiError> {
+) -> Result<Json<AuthResponse>, AppError> {
     let usuario_cliente = ClienteRepository::get_by_email(&state.db, &body.email).await;
     let usuario_empleado = EmpleadoRepository::get_by_email(&state.db, &body.email).await;
 
     if usuario_cliente.is_err() {
         if usuario_empleado.is_err() {
-            return Err(ApiError::UserNotFound);
+            return Err(AppError::UserNotFound);
         }
         let usuario = usuario_empleado.unwrap();
         verify_password(&body.password, &usuario.get_password_hash())?;

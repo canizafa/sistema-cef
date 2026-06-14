@@ -1,10 +1,12 @@
-use super::*;
-use crate::app::{Estado, Rol};
-use crate::ficha_medica::*;
+use super::domain::Cliente;
+use crate::{
+    app::rol::{Estado, Rol},
+    ficha_medica::dto::CreateFichaMedicaRequest,
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateClienteRequest {
     pub dni: i64,
     pub nombre_apellido: String,
@@ -17,15 +19,21 @@ pub struct CreateClienteRequest {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct UpdateClienteRequest {
+pub struct UpdatePasswordRequest {
+    pub email: String,
+    pub old_password: String,
+    pub new_password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ClienteRequest {
     pub dni: i64,
     pub nombre_apellido: String,
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
-    pub rol: Rol,
-    pub ficha_medica: CreateFichaMedicaRequest,
+    pub id_ficha: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -37,14 +45,8 @@ pub struct ClienteResponse {
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
     pub rol: Rol,
-    pub ficha_medica: FichaMedicaResponse,
+    pub id_ficha: String,
 }
-
-#[derive(Debug, Serialize)]
-pub struct ClienteListResponse {
-    pub clientes: Vec<ClienteResponse>,
-}
-
 impl From<Cliente> for ClienteResponse {
     fn from(cliente: Cliente) -> Self {
         Self {
@@ -55,7 +57,7 @@ impl From<Cliente> for ClienteResponse {
             fecha_nacimiento: cliente.get_fecha_nacimiento(),
             estado: cliente.get_estado(),
             rol: cliente.get_rol(),
-            ficha_medica: cliente.get_ficha_medica().into(),
+            id_ficha: cliente.get_id_ficha().to_string(),
         }
     }
 }
