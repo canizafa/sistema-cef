@@ -4,8 +4,8 @@ use sqlx::SqlitePool;
 
 pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     // Hash de passwords
-    let duenio_password = hash_password("123456")?;
-    let empleado_password = hash_password("123456")?;
+    let duenio_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+    let empleado_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
 
     // SALAS
     sqlx::query(
