@@ -1,59 +1,42 @@
-use super::*;
-use crate::app::{ApiError, AppState};
+use crate::app::{errors::AppError, state::AppState};
+use crate::asistencia;
+use crate::asistencia::dto::{AsistenciaResponse, CreateAsistenciaRequest};
 use axum::extract::Path;
 use axum::{Json, extract::State};
 use tracing::instrument;
 
-#[instrument(name = "asistencia.create", skip(pool, request), err)]
+#[instrument(name = "asistencia.create", skip(state, request), err)]
 pub async fn create_asistencia_handler(
-    State(pool): State<AppState>,
+    State(state): State<AppState>,
     Json(request): Json<CreateAsistenciaRequest>,
-) -> Result<Json<AsistenciaResponse>, ApiError> {
-    let asistencia = Asistencia::from(request);
-    asistencia.validate_asistencia()?;
-    let created = AsistenciaRepository::create_asistencia(&pool.db, &asistencia).await?;
-    Ok(Json(AsistenciaResponse::from(created)))
-}
-
-#[instrument(name = "asistencia.get", skip(pool), fields(id = %id), err)]
-pub async fn get_asistencia_by_id_handler(
-    State(pool): State<AppState>,
-    Path(id): Path<String>,
-) -> Result<Json<AsistenciaResponse>, ApiError> {
-    let asistencia = AsistenciaRepository::get_asistencia_by_id(&pool.db, &id).await?;
+) -> Result<Json<AsistenciaResponse>, AppError> {
+    let asistencia = asistencia::service::create(&state.db, request).await?;
     Ok(Json(AsistenciaResponse::from(asistencia)))
 }
 
-#[instrument(name = "asistencia.update", skip(pool, request), fields(id = %id), err)]
+#[instrument(name = "asistencia.get", skip(state), fields(id = %id), err)]
+pub async fn get_asistencia_by_id_handler(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<AsistenciaResponse>, AppError> {
+    let asistencia = asistencia::service::get_by_id(&state.db, &id).await?;
+    Ok(Json(AsistenciaResponse::from(asistencia)))
+}
+
+#[instrument(name = "asistencia.update", skip(state, request), fields(id = %id), err)]
 pub async fn update_asistencia_handler(
-    State(pool): State<AppState>,
+    State(state): State<AppState>,
     Path(id): Path<String>,
     Json(request): Json<CreateAsistenciaRequest>,
-) -> Result<Json<AsistenciaResponse>, ApiError> {
-    let asistencia = Asistencia::from(request);
-    asistencia.validate_asistencia()?;
-    let updated = AsistenciaRepository::update_asistencia(&pool.db, &id, &asistencia).await?;
-    Ok(Json(AsistenciaResponse::from(updated)))
+) -> Result<Json<AsistenciaResponse>, AppError> {
+    let asistencia = asistencia::service::update(&state.db, &id, request).await?;
+    Ok(Json(AsistenciaResponse::from(asistencia)))
 }
 
-#[instrument(name = "asistencia.delete", skip(pool), fields(id = %id), err)]
+#[instrument(name = "asistencia.delete", skip(state), fields(id = %id), err)]
 pub async fn delete_asistencia_handler(
-    State(pool): State<AppState>,
+    State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<AsistenciaResponse>, ApiError> {
-    let deleted = AsistenciaRepository::delete_asistencia(&pool.db, &id).await?;
-    Ok(Json(AsistenciaResponse::from(deleted)))
-}
-
-#[instrument(name = "asistencia.list", skip(pool), err)]
-pub async fn get_asistencias_handler(
-    State(pool): State<AppState>,
-) -> Result<Json<Vec<AsistenciaResponse>>, ApiError> {
-    let asistencias = AsistenciaRepository::get_all_asistencias(&pool.db).await?;
-    Ok(Json(
-        asistencias
-            .into_iter()
-            .map(|a| AsistenciaResponse::from(a))
-            .collect(),
-    ))
+) -> Result<(), AppError> {
+    asistencia::service::delete(&state.db, &id).await
 }

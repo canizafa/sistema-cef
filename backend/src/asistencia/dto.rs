@@ -1,7 +1,6 @@
+use super::domain::Asistencia;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-
-use super::*;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateAsistenciaRequest {
@@ -26,10 +25,10 @@ pub struct AsistenciaListResponse {
 impl From<Asistencia> for AsistenciaResponse {
     fn from(asistencia: Asistencia) -> Self {
         Self {
-            id_asistencia: asistencia.get_id_asistencia(),
-            fecha: asistencia.get_fecha(),
-            metodo: asistencia.get_metodo(),
-            id_reserva: asistencia.get_id_clase(),
+            id_asistencia: asistencia.get_id_asistencia().to_string(),
+            fecha: asistencia.get_fecha().clone(),
+            metodo: asistencia.get_metodo().to_string(),
+            id_reserva: asistencia.get_id_reserva().to_string(),
         }
     }
 }

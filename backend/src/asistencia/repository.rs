@@ -1,20 +1,25 @@
-use super::*;
-use crate::app::ApiError;
+use crate::{app::errors::DbError, asistencia::domain::Asistencia};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
+#[derive(Debug, sqlx::FromRow)]
+pub struct AsistenciaRow {
+    pub id_asistencia: String,
+    pub fecha: NaiveDate,
+    pub metodo: String,
+    pub id_reserva: String,
+}
+
+impl From<AsistenciaRow> for Asistencia {
+    fn from(row: AsistenciaRow) -> Self {
+        Asistencia::new(row.id_asistencia, row.fecha, row.metodo, row.id_reserva)
+    }
+}
+
 pub struct AsistenciaRepository;
 impl AsistenciaRepository {
-    pub async fn create_asistencia(
-        pool: &SqlitePool,
-        asistencia: &Asistencia,
-    ) -> Result<Asistencia, ApiError> {
-        let id = asistencia.get_id_asistencia();
-        let fecha = asistencia.get_fecha().format("%Y-%m-%d").to_string();
-        let metodo = asistencia.get_metodo();
-        let id_reserva = asistencia.get_id_clase();
-
-        sqlx::query!(
+    pub async fn create(pool: &SqlitePool, asistencia: &Asistencia) -> Result<Asistencia, DbError> {
+        let row = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                    INSERT INTO asistencia (
                        id_asistencia,
@@ -24,19 +29,19 @@ impl AsistenciaRepository {
                    )
                    VALUES (?, ?, ?, ?)
                    "#,
-            id,
-            fecha,
-            metodo,
-            id_reserva
         )
-        .execute(pool)
+        .bind(asistencia.get_id_asistencia())
+        .bind(asistencia.get_fecha().format("%Y-%m-%d").to_string())
+        .bind(asistencia.get_metodo())
+        .bind(asistencia.get_id_reserva())
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(asistencia.clone())
+        Ok(row.into())
     }
-    pub async fn get_asistencia_by_id(pool: &SqlitePool, id: &str) -> Result<Asistencia, ApiError> {
-        let row = sqlx::query!(
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Asistencia, DbError> {
+        let row = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                     SELECT
                         id_asistencia as "id_asistencia!",
@@ -46,22 +51,16 @@ impl AsistenciaRepository {
                     FROM asistencia
                     WHERE id_asistencia = ?
                     "#,
-            id
         )
+        .bind(id)
         .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(Asistencia::new(
-            row.id_asistencia,
-            NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap_or_default(),
-            row.metodo,
-            row.id_reserva,
-            Vec::new(),
-        ))
+        Ok(row.into())
     }
-    pub async fn get_all_asistencias(pool: &SqlitePool) -> Result<Vec<Asistencia>, ApiError> {
-        let rows = sqlx::query!(
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Asistencia>, DbError> {
+        let rows = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                     SELECT
                         id_asistencia as "id_asistencia!",
@@ -69,35 +68,20 @@ impl AsistenciaRepository {
                         metodo as "metodo!",
                         id_reserva as "id_reserva!"
                     FROM asistencia
-                    "#
+                    "#,
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(rows
-            .into_iter()
-            .map(|row| {
-                Asistencia::new(
-                    row.id_asistencia,
-                    NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap_or_default(),
-                    row.metodo,
-                    row.id_reserva,
-                    Vec::new(),
-                )
-            })
-            .collect())
+        Ok(rows.into_iter().map(Asistencia::from).collect())
     }
-    pub async fn update_asistencia(
+    pub async fn update(
         pool: &SqlitePool,
         id: &str,
         asistencia: &Asistencia,
-    ) -> Result<Asistencia, ApiError> {
-        let fecha = asistencia.get_fecha().format("%Y-%m-%d").to_string();
-        let metodo = asistencia.get_metodo();
-        let id_reserva = asistencia.get_id_clase();
-
-        sqlx::query!(
+    ) -> Result<Asistencia, DbError> {
+        let row = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                     UPDATE asistencia
                     SET
@@ -106,20 +90,18 @@ impl AsistenciaRepository {
                         id_reserva = ?
                     WHERE id_asistencia = ?
                     "#,
-            fecha,
-            metodo,
-            id_reserva,
-            id
         )
-        .execute(pool)
+        .bind(asistencia.get_fecha().format("%Y-%m-%d").to_string())
+        .bind(asistencia.get_metodo())
+        .bind(asistencia.get_id_reserva())
+        .bind(id)
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Self::get_asistencia_by_id(pool, id).await
+        Ok(row.into())
     }
-    pub async fn delete_asistencia(pool: &SqlitePool, id: &str) -> Result<Asistencia, ApiError> {
-        let asistencia = Self::get_asistencia_by_id(pool, id).await?;
-
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                     DELETE FROM asistencia
@@ -129,8 +111,8 @@ impl AsistenciaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(asistencia)
+        Ok(())
     }
 }

@@ -65,6 +65,8 @@ pub enum AppError {
     PasswordHashError,
     #[error("Credenciales invalidas")]
     InvalidCredentials,
+    #[error("Token invalido")]
+    JwtError,
 }
 impl From<DbError> for AppError {
     fn from(err: DbError) -> Self {
@@ -90,6 +92,10 @@ impl From<sqlx::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, body) = match self {
+            AppError::JwtError => (
+                StatusCode::UNAUTHORIZED,
+                json!({ "error": "Token invalido" }),
+            ),
             AppError::InvalidCredentials => (
                 StatusCode::UNAUTHORIZED,
                 json!({ "error": "Credenciales invalidas" }),

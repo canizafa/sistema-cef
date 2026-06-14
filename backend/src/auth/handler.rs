@@ -1,3 +1,5 @@
+use crate::app::{errors::AppError, state::AppState};
+use crate::empleado::*;
 use axum::{
     Json,
     extract::{Path, State},
@@ -5,10 +7,6 @@ use axum::{
     response::IntoResponse,
 };
 use tracing::instrument;
-
-use crate::app::{errors::AppError, state::AppState};
-use crate::cliente::*;
-use crate::empleado::*;
 
 #[instrument(name = "auth.login", skip(state, body), fields(email = %body.email), err)]
 pub async fn login_handler(
