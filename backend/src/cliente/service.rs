@@ -34,7 +34,7 @@ pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cl
     // Creamos id ficha medica
     let id_ficha = uuid::Uuid::new_v4().to_string();
     //Validamos el cliente
-    let cliente = Cliente::try_from((request, password_hash, id_ficha))?;
+    let cliente = Cliente::try_from((request, password_hash, id_ficha.clone()))?;
     let errors = cliente.validate_cliente();
     if !errors.is_empty() {
         return Err(AppError::from(errors));
