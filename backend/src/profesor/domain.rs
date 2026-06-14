@@ -1,6 +1,9 @@
-use super::*;
-use crate::app::{Estado, Genero};
-#[derive(Debug, Clone)]
+use crate::{
+    app::rol::{Estado, Genero},
+    profesor::{dto::CreateProfesorRequest, errors::ProfesorDomainError},
+};
+
+#[derive(Debug)]
 pub struct Profesor {
     dni: i64,
     nombre_completo: String,
@@ -21,31 +24,27 @@ impl Profesor {
         self.dni
     }
 
-    pub fn get_nombre_completo(&self) -> String {
-        self.nombre_completo.clone()
+    pub fn get_nombre_completo(&self) -> &str {
+        &self.nombre_completo
     }
 
-    pub fn get_genero(&self) -> Genero {
-        self.genero.clone()
+    pub fn get_genero(&self) -> &Genero {
+        &self.genero
     }
 
-    pub fn get_estado(&self) -> Estado {
-        self.estado.clone()
+    pub fn get_estado(&self) -> &Estado {
+        &self.estado
     }
-    // Domain no debe conocer ApiError
-    pub fn validate_profesor(&self) -> Result<(), ApiError> {
+    pub fn validate_profesor(&self) -> Vec<ProfesorDomainError> {
+        let mut errors = Vec::new();
         if self.dni <= 0 {
-            return Err(ApiError::BadRequest(
-                "dni must be greater than 0".to_string(),
-            ));
+            errors.push(ProfesorDomainError::DniInvalid);
         }
         if self.nombre_completo.is_empty() {
-            return Err(ApiError::BadRequest(
-                "nombre_completo cannot be empty".to_string(),
-            ));
+            errors.push(ProfesorDomainError::NombreCompletoEmpty);
         }
 
-        Ok(())
+        errors
     }
 }
 

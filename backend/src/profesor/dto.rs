@@ -1,5 +1,7 @@
-use super::*;
-use crate::app::{Estado, Genero};
+use crate::{
+    app::rol::{Estado, Genero},
+    profesor::domain::Profesor,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -22,9 +24,9 @@ impl From<Profesor> for ProfesorResponse {
     fn from(profesor: Profesor) -> Self {
         Self {
             dni: profesor.get_dni(),
-            nombre_completo: profesor.get_nombre_completo(),
-            genero: profesor.get_genero(),
-            estado: profesor.get_estado(),
+            nombre_completo: profesor.get_nombre_completo().to_owned(),
+            genero: profesor.get_genero().to_owned(),
+            estado: profesor.get_estado().to_owned(),
         }
     }
 }
