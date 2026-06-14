@@ -22,17 +22,18 @@ pub struct CreateChangePasswordRequest {
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
-    pub dni: String,
+    pub dni: i64,
     pub nombre_apellido: String,
     pub password: String,
     pub email: String,
     pub telefono: String,
+    pub rol: Rol,
     pub fecha_nacimiento: NaiveDate,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthResponse {
-    pub dni: String,
+    pub dni: i64,
     pub email: String,
     pub access_token: String,
     pub rol: Rol,

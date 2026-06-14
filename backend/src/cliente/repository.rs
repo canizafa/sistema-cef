@@ -58,7 +58,7 @@ impl ClienteRepository {
         )
         .bind(cliente.get_dni())
         .bind(cliente.get_nombre_apellido())
-        .bind(cliente.get_email())
+        .bind(cliente.get_mail())
         .bind(cliente.get_telefono())
         .bind(cliente.get_fecha_nacimiento())
         .bind(cliente.get_estado())
@@ -160,6 +160,26 @@ impl ClienteRepository {
         .map_err(DbError::from)?;
 
         Ok(row.into())
+    }
+
+    pub async fn update_password_by_dni(
+        pool: &SqlitePool,
+        dni: i64,
+        password_hash: &str,
+    ) -> Result<(), DbError> {
+        sqlx::query!(
+            r#"
+            UPDATE cliente
+            SET password = ?
+            WHERE dni_cliente = ?
+            "#,
+            password_hash,
+            dni,
+        )
+        .execute(pool)
+        .await
+        .map_err(DbError::from)?;
+        Ok(())
     }
 
     pub async fn update_password(

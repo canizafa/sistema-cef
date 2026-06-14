@@ -1,7 +1,9 @@
-pub mod claims;
-pub mod domain;
-pub mod dto;
-pub mod handler;
-pub mod jwt;
+mod claims;
+mod domain;
+mod dto;
+mod handler;
+mod jwt;
+mod service;
+
 pub mod password;
 pub mod route;

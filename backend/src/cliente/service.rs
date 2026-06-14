@@ -6,7 +6,7 @@ use crate::{
     },
     auth,
     cliente::dto::{ClienteRequest, UpdatePasswordRequest},
-    ficha_medica,
+    empleado, ficha_medica,
 };
 use sqlx::SqlitePool;
 
@@ -29,6 +29,13 @@ pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cl
             "El email ya está registrado".to_string(),
         ));
     }
+    //Verificamos que no exista un empleado con el mismo email
+    let existe_empleado = empleado::service::get_by_email(db, &email).await.is_ok();
+    if existe_empleado {
+        return Err(AppError::Conflict(
+            "El email ya está registrado".to_string(),
+        ));
+    }
     //Hasheamos la contraseña
     let password_hash = auth::password::hash_password(&password)?;
     // Creamos id ficha medica
@@ -41,7 +48,7 @@ pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cl
     }
 
     //Creamos la ficha medica
-    let ficha_medica = ficha_medica::service::create(db, ficha_medica, &id_ficha).await?;
+    let _ = ficha_medica::service::create(db, ficha_medica, &id_ficha).await?;
 
     ClienteRepository::create(db, &cliente, &id_ficha).await?;
 
@@ -75,6 +82,30 @@ pub async fn update_nombre(db: &SqlitePool, request: ClienteRequest) -> Result<C
         id_ficha,
     } = request;
     ClienteRepository::update_nombre(db, dni, &nombre_apellido)
+        .await
+        .map_err(AppError::from)
+}
+
+pub async fn change_password(
+    db: &SqlitePool,
+    dni: i64,
+    old_password: &str,
+    new_password: &str,
+) -> Result<(), AppError> {
+    let mut cliente = ClienteRepository::get_by_dni(db, dni)
+        .await
+        .map_err(AppError::from)?;
+    if !auth::password::verify_password(&old_password, &cliente.get_password_hash()).is_ok() {
+        return Err(AppError::Unauthorized(
+            "Clave actual incorrecta, intente nuevamente".to_string(),
+        ));
+    }
+    let new_password_hash = auth::password::hash_password(new_password)?;
+    let errors = cliente.update_password(true, &new_password_hash);
+    if !errors.is_empty() {
+        return Err(AppError::from(errors));
+    }
+    ClienteRepository::update_password_by_dni(db, dni, &new_password_hash)
         .await
         .map_err(AppError::from)
 }
@@ -132,4 +163,18 @@ pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {
     ClienteRepository::delete(db, dni)
         .await
         .map_err(AppError::from)
+}
+
+pub async fn login_cliente(
+    db: &SqlitePool,
+    email: &str,
+    password: &str,
+) -> Result<Cliente, AppError> {
+    let cliente = ClienteRepository::get_by_email(db, email)
+        .await
+        .map_err(AppError::from)?;
+    if auth::password::verify_password(password, &cliente.get_password_hash()).is_err() {
+        return Err(AppError::InvalidCredentials);
+    }
+    Ok(cliente)
 }

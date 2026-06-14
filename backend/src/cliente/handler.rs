@@ -48,12 +48,13 @@ pub async fn update_password_handler(
     State(state): State<AppState>,
     Json(request): Json<UpdatePasswordRequest>,
 ) -> Result<(), AppError> {
-    let cliente = cliente::service::update_password(&state.db, request)
+    let _ = cliente::service::update_password(&state.db, request)
         .await
         .map_err(AppError::from)?;
     Ok(())
 }
 
+#[instrument(name = "cliente.update_estado", skip(state, request), err)]
 pub async fn update_estado_handler(
     State(state): State<AppState>,
     Json(request): Json<ClienteRequest>,
@@ -64,6 +65,7 @@ pub async fn update_estado_handler(
     Ok(Json(ClienteResponse::from(cliente)))
 }
 
+#[instrument(name = "cliente.reset_password", skip(state, email), err)]
 pub async fn reset_password_handler(
     State(state): State<AppState>,
     Path(email): Path<String>,

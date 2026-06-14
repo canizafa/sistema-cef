@@ -8,6 +8,4 @@ pub fn auth_router() -> Router<AppState> {
         .route("/login", post(login_handler))
         .route("/change-password/{dni}", put(change_password_handler))
         .route("/reset-password", post(reset_password_handler))
-        .route("/register-empleado", post(register_empleado_handler))
-        .route("/register-cliente", post(register_cliente_handler))
 }

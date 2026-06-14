@@ -98,7 +98,7 @@ impl IntoResponse for AppError {
             ),
             AppError::InvalidCredentials => (
                 StatusCode::UNAUTHORIZED,
-                json!({ "error": "Credenciales invalidas" }),
+                json!({ "error": "Email o contraseña incorrectos" }),
             ),
             AppError::PasswordHashError => (
                 StatusCode::INTERNAL_SERVER_ERROR,

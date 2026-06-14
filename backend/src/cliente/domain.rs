@@ -49,7 +49,7 @@ impl Cliente {
     pub fn get_nombre_apellido(&self) -> String {
         self.nombre_apellido.clone()
     }
-    pub fn get_email(&self) -> String {
+    pub fn get_mail(&self) -> String {
         self.email.clone()
     }
     pub fn get_telefono(&self) -> String {

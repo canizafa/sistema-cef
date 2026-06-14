@@ -52,7 +52,7 @@ impl From<Cliente> for ClienteResponse {
         Self {
             dni: cliente.get_dni(),
             nombre_apellido: cliente.get_nombre_apellido(),
-            email: cliente.get_email(),
+            email: cliente.get_mail(),
             telefono: cliente.get_telefono(),
             fecha_nacimiento: cliente.get_fecha_nacimiento(),
             estado: cliente.get_estado(),
