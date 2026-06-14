@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use crate::{
     app::rol::Estado,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
-use chrono::NaiveDate;
+use chrono::{NaiveDate, NaiveTime};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -69,40 +71,37 @@ impl Clase {
     pub fn get_dni_profesor(&self) -> i64 {
         self.dni_profesor
     }
-    // pub fn sala_libre(&self, otras_clases: &[Clase]) -> Vec<ClaseDomainError> {
-    //     let mut errors = Vec::new();
-    //     if otras_clases.iter().any(|c| {
-    //         // si no hay una diferencia de 2 horas entre los horarios
-    //         c.id_sala == self.id_sala
-    //             && NaiveTime::from_str(&c.get_horario())
-    //                 .unwrap()
-    //                 .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
-    //                 .abs()
-    //                 < chrono::Duration::hours(2)
-    //             && c.get_dia() == self.dia
-    //     }) {
-    //         errors.push(ClaseDomainError::BadRequest(
-    //             "La sala ya está tomada".to_string(),
-    //         ));
-    //     }
-    // }
-    // pub fn profesor_libre(&self, otras_clases: &[Clase]) -> Result<(), ApiError> {
-    //     if otras_clases.iter().any(|c| {
-    //         c.get_dni_profesor() == self.dni_profesor
-    //             && c.get_dia() == self.dia
-    //             && NaiveTime::from_str(&c.get_horario())
-    //                 .unwrap()
-    //                 .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
-    //                 .abs()
-    //                 < chrono::Duration::hours(2)
-    //     }) {
-    //         Err(ApiError::BadRequest(
-    //             "El profesor ya está tomado".to_string(),
-    //         ))
-    //     } else {
-    //         Ok(())
-    //     }
-    //}
+    pub fn verificar_disponibilidad(&self, otras_clases: &[Clase]) -> Vec<ClaseDomainError> {
+        let mut errors = Vec::new();
+        if otras_clases.iter().any(|c| {
+            // si no hay una diferencia de 2 horas entre los horarios
+            c.id_sala == self.id_sala
+                && NaiveTime::from_str(&c.get_horario())
+                    .unwrap()
+                    .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
+                    .abs()
+                    < chrono::Duration::hours(2)
+                && c.get_dia() == self.dia
+        }) {
+            errors.push(ClaseDomainError::NoDisponible);
+        }
+        errors
+    }
+    pub fn profesor_libre(&self, otras_clases: &[Clase]) -> Vec<ClaseDomainError> {
+        let mut errors = Vec::new();
+        if otras_clases.iter().any(|c| {
+            c.get_dni_profesor() == self.dni_profesor
+                && c.get_dia() == self.dia
+                && NaiveTime::from_str(&c.get_horario())
+                    .unwrap()
+                    .signed_duration_since(NaiveTime::from_str(&self.horario).unwrap())
+                    .abs()
+                    < chrono::Duration::hours(2)
+        }) {
+            errors.push(ClaseDomainError::ProfesorNoDisponible);
+        }
+        errors
+    }
 
     pub fn validate_clase(&self, sala_capacidad: i64) -> Vec<ClaseDomainError> {
         let mut errors = Vec::new();

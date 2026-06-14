@@ -1,5 +1,9 @@
-use super::*;
-use crate::app::{ApiError, AppState};
+use super::dto::{ClaseResponse, CreateClaseRequest};
+use crate::{
+    app::{errors::AppError, state::AppState},
+    clase,
+};
+
 use axum::{
     extract::{Json, Path, State},
     http::StatusCode,
@@ -10,12 +14,9 @@ use tracing::instrument;
 pub async fn create_clase_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClaseRequest>,
-) -> Result<Json<ClaseResponse>, ApiError> {
-    let clase = Clase::from(request);
-    clase.validate_clase()?;
-    clase.sala_libre(&ClaseRepository::get_all(&state.db).await?)?;
-    clase.profesor_libre(&ClaseRepository::get_all(&state.db).await?)?;
-    ClaseRepository::create_clase(&state.db, &clase).await?;
+) -> Result<Json<ClaseResponse>, AppError> {
+    let id = uuid::Uuid::new_v4().to_string();
+    let clase = clase::service::create(&state.db, request, &id).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
 
@@ -23,8 +24,8 @@ pub async fn create_clase_handler(
 pub async fn get_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<ClaseResponse>, ApiError> {
-    let clase = ClaseRepository::get_by_id(&state.db, &id).await?;
+) -> Result<Json<ClaseResponse>, AppError> {
+    let clase = clase::service::get_by_id(&state.db, &id).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
 
@@ -33,10 +34,8 @@ pub async fn update_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
     Json(request): Json<CreateClaseRequest>,
-) -> Result<Json<ClaseResponse>, ApiError> {
-    let clase = Clase::from(request);
-    clase.validate_clase()?;
-    ClaseRepository::update_clase(&state.db, &id, &clase).await?;
+) -> Result<Json<ClaseResponse>, AppError> {
+    let clase = clase::service::update(&state.db, &id, request).await?;
     Ok(Json(ClaseResponse::from(clase)))
 }
 
@@ -44,8 +43,8 @@ pub async fn update_clase_handler(
 //     State(state): State<AppState>,
 //     Path(id): Path<String>,
 //     Json
-// ) -> Result<Json<ClaseResponse>, ApiError> {
-//     let mut clase = ClaseRepository::get_by_id(&state.db, &id).await?;
+// ) -> Result<Json<ClaseResponse>, AppError> {
+//     let mut clase = clase::service::get_by_id(&state.db, &id).await?;
 //     clase.disminuir_cupo()?;
 //     ClaseRepository::update_clase(&state.db, &id, &clase).await?;
 //     Ok(Json(ClaseResponse::from(clase)))
@@ -55,15 +54,15 @@ pub async fn update_clase_handler(
 pub async fn delete_clase_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<impl axum::response::IntoResponse, ApiError> {
-    ClaseRepository::delete_clase(&state.db, &id).await?;
+) -> Result<impl axum::response::IntoResponse, AppError> {
+    clase::service::delete(&state.db, &id).await?;
     Ok(StatusCode::OK)
 }
 
 #[instrument(name = "clase.list", skip(state), err)]
 pub async fn get_clases_handler(
     State(state): State<AppState>,
-) -> Result<Json<Vec<ClaseResponse>>, ApiError> {
-    let clases = ClaseRepository::get_all(&state.db).await?;
+) -> Result<Json<Vec<ClaseResponse>>, AppError> {
+    let clases = clase::service::get_all(&state.db).await?;
     Ok(Json(clases.into_iter().map(ClaseResponse::from).collect()))
 }

@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::app::errors::FieldError;
+use crate::{app::errors::FieldError, clase::errors::ClaseDomainError::ProfesorNoDisponible};
 
 #[derive(Debug, Error)]
 pub enum ClaseDomainError {
@@ -18,11 +18,19 @@ pub enum ClaseDomainError {
     DniProfesorInvalido,
     #[error("ID de actividad inválido")]
     IdActividadInvalido,
+    #[error("No disponible")]
+    NoDisponible,
+    #[error("Profesor no disponible")]
+    ProfesorNoDisponible,
 }
 
 impl From<ClaseDomainError> for FieldError {
     fn from(error: ClaseDomainError) -> Self {
         let (field, message) = match error {
+            ProfesorNoDisponible => (
+                "profesor",
+                "Profesor no disponible en ese día y horario".to_string(),
+            ),
             ClaseDomainError::SalaSobrepasada => {
                 ("sala", "Se supera el límite de la sala".to_string())
             }
@@ -38,6 +46,10 @@ impl From<ClaseDomainError> for FieldError {
             ClaseDomainError::IdActividadInvalido => {
                 ("id_actividad", "ID de actividad inválido".to_string())
             }
+            ClaseDomainError::NoDisponible => (
+                "no_disponible",
+                "Sala no disponible para ese día y horario".to_string(),
+            ),
         };
         FieldError {
             field: field.to_string(),
