@@ -36,6 +36,7 @@ impl FichaMedicaRepository {
                    detalles
                )
                VALUES (?, ?, ?, ?)
+               RETURNING id_ficha, enfermedades, operaciones_quirurgicas, detalles
                "#,
         )
         .bind(id_ficha)
@@ -81,6 +82,7 @@ impl FichaMedicaRepository {
                         operaciones_quirurgicas = ?,
                         detalles = ?
                     WHERE id_ficha = ?
+                    RETURNING id_ficha, enfermedades, operaciones_quirurgicas, detalles
                     "#,
         )
         .bind(ficha_medica.get_enfermedades())

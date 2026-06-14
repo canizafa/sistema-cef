@@ -24,6 +24,7 @@ impl ActividadRepository {
                    descripcion
                )
                VALUES (?, ?, ?)
+               RETURNING id_actividad, nombre, descripcion
                "#,
         )
         .bind(actividad.get_id())
@@ -81,6 +82,7 @@ impl ActividadRepository {
                    nombre = ?,
                    descripcion = ?
                WHERE id_actividad = ?
+               RETURNING id_actividad, nombre, descripcion
                "#,
         )
         .bind(actividad.get_nombre())

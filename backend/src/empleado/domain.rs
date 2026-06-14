@@ -1,8 +1,12 @@
-use super::*;
-use crate::app::Rol;
-use crate::auth::*;
+use crate::{
+    app::rol::Rol,
+    empleado::{
+        dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
+        errors::EmpleadoDomainError,
+    },
+};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Empleado {
     pub dni_empleado: i64,
     pub nombre_apellido: String,
@@ -39,7 +43,7 @@ impl Empleado {
     pub fn get_nombre_apellido(&self) -> String {
         self.nombre_apellido.clone()
     }
-    pub fn get_email(&self) -> String {
+    pub fn get_mail(&self) -> String {
         self.mail.clone()
     }
     pub fn get_genero(&self) -> String {
@@ -54,31 +58,26 @@ impl Empleado {
     pub fn get_password_hash(&self) -> String {
         self.password_hash.clone()
     }
-    // Domain no debe conocer api errors
-    pub fn update_password(&mut self, password_hash: &str) -> Result<(), ApiError> {
-        if password_hash.len() < 5 {
-            return Err(ApiError::WeakPassword);
-        }
-        self.password_hash = hash_password(password_hash)?;
-        Ok(())
+    pub fn update_password(&mut self, password_hash: &str) {
+        self.password_hash = password_hash.to_string();
     }
-    pub fn validate_empleado(&self) -> Result<(), ApiError> {
+    pub fn validate_empleado(&self) -> Vec<EmpleadoDomainError> {
+        let mut errors = Vec::new();
         if self.dni_empleado <= 0 {
-            return Err(ApiError::InvalidDni);
+            errors.push(EmpleadoDomainError::InvalidDNI);
         }
         if !self.mail.contains('@') {
-            return Err(ApiError::InvalidEmail);
+            errors.push(EmpleadoDomainError::InvalidEmail);
         }
         if self.password_hash.len() < 5 {
-            return Err(ApiError::WeakPassword);
+            errors.push(EmpleadoDomainError::WeakPassword);
         }
-        Ok(())
+        errors
     }
 }
 
-impl From<CreateEmpleadoRequest> for Empleado {
-    fn from(request: CreateEmpleadoRequest) -> Self {
-        let password_hash = hash_password(&request.password).expect("Failed to hash password");
+impl From<(CreateEmpleadoRequest, String)> for Empleado {
+    fn from((request, password_hash): (CreateEmpleadoRequest, String)) -> Self {
         Self {
             dni_empleado: request.dni,
             nombre_apellido: request.nombre_apellido,
@@ -90,12 +89,12 @@ impl From<CreateEmpleadoRequest> for Empleado {
         }
     }
 }
-impl From<UpdateEmpleadoRequest> for Empleado {
-    fn from(request: UpdateEmpleadoRequest) -> Self {
+impl From<(UpdateEmpleadoRequest, String)> for Empleado {
+    fn from((request, password_hash): (UpdateEmpleadoRequest, String)) -> Self {
         Self {
             dni_empleado: request.dni,
             nombre_apellido: request.nombre_apellido,
-            password_hash: "12345".to_string(),
+            password_hash,
             mail: request.mail,
             genero: request.genero,
             estado: request.estado,

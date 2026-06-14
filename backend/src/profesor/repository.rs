@@ -32,6 +32,7 @@ impl ProfesorRepository {
                         estado
                     )
                     VALUES (?, ?, ?, ?)
+                    RETURNING dni_profesor, nombre, genero, estado
                     "#,
         )
         .bind(profesor.get_dni())
@@ -93,6 +94,7 @@ impl ProfesorRepository {
                         genero = ?,
                         estado = ?
                     WHERE dni_profesor = ?
+                    RETURNING dni_profesor, nombre, genero, estado
                     "#,
         )
         .bind(profesor.get_nombre_completo())

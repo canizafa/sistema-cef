@@ -1,16 +1,35 @@
-use super::*;
-use crate::app::{ApiError, Rol};
+use crate::app::errors::DbError;
+use crate::empleado::domain::Empleado;
 use sqlx::SqlitePool;
 
-pub struct EmpleadoRepository;
+#[derive(Debug, sqlx::FromRow)]
+struct EmpleadoRow {
+    dni_empleado: i64,
+    nombre_apellido: String,
+    password: String,
+    mail: String,
+    genero: String,
+    estado: String,
+    rol: String,
+}
+impl From<EmpleadoRow> for Empleado {
+    fn from(row: EmpleadoRow) -> Self {
+        Empleado {
+            dni_empleado: row.dni_empleado,
+            nombre_apellido: row.nombre_apellido,
+            password_hash: row.password,
+            mail: row.mail,
+            genero: row.genero,
+            estado: row.estado,
+            rol: row.rol.into(),
+        }
+    }
+}
 
+pub struct EmpleadoRepository;
 impl EmpleadoRepository {
-    pub async fn create_empleado(
-        pool: &SqlitePool,
-        empleado: &Empleado,
-    ) -> Result<Empleado, ApiError> {
-        let rol = empleado.rol.to_string();
-        sqlx::query!(
+    pub async fn create(pool: &SqlitePool, empleado: &Empleado) -> Result<Empleado, DbError> {
+        let row = sqlx::query_as::<_, EmpleadoRow>(
             r#"
                INSERT INTO empleado (
                    dni_empleado,
@@ -22,24 +41,25 @@ impl EmpleadoRepository {
                    rol
                )
                VALUES (?, ?, ?, ?, ?, ?, ?)
+               RETURNING dni_empleado, nombre_apellido, mail, password, genero, estado, rol
                "#,
-            empleado.dni_empleado,
-            empleado.nombre_apellido,
-            empleado.mail,
-            empleado.password_hash,
-            empleado.genero,
-            empleado.estado,
-            rol
         )
-        .execute(pool)
+        .bind(empleado.get_dni())
+        .bind(empleado.get_nombre_apellido())
+        .bind(empleado.get_mail())
+        .bind(empleado.get_password_hash())
+        .bind(empleado.get_genero())
+        .bind(empleado.get_estado())
+        .bind(empleado.get_rol())
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(empleado.clone())
+        Ok(row.into())
     }
 
-    pub async fn get_empleados(pool: &SqlitePool) -> Result<Vec<Empleado>, ApiError> {
-        let rows = sqlx::query!(
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Empleado>, DbError> {
+        let rows = sqlx::query_as::<_, EmpleadoRow>(
             r#"
               SELECT
                   dni_empleado,
@@ -50,30 +70,17 @@ impl EmpleadoRepository {
                   estado,
                   rol
               FROM empleado
-              "#
+              "#,
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        let empleados = rows
-            .into_iter()
-            .map(|row| Empleado {
-                dni_empleado: row.dni_empleado,
-                nombre_apellido: row.nombre_apellido,
-                mail: row.mail,
-                password_hash: row.password,
-                genero: row.genero,
-                estado: row.estado,
-                rol: Rol::from(row.rol),
-            })
-            .collect();
-
-        Ok(empleados)
+        Ok(rows.into_iter().map(Empleado::from).collect())
     }
 
-    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Empleado, ApiError> {
-        let row = sqlx::query!(
+    pub async fn get_by_email(pool: &SqlitePool, email: &str) -> Result<Empleado, DbError> {
+        let row = sqlx::query_as::<_, EmpleadoRow>(
             r#"
                 SELECT
                     dni_empleado as "dni_empleado!: i64",
@@ -86,25 +93,17 @@ impl EmpleadoRepository {
                 FROM empleado
                 WHERE mail = ?
                 "#,
-            email
         )
+        .bind(email)
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        Ok(Empleado {
-            dni_empleado: row.dni_empleado,
-            nombre_apellido: row.nombre_apellido,
-            mail: row.mail,
-            password_hash: row.password,
-            genero: row.genero,
-            estado: row.estado,
-            rol: Rol::from(row.rol),
-        })
+        Ok(row.into())
     }
 
-    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Empleado, ApiError> {
-        let row = sqlx::query!(
+    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Empleado, DbError> {
+        let row = sqlx::query_as::<_, EmpleadoRow>(
             r#"
                 SELECT
                     dni_empleado,
@@ -117,28 +116,20 @@ impl EmpleadoRepository {
                 FROM empleado
                 WHERE dni_empleado = ?
                 "#,
-            dni
         )
+        .bind(dni)
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        Ok(Empleado {
-            dni_empleado: row.dni_empleado,
-            nombre_apellido: row.nombre_apellido,
-            mail: row.mail,
-            password_hash: row.password,
-            genero: row.genero,
-            estado: row.estado,
-            rol: Rol::from(row.rol),
-        })
+        Ok(row.into())
     }
 
     pub async fn update_password_by_email(
         pool: &SqlitePool,
         email: &str,
         password_hash: &str,
-    ) -> Result<(), ApiError> {
+    ) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                 UPDATE empleado
@@ -150,7 +141,8 @@ impl EmpleadoRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
+
         Ok(())
     }
 
@@ -158,7 +150,7 @@ impl EmpleadoRepository {
         pool: &SqlitePool,
         dni: i64,
         password_hash: &str,
-    ) -> Result<(), ApiError> {
+    ) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                 UPDATE empleado
@@ -170,17 +162,16 @@ impl EmpleadoRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
         Ok(())
     }
 
-    pub async fn update_empleado(
+    pub async fn update(
         pool: &SqlitePool,
         dni: i64,
         empleado: &Empleado,
-    ) -> Result<Empleado, ApiError> {
-        let rol = empleado.rol.to_string();
-        sqlx::query!(
+    ) -> Result<Empleado, DbError> {
+        let row = sqlx::query_as::<_, EmpleadoRow>(
             r#"
                 UPDATE empleado
                 SET
@@ -190,24 +181,23 @@ impl EmpleadoRepository {
                     estado = ?,
                     rol = ?
                 WHERE dni_empleado = ?
+                RETURNING *
                 "#,
-            empleado.nombre_apellido,
-            empleado.mail,
-            empleado.genero,
-            empleado.estado,
-            rol,
-            dni
         )
-        .execute(pool)
+        .bind(empleado.nombre_apellido.clone())
+        .bind(empleado.mail.clone())
+        .bind(empleado.genero.clone())
+        .bind(empleado.estado.clone())
+        .bind(empleado.rol.to_string())
+        .bind(dni)
+        .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        Self::get_by_dni(pool, dni).await
+        Ok(row.into())
     }
 
-    pub async fn delete_empleado(pool: &SqlitePool, dni: i64) -> Result<Empleado, ApiError> {
-        let empleado = Self::get_by_dni(pool, dni).await?;
-
+    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                 DELETE FROM empleado
@@ -217,8 +207,8 @@ impl EmpleadoRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        Ok(empleado)
+        Ok(())
     }
 }

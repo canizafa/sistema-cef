@@ -25,6 +25,7 @@ impl SalaRepository {
                     capacidad_maxima
                 )
                 VALUES (?, ?, ?)
+                RETURNING id_sala, numero, capacidad_maxima
             "#,
         )
         .bind(sala.get_id())
@@ -78,6 +79,7 @@ impl SalaRepository {
                     numero = ?,
                     capacidad_maxima = ?
                 WHERE id_sala = ?
+                RETURNING id_sala, numero, capacidad_maxima
             "#,
         )
         .bind(sala.numero)

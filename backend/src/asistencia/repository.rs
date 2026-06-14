@@ -28,6 +28,7 @@ impl AsistenciaRepository {
                        id_reserva
                    )
                    VALUES (?, ?, ?, ?)
+                   RETURNING id_asistencia, fecha, metodo, id_reserva
                    "#,
         )
         .bind(asistencia.get_id_asistencia())
@@ -89,6 +90,7 @@ impl AsistenciaRepository {
                         metodo = ?,
                         id_reserva = ?
                     WHERE id_asistencia = ?
+                    RETURNING id_asistencia, fecha, metodo, id_reserva
                     "#,
         )
         .bind(asistencia.get_fecha().format("%Y-%m-%d").to_string())

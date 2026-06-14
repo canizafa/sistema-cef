@@ -42,7 +42,7 @@ pub async fn update(
     request: CreateActividadRequest,
 ) -> Result<Actividad, AppError> {
     let nueva_actividad = Actividad::from(request);
-    let actividad = ActividadRepository::get_by_id(db, id)
+    let mut actividad = ActividadRepository::get_by_id(db, id)
         .await
         .map_err(AppError::from)?;
     actividad.update_actividad(nueva_actividad);
