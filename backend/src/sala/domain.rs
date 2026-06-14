@@ -1,6 +1,6 @@
-use super::*;
+use crate::sala::{dto::CreateSalaRequest, errors::SalaDomainError};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Sala {
     pub id: String,
     pub numero: i64,
@@ -24,15 +24,15 @@ impl Sala {
     pub fn get_capacidad_maxima(&self) -> i64 {
         self.capacidad_maxima
     }
-    // Domain no debe conocer Apierror
-    pub fn validate_sala(&self) -> Result<(), ApiError> {
-        if self.numero <= 0 || self.capacidad_maxima <= 0 {
-            Err(ApiError::BadRequest(
-                "El número y la capacidad máxima deben ser mayores a 0".to_string(),
-            ))
-        } else {
-            Ok(())
+    pub fn validate_sala(&self) -> Vec<SalaDomainError> {
+        let mut errors = Vec::new();
+        if self.numero <= 0 {
+            errors.push(SalaDomainError::NumeroInvalido);
         }
+        if self.capacidad_maxima <= 0 {
+            errors.push(SalaDomainError::CapacidadInvalida);
+        }
+        errors
     }
 }
 impl From<CreateSalaRequest> for Sala {

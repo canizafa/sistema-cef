@@ -1,4 +1,4 @@
-use super::*;
+use super::domain::Sala;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]

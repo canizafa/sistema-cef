@@ -1,5 +1,5 @@
-use super::*;
-use crate::app::Estado;
+use super::domain::Clase;
+use crate::app::rol::Estado;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -56,13 +56,13 @@ impl From<Clase> for ClaseResponse {
             id_clase: value.get_id().to_string(),
             dia: value.get_dia(),
             dia_semana: dia_semana_castellano.to_string(),
-            horario: value.get_horario(),
+            horario: value.get_horario().to_owned(),
             cupo_base: value.get_cupo_base(),
-            estado: value.get_estado(),
+            estado: value.get_estado().to_owned(),
             lleno: value.is_lleno(),
             dni_profesor: value.get_dni_profesor(),
-            descripcion: value.get_descripcion(),
-            id_actividad: value.get_id_actividad(),
+            descripcion: value.get_descripcion().to_owned(),
+            id_actividad: value.get_id_actividad().to_owned(),
             id_sala: value.get_id_sala().to_string(),
         }
     }
