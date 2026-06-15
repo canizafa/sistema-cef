@@ -59,8 +59,8 @@ pub async fn update(
         .map_err(AppError::from)
 }
 
-pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {
-    EmpleadoRepository::delete(db, dni)
+pub async fn delete(db: &SqlitePool, dni: i64, motivo_eliminacion: &str) -> Result<(), AppError> {
+    EmpleadoRepository::delete(db, dni, motivo_eliminacion)
         .await
         .map_err(AppError::from)
 }
