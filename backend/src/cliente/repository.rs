@@ -242,12 +242,27 @@ impl ClienteRepository {
 
         Ok(row.into())
     }
-    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
-        sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
-            .bind(dni)
-            .execute(pool)
-            .await
-            .map_err(DbError::from)?;
+    pub async fn delete(
+        pool: &SqlitePool,
+        dni: i64,
+        motivo_eliminacion: &str,
+    ) -> Result<(), DbError> {
+        let estado = Estado::Eliminado.to_string();
+        sqlx::query!(
+            r#"
+                UPDATE cliente
+                SET
+                    estado = ?,
+                    motivo_eliminacion = ?
+                WHERE dni_cliente = ?
+                "#,
+            estado,
+            motivo_eliminacion,
+            dni
+        )
+        .execute(pool)
+        .await
+        .map_err(DbError::from)?;
 
         Ok(())
     }
