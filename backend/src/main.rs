@@ -1,7 +1,8 @@
-use backend::feed_database;
-use backend::mailer::Mailer;
+use backend::app::errors::AppError;
+use backend::app::mailer::Mailer;
+use backend::app::state::AppState;
+use backend::app::{feed_database, telemetry};
 use backend::routes::root;
-use backend::{app_state::AppState, errors::AppError, telemetry};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -17,21 +18,21 @@ async fn main() -> Result<(), AppError> {
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
-    let config = backend::config::Config::from_env()?;
+    let config = backend::app::config::Config::from_env()?;
     let dir = SocketAddr::from(([0, 0, 0, 0], config.port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
-        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+        .map_err(|_| AppError::Internal)?;
 
     let db = SqlitePool::connect(&config.database_url)
         .await
-        .map_err(|e| AppError::DatabaseError(e))?;
+        .map_err(|_| AppError::Internal)?;
 
     sqlx::query("PRAGMA foreign_keys = ON;")
         .execute(&db)
         .await?;
 
-    let mailer = Mailer::new().map_err(|e| AppError::Api(e))?;
+    let mailer = Mailer::new()?;
 
     let app_state = AppState {
         db,
@@ -42,7 +43,7 @@ async fn main() -> Result<(), AppError> {
     sqlx::migrate!("./migrations")
         .run(&app_state.db)
         .await
-        .map_err(|e| AppError::MigrationError(e))?;
+        .map_err(|_| AppError::Internal)?;
 
     tracing::info!(port = config.port, "Servidor iniciado");
     feed_database::seed_database(&app_state.db).await?;
@@ -54,6 +55,6 @@ async fn main() -> Result<(), AppError> {
 
     axum::serve(listener, app)
         .await
-        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+        .map_err(|_| AppError::Internal)?;
     Ok(())
 }
