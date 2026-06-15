@@ -1,4 +1,4 @@
-use backend::app::errors::AppError;
+use backend::app::errors::{AppError, DbError};
 use backend::app::mailer::Mailer;
 use backend::app::state::AppState;
 use backend::app::{feed_database, telemetry};
@@ -22,11 +22,11 @@ async fn main() -> Result<(), AppError> {
     let dir = SocketAddr::from(([0, 0, 0, 0], config.port));
     let listener = tokio::net::TcpListener::bind(dir)
         .await
-        .map_err(|_| AppError::Internal)?;
+        .map_err(AppError::from)?;
 
     let db = SqlitePool::connect(&config.database_url)
         .await
-        .map_err(|_| AppError::Internal)?;
+        .map_err(AppError::from)?;
 
     sqlx::query("PRAGMA foreign_keys = ON;")
         .execute(&db)
@@ -43,7 +43,8 @@ async fn main() -> Result<(), AppError> {
     sqlx::migrate!("./migrations")
         .run(&app_state.db)
         .await
-        .map_err(|_| AppError::Internal)?;
+        .map_err(DbError::from)
+        .map_err(AppError::from)?;
 
     tracing::info!(port = config.port, "Servidor iniciado");
     feed_database::seed_database(&app_state.db).await?;
@@ -53,8 +54,6 @@ async fn main() -> Result<(), AppError> {
         .layer(TraceLayer::new_for_http())
         .layer(cors);
 
-    axum::serve(listener, app)
-        .await
-        .map_err(|_| AppError::Internal)?;
+    axum::serve(listener, app).await.map_err(AppError::from)?;
     Ok(())
 }
