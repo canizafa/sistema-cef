@@ -40,10 +40,7 @@ pub struct EmpleadoResponse {
     pub estado: String,
     pub rol: Rol,
 }
-#[derive(Debug, Deserialize)]
-pub struct EliminarEmpleadoRequest {
-    pub motivo_eliminacion: String,
-}
+
 impl From<Empleado> for EmpleadoResponse {
     fn from(empleado: Empleado) -> Self {
         Self {
