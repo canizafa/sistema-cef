@@ -47,10 +47,10 @@ impl AsistenciaRepository {
         let row = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                     SELECT
-                        id_asistencia as "id_asistencia!",
-                        fecha as "fecha!",
-                        metodo as "metodo!",
-                        id_reserva as "id_reserva!"
+                        id_asistencia,
+                        fecha,
+                        metodo,
+                        id_reserva
                     FROM asistencia
                     WHERE id_asistencia = ?
                     "#,
@@ -66,10 +66,10 @@ impl AsistenciaRepository {
         let rows = sqlx::query_as::<_, AsistenciaRow>(
             r#"
                     SELECT
-                        id_asistencia as "id_asistencia!",
-                        fecha as "fecha!",
-                        metodo as "metodo!",
-                        id_reserva as "id_reserva!"
+                        id_asistencia,
+                        fecha,
+                        metodo,
+                        id_reserva
                     FROM asistencia
                     "#,
         )

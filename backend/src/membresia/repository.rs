@@ -69,12 +69,12 @@ impl MembresiaRepository {
         let rows = sqlx::query_as::<_, MembresiaRow>(
             r#"
                     SELECT
-                        id_membresia as "id_membresia!",
-                        tipo as "tipo!",
-                        dni_cliente as "dni_cliente!",
-                        estado as "estado!",
-                        fecha_inicio as "fecha_inicio!",
-                        fecha_fin as "fecha_fin!"
+                        id_membresia,
+                        tipo,
+                        dni_cliente,
+                        estado,
+                        fecha_inicio,
+                        fecha_fin
                     FROM membresias
                     WHERE dni_cliente = ?
                     "#,

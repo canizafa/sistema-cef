@@ -66,7 +66,7 @@ impl EmpleadoRepository {
                   nombre_apellido,
                   mail,
                   password,
-                  genero as "genero!: String",
+                  genero,
                   estado,
                   rol
               FROM empleado
@@ -83,11 +83,11 @@ impl EmpleadoRepository {
         let row = sqlx::query_as::<_, EmpleadoRow>(
             r#"
                 SELECT
-                    dni_empleado as "dni_empleado!: i64",
+                    dni_empleado,
                     nombre_apellido,
                     mail,
                     password,
-                    genero as "genero!: String",
+                    genero,
                     estado,
                     rol
                 FROM empleado
@@ -110,7 +110,7 @@ impl EmpleadoRepository {
                     nombre_apellido,
                     mail,
                     password,
-                    genero as "genero!: String",
+                    genero,
                     estado,
                     rol
                 FROM empleado
