@@ -60,12 +60,12 @@ pub async fn update_profesor_handler(
     Ok(Json(ProfesorResponse::from(profesor)))
 }
 
-#[instrument(name = "profesor.delete", skip(state), fields(dni = dni), err)]
+#[instrument(name = "profesor.delete", skip(state), fields(request = request.profesor_dni), err)]
 pub async fn delete_profesor_handler(
     State(state): State<AppState>,
-    Path(dni): Path<i64>,
+    Json(request): Json<EliminarProfesorRequest>,
 ) -> Result<Json<()>, AppError> {
-    profesor::service::delete(&state.db, dni)
+    profesor::service::delete(&state.db, request)
         .await
         .map_err(AppError::from)?;
     Ok(Json(()))

@@ -20,6 +20,12 @@ pub struct ProfesorResponse {
     pub estado: Estado,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct EliminarProfesorRequest {
+    pub profesor_dni: i64,
+    pub motivo_eliminacion: String,
+}
+
 impl From<Profesor> for ProfesorResponse {
     fn from(profesor: Profesor) -> Self {
         Self {
