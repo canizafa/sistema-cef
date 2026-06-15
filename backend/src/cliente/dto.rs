@@ -47,10 +47,6 @@ pub struct ClienteResponse {
     pub rol: Rol,
     pub id_ficha: String,
 }
-#[derive(Debug, Deserialize)]
-pub struct EliminarClienteRequest {
-    pub motivo_eliminacion: String,
-}
 impl From<Cliente> for ClienteResponse {
     fn from(cliente: Cliente) -> Self {
         Self {

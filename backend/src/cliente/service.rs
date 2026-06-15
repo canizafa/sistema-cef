@@ -139,8 +139,8 @@ pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<C
         .map_err(AppError::from)
 }
 
-pub async fn delete(db: &SqlitePool, dni: i64, motivo_eliminacion: &str) -> Result<(), AppError> {
-    ClienteRepository::delete(db, dni, motivo_eliminacion)
+pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {
+    ClienteRepository::delete(db, dni)
         .await
         .map_err(AppError::from)
 }
