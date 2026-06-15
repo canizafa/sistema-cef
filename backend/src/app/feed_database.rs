@@ -1,12 +1,11 @@
+use crate::app::errors::DbError;
+use crate::auth::password::hash_password;
 use sqlx::SqlitePool;
 
-use super::ApiError;
-use crate::auth::password::hash_password;
-
-pub async fn seed_database(pool: &SqlitePool) -> Result<(), ApiError> {
+pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     // Hash de passwords
-    let duenio_password = hash_password("123456")?;
-    let empleado_password = hash_password("123456")?;
+    let duenio_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+    let empleado_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
 
     // SALAS
     sqlx::query(
@@ -23,7 +22,7 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), ApiError> {
     )
     .execute(pool)
     .await
-    .map_err(ApiError::DatabaseError)?;
+    .map_err(DbError::from)?;
 
     // PROFESORES
     sqlx::query(
@@ -41,7 +40,7 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), ApiError> {
     )
     .execute(pool)
     .await
-    .map_err(ApiError::DatabaseError)?;
+    .map_err(DbError::from)?;
 
     // ACTIVIDADES
     sqlx::query(
@@ -66,7 +65,7 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), ApiError> {
     )
     .execute(pool)
     .await
-    .map_err(ApiError::DatabaseError)?;
+    .map_err(DbError::from)?;
 
     // EMPLEADOS
     sqlx::query(
@@ -101,7 +100,7 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), ApiError> {
     .bind("empleado")
     .execute(pool)
     .await
-    .map_err(ApiError::DatabaseError)?;
+    .map_err(DbError::from)?;
 
     Ok(())
 }

@@ -1,0 +1,63 @@
+use super::domain::Cliente;
+use crate::{
+    app::rol::{Estado, Rol},
+    ficha_medica::dto::CreateFichaMedicaRequest,
+};
+use chrono::NaiveDate;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct CreateClienteRequest {
+    pub dni: i64,
+    pub nombre_apellido: String,
+    pub password: String,
+    pub email: String,
+    pub telefono: String,
+    pub fecha_nacimiento: NaiveDate,
+    pub estado: Estado,
+    pub ficha_medica: CreateFichaMedicaRequest,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdatePasswordRequest {
+    pub email: String,
+    pub old_password: String,
+    pub new_password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ClienteRequest {
+    pub dni: i64,
+    pub nombre_apellido: String,
+    pub email: String,
+    pub telefono: String,
+    pub fecha_nacimiento: NaiveDate,
+    pub estado: Estado,
+    pub id_ficha: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ClienteResponse {
+    pub dni: i64,
+    pub nombre_apellido: String,
+    pub email: String,
+    pub telefono: String,
+    pub fecha_nacimiento: NaiveDate,
+    pub estado: Estado,
+    pub rol: Rol,
+    pub id_ficha: String,
+}
+impl From<Cliente> for ClienteResponse {
+    fn from(cliente: Cliente) -> Self {
+        Self {
+            dni: cliente.get_dni(),
+            nombre_apellido: cliente.get_nombre_apellido(),
+            email: cliente.get_mail(),
+            telefono: cliente.get_telefono(),
+            fecha_nacimiento: cliente.get_fecha_nacimiento(),
+            estado: cliente.get_estado(),
+            rol: cliente.get_rol(),
+            id_ficha: cliente.get_id_ficha().to_string(),
+        }
+    }
+}

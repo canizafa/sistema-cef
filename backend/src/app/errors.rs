@@ -12,6 +12,7 @@ pub struct FieldError {
     pub field: String,
     pub message: String,
 }
+
 // --------- ERRORES DE LA BASE DE DATOS --------
 #[derive(Debug, Error)]
 pub enum DbError {
@@ -41,6 +42,15 @@ impl From<sqlx::Error> for DbError {
         }
     }
 }
+
+impl From<reqwest::Error> for AppError {
+    fn from(error: reqwest::Error) -> Self {
+        match error {
+            _ => AppError::NotFound("Recurso no encontrado".to_string()),
+        }
+    }
+}
+
 // --------- ERRORES DE LA APP --------
 #[derive(Debug, Error)]
 pub enum AppError {
@@ -54,10 +64,18 @@ pub enum AppError {
     Unauthorized(String),
     #[error("{0}")]
     Forbidden(String),
-    #[error("error interno del servidor")]
+    #[error("Error interno del servidor")]
     Internal,
-    #[error("servicio no disponible")]
+    #[error("Servicio no disponible")]
     ServiceUnavailable,
+    #[error("Variable de entorno no encontrada")]
+    EnvironmentVariableNotFound,
+    #[error("Error de hash de contraseña")]
+    PasswordHashError,
+    #[error("Credenciales invalidas")]
+    InvalidCredentials,
+    #[error("Token invalido")]
+    JwtError,
 }
 impl From<DbError> for AppError {
     fn from(err: DbError) -> Self {
@@ -83,6 +101,22 @@ impl From<sqlx::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, body) = match self {
+            AppError::JwtError => (
+                StatusCode::UNAUTHORIZED,
+                json!({ "error": "Token invalido" }),
+            ),
+            AppError::InvalidCredentials => (
+                StatusCode::UNAUTHORIZED,
+                json!({ "error": "Email o contraseña incorrectos" }),
+            ),
+            AppError::PasswordHashError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                json!({ "error": "Error de hash de contraseña" }),
+            ),
+            AppError::EnvironmentVariableNotFound => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                json!({ "error": "Variable de entorno no encontrada" }),
+            ),
             AppError::Validation(errors) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 json!({

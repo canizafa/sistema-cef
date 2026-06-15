@@ -1,7 +1,6 @@
-pub mod ficha_medica;
-pub mod ficha_medica_dto;
-pub mod ficha_medica_repository;
+pub mod domain;
+mod repository;
 
-pub use ficha_medica::*;
-pub use ficha_medica_dto::*;
-pub use ficha_medica_repository::*;
+pub mod dto;
+pub mod service;
+pub use repository::FichaMedicaRow;

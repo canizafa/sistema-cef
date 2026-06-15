@@ -1,11 +1,8 @@
-pub mod profesor;
-pub mod profesor_dto;
-pub mod profesor_handler;
-pub mod profesor_repository;
-pub mod profesor_route;
+mod domain;
+mod dto;
+mod errors;
+mod handler;
+mod repository;
 
-pub use profesor::*;
-pub use profesor_dto::*;
-pub use profesor_handler::*;
-pub use profesor_repository::*;
-pub use profesor_route::*;
+pub mod route;
+pub mod service;

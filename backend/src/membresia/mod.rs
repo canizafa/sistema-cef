@@ -1,11 +1,8 @@
-pub mod membresia;
-pub mod membresia_dto;
-pub mod membresia_handler;
-pub mod membresia_repository;
-pub mod membresia_route;
+mod domain;
+mod dto;
+mod errors;
+mod handler;
+mod repository;
 
-pub use membresia::*;
-pub use membresia_dto::*;
-pub use membresia_handler::*;
-pub use membresia_repository::*;
-pub use membresia_route::*;
+pub mod route;
+pub mod service;

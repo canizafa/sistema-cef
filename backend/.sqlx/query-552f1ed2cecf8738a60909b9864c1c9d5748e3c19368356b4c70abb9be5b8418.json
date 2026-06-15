@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                SELECT dni_cliente\n                FROM cliente_lista_espera\n                WHERE id_espera = ?\n                ORDER BY fecha_ingreso\n                ",
+  "describe": {
+    "columns": [
+      {
+        "name": "dni_cliente",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "552f1ed2cecf8738a60909b9864c1c9d5748e3c19368356b4c70abb9be5b8418"
+}
