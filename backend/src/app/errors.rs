@@ -42,6 +42,15 @@ impl From<sqlx::Error> for DbError {
         }
     }
 }
+
+impl From<reqwest::Error> for AppError {
+    fn from(error: reqwest::Error) -> Self {
+        match error {
+            _ => AppError::NotFound("Recurso no encontrado".to_string()),
+        }
+    }
+}
+
 // --------- ERRORES DE LA APP --------
 #[derive(Debug, Error)]
 pub enum AppError {

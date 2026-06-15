@@ -4,7 +4,7 @@ use sqlx::SqlitePool;
 
 pub struct PagoRepository;
 impl PagoRepository {
-    pub async fn create_pago(pool: &SqlitePool, pago: &Pago) -> Result<Pago, DbError> {
+    pub async fn create(pool: &SqlitePool, pago: &Pago) -> Result<Pago, DbError> {
         let id_pago = pago.get_id_pago();
         let monto = pago.get_monto();
         let fecha = pago.get_fecha().format("%Y-%m-%d").to_string();
@@ -74,7 +74,7 @@ impl PagoRepository {
             })
             .collect())
     }
-    pub async fn get_pago(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
         let row = sqlx::query!(
             r#"
                    SELECT
@@ -104,9 +104,7 @@ impl PagoRepository {
             row.reserva_paga,
         ))
     }
-    pub async fn delete_pago(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
-        let pago = Self::get_pago(pool, id).await?;
-
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                    DELETE FROM pagos
@@ -118,6 +116,6 @@ impl PagoRepository {
         .await
         .map_err(DbError::from)?;
 
-        Ok(pago)
+        Ok(())
     }
 }

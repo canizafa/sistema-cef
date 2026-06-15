@@ -1,23 +1,17 @@
-use super::*;
-use crate::app::*;
+use crate::app::{errors::AppError, state::AppState};
 use crate::mercado_pago::*;
+use crate::pago::dto::{CreatePagoRequest, PagoResponse};
 use axum::{Json, extract::State};
 use tracing::instrument;
 
-#[instrument(name = "pago.create", skip(state, payload), fields(monto = payload.monto), err)]
+#[instrument(name = "pago.create", skip(_state, payload), fields(monto = payload.monto), err)]
 pub async fn crear_pago_handler(
-    State(state): State<AppState>,
+    State(_state): State<AppState>,
     Json(payload): Json<CreatePagoRequest>,
-) -> Result<Json<PagoResponse>, ApiError> {
-    let pago = Pago::from(payload.clone());
-    pago.validate_pago()?;
+) -> Result<Json<PagoResponse>, AppError> {
     let mp_response = crear_preferencia(payload.titulo, payload.monto)
         .await
-        .map_err(|e| ApiError::MpError(e.to_string()))?;
-
-    PagoRepository::create_pago(&state.db, &pago)
-        .await
-        .map_err(|e| ApiError::MpError(e.to_string()))?;
+        .map_err(AppError::from)?;
 
     Ok(Json(PagoResponse {
         init_point: mp_response.init_point,
