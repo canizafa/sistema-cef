@@ -2,7 +2,7 @@ use crate::{
     app::{errors::AppError, state::AppState},
     profesor::{
         self,
-        dto::{CreateProfesorRequest, ProfesorResponse},
+        dto::{CreateProfesorRequest, EliminarProfesorRequest, ProfesorResponse},
     },
 };
 use axum::{
