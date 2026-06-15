@@ -2,7 +2,7 @@ use crate::{
     app::{errors::AppError, state::AppState},
     profesor::{
         self,
-        dto::{CreateProfesorRequest, ProfesorResponse},
+        dto::{CreateProfesorRequest, EliminarProfesorRequest, ProfesorResponse},
     },
 };
 use axum::{
@@ -64,8 +64,9 @@ pub async fn update_profesor_handler(
 pub async fn delete_profesor_handler(
     State(state): State<AppState>,
     Path(dni): Path<i64>,
+    Json(request): Json<EliminarProfesorRequest>,
 ) -> Result<Json<()>, AppError> {
-    profesor::service::delete(&state.db, dni)
+    profesor::service::delete(&state.db, dni, &request.motivo_eliminacion)
         .await
         .map_err(AppError::from)?;
     Ok(Json(()))

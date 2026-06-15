@@ -1,4 +1,4 @@
-use super::dto::{ClienteResponse, CreateClienteRequest};
+use super::dto::{ClienteResponse, CreateClienteRequest, EliminarClienteRequest};
 use crate::app::{errors::AppError, state::AppState};
 use crate::cliente;
 use crate::cliente::dto::{ClienteRequest, UpdatePasswordRequest};
@@ -80,8 +80,9 @@ pub async fn reset_password_handler(
 pub async fn delete_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
+    Json(request): Json<EliminarClienteRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    cliente::service::delete(&state.db, id).await?;
+    cliente::service::delete(&state.db, id, &request.motivo_eliminacion.to_string()).await?;
     Ok(StatusCode::OK)
 }
 
