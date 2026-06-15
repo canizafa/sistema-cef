@@ -13,6 +13,7 @@ pub struct ResetPasswordRequest {
     pub email: String,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct CreateChangePasswordRequest {
     pub dni_cliente: i64,
@@ -20,6 +21,7 @@ pub struct CreateChangePasswordRequest {
     pub new_password: String,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
     pub dni: i64,
