@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE profesor\n                SET\n                    estado = ?,\n                    motivo_eliminacion = ?\n                WHERE dni_profesor = ?\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "b6a028a5a51b40ed246e57874df46a70bfe922531e8cebe1adae03cd6c1a5b15"
+}

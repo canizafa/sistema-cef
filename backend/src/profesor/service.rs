@@ -1,7 +1,8 @@
 use crate::{
     app::errors::AppError,
     profesor::{
-        domain::Profesor, dto::CreateProfesorRequest, dto::EliminarProfesorRequest,
+        domain::Profesor,
+        dto::{CreateProfesorRequest, EliminarProfesorRequest},
         repository::ProfesorRepository,
     },
 };
@@ -54,8 +55,8 @@ pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Profesor>, AppError> {
     Ok(profesores)
 }
 
-pub async fn delete(pool: &SqlitePool, dni: i64, motivo_eliminacion: &str) -> Result<(), AppError> {
-    ProfesorRepository::delete(pool, dni, &motivo_eliminacion)
+pub async fn delete(pool: &SqlitePool, request: EliminarProfesorRequest) -> Result<(), AppError> {
+    ProfesorRepository::delete(pool, request.profesor_dni, &request.motivo_eliminacion)
         .await
         .map_err(AppError::from)
 }
