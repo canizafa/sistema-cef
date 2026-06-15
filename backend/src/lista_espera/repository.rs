@@ -59,10 +59,10 @@ impl ListaDeEsperaRepository {
         let rows = sqlx::query!(
             r#"
                     SELECT
-                    id_espera as "id_espera!",
-                            tipo as "tipo!",
-                            fecha_ingreso as "fecha_ingreso!",
-                            id_clase as "id_clase!"
+                    id_espera,
+                            tipo,
+                            fecha_ingreso,
+                            id_clase
                     FROM lista_de_espera
                     "#
         )
@@ -90,10 +90,10 @@ impl ListaDeEsperaRepository {
         let row = sqlx::query!(
             r#"
              SELECT
-             id_espera as "id_espera!",
-                     tipo as "tipo!",
-                     fecha_ingreso as "fecha_ingreso!",
-                     id_clase as "id_clase!"
+             id_espera,
+                     tipo,
+                     fecha_ingreso,
+                     id_clase
              FROM lista_de_espera
              WHERE id_espera = ?
              "#,

@@ -40,7 +40,7 @@ impl ActividadRepository {
         let row = sqlx::query_as::<_, ActividadRow>(
             r#"
                SELECT
-                   id_actividad as "id_actividad!",
+                   id_actividad,
                    nombre,
                    descripcion
                FROM actividad
@@ -58,7 +58,7 @@ impl ActividadRepository {
         let rows = sqlx::query_as::<_, ActividadRow>(
             r#"
                 SELECT
-                    id_actividad as "id_actividad!",
+                    id_actividad,
                     nombre,
                     descripcion
                 FROM actividad

@@ -54,6 +54,16 @@ impl ClienteRepository {
                 id_ficha
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING 
+                dni_cliente AS dni,
+                nombre_completo AS nombre,
+                email,
+                telefono,
+                fecha_nacimiento,
+                estado,
+                password,
+                id_ficha,
+                'Cliente' AS rol
             "#,
         )
         .bind(cliente.get_dni())
@@ -75,22 +85,16 @@ impl ClienteRepository {
         let rows = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
-                c.dni_cliente as "dni_cliente!",
-                c.nombre_completo as "nombre_completo!",
-                c.email as "email!",
-                c.telefono as "telefono!",
-                c.fecha_nacimiento as "fecha_nacimiento!",
-                c.estado as "estado!",
-                c.password as "password!",
-
-                f.id_ficha as "id_ficha!",
-                f.enfermedades as "enfermedades!",
-                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
-                f.detalles as "detalles!"
-
+                c.dni_cliente AS dni,
+                c.nombre_completo AS nombre,
+                c.email,
+                c.telefono,
+                c.fecha_nacimiento,
+                c.estado,
+                c.password,
+                c.id_ficha,
+                'Cliente' AS rol
             FROM cliente c
-            INNER JOIN ficha_medica f
-                ON c.id_ficha = f.id_ficha
             "#,
         )
         .fetch_all(pool)
@@ -104,22 +108,16 @@ impl ClienteRepository {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
-                c.dni_cliente as "dni_cliente!",
-                c.nombre_completo as "nombre_completo!",
-                c.email as "email!",
-                c.telefono as "telefono!",
-                c.fecha_nacimiento as "fecha_nacimiento!",
-                c.estado as "estado!",
-                c.password as "password!",
-
-                f.id_ficha as "id_ficha!",
-                f.enfermedades as "enfermedades!",
-                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
-                f.detalles as "detalles!"
-
+                c.dni_cliente AS dni,
+                c.nombre_completo AS nombre,
+                c.email,
+                c.telefono,
+                c.fecha_nacimiento,
+                c.estado,
+                c.password,
+                c.id_ficha,
+                'Cliente' AS rol
             FROM cliente c
-            INNER JOIN ficha_medica f
-                ON c.id_ficha = f.id_ficha
             WHERE c.dni_cliente = ?
             "#,
         )
@@ -135,22 +133,16 @@ impl ClienteRepository {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
             SELECT
-                c.dni_cliente as "dni_cliente!",
-                c.nombre_completo as "nombre_completo!",
-                c.email as "email!",
-                c.telefono as "telefono!",
-                c.fecha_nacimiento as "fecha_nacimiento!",
-                c.estado as "estado!",
-                c.password as "password!",
-
-                f.id_ficha as "id_ficha!",
-                f.enfermedades as "enfermedades!",
-                f.operaciones_quirurgicas as "operaciones_quirurgicas!",
-                f.detalles as "detalles!"
-
+                c.dni_cliente AS dni,
+                c.nombre_completo AS nombre,
+                c.email,
+                c.telefono,
+                c.fecha_nacimiento,
+                c.estado,
+                c.password,
+                c.id_ficha,
+                'Cliente' AS rol
             FROM cliente c
-            INNER JOIN ficha_medica f
-                ON c.id_ficha = f.id_ficha
             WHERE c.email = ?
             "#,
         )
@@ -209,9 +201,18 @@ impl ClienteRepository {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
                 UPDATE cliente
-                SET
-                    nombre_completo = ?
+                SET nombre_completo = ?
                 WHERE dni_cliente = ?
+                RETURNING 
+                    dni_cliente AS dni,
+                    nombre_completo AS nombre,
+                    email,
+                    telefono,
+                    fecha_nacimiento,
+                    estado,
+                    password,
+                    id_ficha,
+                    'Cliente' AS rol
                 "#,
         )
         .bind(nombre_apellido)
@@ -232,6 +233,16 @@ impl ClienteRepository {
                 UPDATE cliente
                 SET estado = ?
                 WHERE dni_cliente = ?
+                RETURNING 
+                    dni_cliente AS dni,
+                    nombre_completo AS nombre,
+                    email,
+                    telefono,
+                    fecha_nacimiento,
+                    estado,
+                    password,
+                    id_ficha,
+                    'Cliente' AS rol
                 "#,
         )
         .bind(estado)

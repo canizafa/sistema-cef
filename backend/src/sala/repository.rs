@@ -41,9 +41,9 @@ impl SalaRepository {
         let row = sqlx::query_as::<_, SalaRow>(
             r#"
                 SELECT
-                    id_sala as "id_sala!",
-                    numero as "numero!",
-                    capacidad_maxima as "capacidad_maxima!"
+                    id_sala,
+                    numero,
+                    capacidad_maxima
                 FROM sala
                 WHERE id_sala = ?
             "#,
@@ -59,9 +59,9 @@ impl SalaRepository {
         let rows = sqlx::query_as::<_, SalaRow>(
             r#"
                 SELECT
-                    id_sala as "id_sala!",
-                    numero as "numero!",
-                    capacidad_maxima as "capacidad_maxima!"
+                    id_sala,
+                    numero,
+                    capacidad_maxima
                 FROM sala
             "#,
         )

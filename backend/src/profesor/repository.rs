@@ -49,10 +49,10 @@ impl ProfesorRepository {
         let row = sqlx::query_as::<_, ProfesorRow>(
             r#"
                     SELECT
-                        dni_profesor as "dni_profesor!",
-                        nombre as "nombre!",
-                        genero as "genero!",
-                        estado as "estado!"
+                        dni_profesor,
+                        nombre,
+                        genero,
+                        estado
                     FROM profesor
                     WHERE dni_profesor = ?
                     "#,
@@ -68,10 +68,10 @@ impl ProfesorRepository {
         let rows = sqlx::query_as::<_, ProfesorRow>(
             r#"
                     SELECT
-                        dni_profesor as "dni_profesor!",
-                        nombre as "nombre!",
-                        genero as "genero!",
-                        estado as "estado!"
+                        dni_profesor,
+                        nombre,
+                        genero,
+                        estado
                     FROM profesor
                     "#,
         )
