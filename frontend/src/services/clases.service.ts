@@ -5,16 +5,19 @@ export type EstadoClase = 'alta' | 'baja';
 export type ClaseDTO = {
     id_clase: string;
     dia: string;
+    dia_semana: string;
     horario: string;
     estado: EstadoClase;
     lleno: boolean;
     descripcion: string;
     id_actividad: string;
     id_sala: string;
+    dni_profesor: number;  
 };
 
 export type NuevaClaseData = {
     dia: string;
+    dia_semana: string;
     horario: string;
     cupo_base: number;
     cupo_maximo: number;
@@ -29,6 +32,14 @@ export type NuevaReservaData = {
     fecha: string;
     estado: string;
     dni_cliente: number;
+    id_clase: string;
+};
+
+export type ReservaResponse = {
+    fecha: string;
+    tipo: string;
+    estado: string;
+    dni_cliente: string;
     id_clase: string;
 };
 
@@ -65,6 +76,7 @@ export const clasesService = {
     },
 };
 
+// reservas
 export const reservasService = {
     async crearReserva(data: NuevaReservaData) {
         const response = await api.post('/reservas/create', data);
@@ -74,6 +86,11 @@ export const reservasService = {
     async cancelarReserva(idReserva: string) {
         const response = await api.delete(`/reservas/delete-reserva/${idReserva}`);
         return response.data;
+    },
+
+    async getReservas(): Promise<ReservaResponse[]> {
+        const response = await api.get('/reservas/get-all');
+        return response.data.reservas ?? response.data;
     },
 };
 

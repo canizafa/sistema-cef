@@ -42,4 +42,9 @@ export const clienteService = {
     async updatePerfil(dni: number, data: UpdateClienteRequest): Promise<void> {
         await api.put(`/clientes/update-cliente/${dni}`, data);
     },
+
+    async getClientes(): Promise<ClienteResponse[]> {
+    const response = await api.get<{ clientes: ClienteResponse[] }>('/clientes/get-clientes');
+    return response.data.clientes;
+},
 };
