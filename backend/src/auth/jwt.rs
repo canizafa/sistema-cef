@@ -19,6 +19,7 @@ pub fn generar_token(dni: i64, rol: Rol, secret: &str) -> Result<String, AppErro
     .map_err(|_| AppError::JwtError)
 }
 
+#[allow(dead_code)]
 pub fn validar_token(token: &str, secret: &str) -> Result<Claims, AppError> {
     decode::<Claims>(
         token,

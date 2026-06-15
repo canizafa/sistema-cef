@@ -71,38 +71,38 @@ impl SalaRepository {
 
         Ok(rows.into_iter().map(Sala::from).collect())
     }
-    pub async fn update(pool: &SqlitePool, id: &str, sala: &Sala) -> Result<Sala, DbError> {
-        let row = sqlx::query_as::<_, SalaRow>(
-            r#"
-                UPDATE sala
-                SET
-                    numero = ?,
-                    capacidad_maxima = ?
-                WHERE id_sala = ?
-                RETURNING id_sala, numero, capacidad_maxima
-            "#,
-        )
-        .bind(sala.numero)
-        .bind(sala.capacidad_maxima)
-        .bind(id)
-        .fetch_one(pool)
-        .await
-        .map_err(DbError::from)?;
+    // pub async fn update(pool: &SqlitePool, id: &str, sala: &Sala) -> Result<Sala, DbError> {
+    //     let row = sqlx::query_as::<_, SalaRow>(
+    //         r#"
+    //             UPDATE sala
+    //             SET
+    //                 numero = ?,
+    //                 capacidad_maxima = ?
+    //             WHERE id_sala = ?
+    //             RETURNING id_sala, numero, capacidad_maxima
+    //         "#,
+    //     )
+    //     .bind(sala.numero)
+    //     .bind(sala.capacidad_maxima)
+    //     .bind(id)
+    //     .fetch_one(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(row.into())
-    }
-    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
-        sqlx::query!(
-            r#"
-                DELETE FROM sala
-                WHERE id_sala = ?
-            "#,
-            id
-        )
-        .execute(pool)
-        .await
-        .map_err(DbError::from)?;
+    //     Ok(row.into())
+    // }
+    // pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
+    //     sqlx::query!(
+    //         r#"
+    //             DELETE FROM sala
+    //             WHERE id_sala = ?
+    //         "#,
+    //         id
+    //     )
+    //     .execute(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }

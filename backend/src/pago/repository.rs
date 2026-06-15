@@ -41,81 +41,81 @@ impl PagoRepository {
 
         Ok(pago.clone())
     }
-    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Pago>, DbError> {
-        let rows = sqlx::query!(
-            r#"
-                    SELECT
-                        id_pago as "id_pago!",
-                        monto as "monto!",
-                        fecha as "fecha!",
-                        hora as "hora!",
-                        sena as "sena!",
-                        id_membresia,
-                        reserva_paga
-                    FROM pagos
-                    "#
-        )
-        .fetch_all(pool)
-        .await
-        .map_err(DbError::from)?;
+    // pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Pago>, DbError> {
+    //     let rows = sqlx::query!(
+    //         r#"
+    //                 SELECT
+    //                     id_pago as "id_pago!",
+    //                     monto as "monto!",
+    //                     fecha as "fecha!",
+    //                     hora as "hora!",
+    //                     sena as "sena!",
+    //                     id_membresia,
+    //                     reserva_paga
+    //                 FROM pagos
+    //                 "#
+    //     )
+    //     .fetch_all(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(rows
-            .into_iter()
-            .map(|row| {
-                Pago::new(
-                    row.id_pago,
-                    row.monto,
-                    chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
-                    row.hora,
-                    row.sena,
-                    row.id_membresia,
-                    row.reserva_paga,
-                )
-            })
-            .collect())
-    }
-    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
-        let row = sqlx::query!(
-            r#"
-                   SELECT
-                       id_pago as "id_pago!",
-                       monto as "monto!",
-                       fecha as "fecha!",
-                       hora as "hora!",
-                       sena as "sena!",
-                       id_membresia,
-                       reserva_paga
-                   FROM pagos
-                   WHERE id_pago = ?
-                   "#,
-            id
-        )
-        .fetch_one(pool)
-        .await
-        .map_err(DbError::from)?;
+    //     Ok(rows
+    //         .into_iter()
+    //         .map(|row| {
+    //             Pago::new(
+    //                 row.id_pago,
+    //                 row.monto,
+    //                 chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
+    //                 row.hora,
+    //                 row.sena,
+    //                 row.id_membresia,
+    //                 row.reserva_paga,
+    //             )
+    //         })
+    //         .collect())
+    // }
+    // pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
+    //     let row = sqlx::query!(
+    //         r#"
+    //                SELECT
+    //                    id_pago as "id_pago!",
+    //                    monto as "monto!",
+    //                    fecha as "fecha!",
+    //                    hora as "hora!",
+    //                    sena as "sena!",
+    //                    id_membresia,
+    //                    reserva_paga
+    //                FROM pagos
+    //                WHERE id_pago = ?
+    //                "#,
+    //         id
+    //     )
+    //     .fetch_one(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(Pago::new(
-            row.id_pago,
-            row.monto,
-            chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
-            row.hora,
-            row.sena,
-            row.id_membresia,
-            row.reserva_paga,
-        ))
-    }
-    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
-        sqlx::query!(
-            r#"
-                   DELETE FROM pagos
-                   WHERE id_pago = ?
-                   "#,
-            id
-        )
-        .execute(pool)
-        .await
-        .map_err(DbError::from)?;
+    //     Ok(Pago::new(
+    //         row.id_pago,
+    //         row.monto,
+    //         chrono::NaiveDate::parse_from_str(&row.fecha, "%Y-%m-%d").unwrap(),
+    //         row.hora,
+    //         row.sena,
+    //         row.id_membresia,
+    //         row.reserva_paga,
+    //     ))
+    // }
+    // pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
+    //     sqlx::query!(
+    //         r#"
+    //                DELETE FROM pagos
+    //                WHERE id_pago = ?
+    //                "#,
+    //         id
+    //     )
+    //     .execute(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 }

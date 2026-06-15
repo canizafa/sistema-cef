@@ -1,6 +1,7 @@
 use crate::auth::dto::RegisterRequest;
 use chrono::NaiveDate;
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct Register {
     pub dni: String,
@@ -11,6 +12,7 @@ pub struct Register {
     pub fecha_nacimiento: NaiveDate,
 }
 
+#[allow(dead_code)]
 impl Register {
     pub fn new(
         dni: String,
