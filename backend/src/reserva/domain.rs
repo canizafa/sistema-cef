@@ -1,5 +1,7 @@
-use super::*;
-use crate::app::Estado;
+use crate::{
+    app::rol::Estado,
+    reserva::{dto::CreateReservaRequest, errors::ReservaDomainError},
+};
 use chrono::NaiveDate;
 use uuid::Uuid;
 
@@ -9,7 +11,7 @@ pub struct Reserva {
     estado: Estado,
     tipo: String,
     fecha_reserva: NaiveDate,
-    dni_cliente: String,
+    dni_cliente: i64,
     id_clase: String,
 }
 
@@ -19,7 +21,7 @@ impl Reserva {
         estado: Estado,
         tipo: String,
         fecha_reserva: NaiveDate,
-        dni_cliente: String,
+        dni_cliente: i64,
         id_clase: String,
     ) -> Self {
         Self {
@@ -48,32 +50,28 @@ impl Reserva {
         self.fecha_reserva.clone()
     }
 
-    pub fn get_id_clase(&self) -> String {
-        self.id_clase.clone()
-    }
-
-    pub fn get_dni_cliente(&self) -> String {
+    pub fn get_dni_cliente(&self) -> i64 {
         self.dni_cliente.clone()
     }
 
-    // Domain no debe conocer apierrors
-    pub fn validate_reserva(&self) -> Result<(), ApiError> {
+    pub fn get_id_clase(&self) -> String {
+        self.id_clase.clone()
+    }
+    pub fn validate_reserva(&self) -> Vec<ReservaDomainError> {
+        let mut vec_errors = Vec::new();
         if self.tipo.is_empty() {
-            return Err(ApiError::BadRequest("tipo is required".to_string()));
+            vec_errors.push(ReservaDomainError::Tipo);
         }
         if self.fecha_reserva == NaiveDate::MIN {
-            return Err(ApiError::BadRequest(
-                "fecha_reserva is required".to_string(),
-            ));
+            vec_errors.push(ReservaDomainError::FechaReserva);
         }
-        if self.dni_cliente.is_empty() {
-            return Err(ApiError::BadRequest("dni_cliente is required".to_string()));
+        if self.dni_cliente == 0 {
+            vec_errors.push(ReservaDomainError::DniCliente);
         }
         if self.id_clase.is_empty() {
-            return Err(ApiError::BadRequest("id_clase is required".to_string()));
+            vec_errors.push(ReservaDomainError::IdClase);
         }
-
-        Ok(())
+        vec_errors
     }
 }
 

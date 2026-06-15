@@ -1,11 +1,12 @@
-use super::*;
-use crate::app::{ApiError, Estado};
+use crate::{
+    app::{errors::DbError, rol::Estado},
+    reserva::domain::Reserva,
+};
 use sqlx::SqlitePool;
 
 pub struct ReservaRepository;
-
 impl ReservaRepository {
-    pub async fn create_reserva(pool: &SqlitePool, reserva: &Reserva) -> Result<Reserva, ApiError> {
+    pub async fn create(pool: &SqlitePool, reserva: &Reserva) -> Result<Reserva, DbError> {
         let id = reserva.get_id();
         let estado = reserva.get_estado().to_string();
         let tipo = reserva.get_tipo();
@@ -33,11 +34,11 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(reserva.clone())
     }
-    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Reserva>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Reserva>, DbError> {
         let rows = sqlx::query!(
             r#"
             SELECT
@@ -52,7 +53,7 @@ impl ReservaRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         let reservas = rows
             .into_iter()
@@ -71,7 +72,7 @@ impl ReservaRepository {
 
         Ok(reservas)
     }
-    pub async fn get_reserva(pool: &SqlitePool, id: &str) -> Result<Reserva, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Reserva, DbError> {
         let row = sqlx::query!(
             r#"
             SELECT
@@ -88,7 +89,7 @@ impl ReservaRepository {
         )
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(Reserva::new(
             row.id_reserva,
@@ -100,11 +101,11 @@ impl ReservaRepository {
             row.id_clase,
         ))
     }
-    pub async fn update_reserva(
+    pub async fn update(
         pool: &SqlitePool,
         id: &str,
         reserva: &Reserva,
-    ) -> Result<Reserva, ApiError> {
+    ) -> Result<Reserva, DbError> {
         let estado = reserva.get_estado().to_string();
         let tipo = reserva.get_tipo();
         let fecha = reserva.get_fecha_reserva().format("%Y-%m-%d").to_string();
@@ -131,13 +132,11 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
-        Self::get_reserva(pool, id).await
+        Ok(reserva.clone())
     }
-    pub async fn delete_reserva(pool: &SqlitePool, id: &str) -> Result<Option<Reserva>, ApiError> {
-        let reserva = Self::get_reserva(pool, id).await.ok();
-
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                 DELETE FROM reserva
@@ -147,7 +146,7 @@ impl ReservaRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
-        Ok(reserva)
+        .map_err(DbError::from)?;
+        Ok(())
     }
 }
