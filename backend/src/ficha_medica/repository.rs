@@ -54,10 +54,10 @@ impl FichaMedicaRepository {
         let row = sqlx::query_as::<_, FichaMedicaRow>(
             r#"
                    SELECT
-                       id_ficha as "id_ficha!",
-                       enfermedades as "enfermedades!",
-                       operaciones_quirurgicas as "operaciones_quirurgicas!",
-                       detalles as "detalles!"
+                       id_ficha,
+                       enfermedades,
+                       operaciones_quirurgicas,
+                       detalles
                    FROM ficha_medica
                    WHERE id_ficha = ?
                    "#,
