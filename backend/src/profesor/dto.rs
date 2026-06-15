@@ -22,6 +22,7 @@ pub struct ProfesorResponse {
 
 #[derive(Debug, Deserialize)]
 pub struct EliminarProfesorRequest {
+    pub profesor_dni: i64,
     pub motivo_eliminacion: String,
 }
 

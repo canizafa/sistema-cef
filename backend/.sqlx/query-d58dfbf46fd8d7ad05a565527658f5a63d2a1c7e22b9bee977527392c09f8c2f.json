@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE cliente\n                SET\n                    estado = ?,\n                    motivo_eliminacion = ?\n                WHERE dni_cliente = ?\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "d58dfbf46fd8d7ad05a565527658f5a63d2a1c7e22b9bee977527392c09f8c2f"
+}
