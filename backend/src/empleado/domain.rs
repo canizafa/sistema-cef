@@ -1,0 +1,104 @@
+use crate::{
+    app::rol::Rol,
+    empleado::{
+        dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
+        errors::EmpleadoDomainError,
+    },
+};
+
+#[derive(Debug)]
+pub struct Empleado {
+    pub dni_empleado: i64,
+    pub nombre_apellido: String,
+    pub password_hash: String,
+    pub mail: String,
+    pub genero: String,
+    pub estado: String,
+    pub rol: Rol,
+}
+
+impl Empleado {
+    pub fn new(
+        dni_empleado: i64,
+        nombre_apellido: String,
+        password_hash: String,
+        mail: String,
+        genero: String,
+        estado: String,
+        rol: Rol,
+    ) -> Self {
+        Self {
+            dni_empleado,
+            nombre_apellido,
+            password_hash,
+            mail,
+            genero,
+            estado,
+            rol,
+        }
+    }
+    pub fn get_dni(&self) -> i64 {
+        self.dni_empleado
+    }
+    pub fn get_nombre_apellido(&self) -> String {
+        self.nombre_apellido.clone()
+    }
+    pub fn get_mail(&self) -> String {
+        self.mail.clone()
+    }
+    pub fn get_genero(&self) -> String {
+        self.genero.clone()
+    }
+    pub fn get_estado(&self) -> String {
+        self.estado.clone()
+    }
+    pub fn get_rol(&self) -> Rol {
+        self.rol.clone()
+    }
+    pub fn get_password_hash(&self) -> String {
+        self.password_hash.clone()
+    }
+    pub fn update_password(&mut self, password_hash: &str) {
+        self.password_hash = password_hash.to_string();
+    }
+    pub fn validate_empleado(&self) -> Vec<EmpleadoDomainError> {
+        let mut errors = Vec::new();
+        if self.dni_empleado <= 0 {
+            errors.push(EmpleadoDomainError::InvalidDNI);
+        }
+        if !self.mail.contains('@') {
+            errors.push(EmpleadoDomainError::InvalidEmail);
+        }
+        if self.password_hash.len() < 5 {
+            errors.push(EmpleadoDomainError::WeakPassword);
+        }
+        errors
+    }
+}
+
+impl From<(CreateEmpleadoRequest, String)> for Empleado {
+    fn from((request, password_hash): (CreateEmpleadoRequest, String)) -> Self {
+        Self {
+            dni_empleado: request.dni,
+            nombre_apellido: request.nombre_apellido,
+            password_hash,
+            mail: request.mail,
+            genero: request.genero,
+            estado: request.estado,
+            rol: request.rol,
+        }
+    }
+}
+impl From<(UpdateEmpleadoRequest, String)> for Empleado {
+    fn from((request, password_hash): (UpdateEmpleadoRequest, String)) -> Self {
+        Self {
+            dni_empleado: request.dni,
+            nombre_apellido: request.nombre_apellido,
+            password_hash,
+            mail: request.mail,
+            genero: request.genero,
+            estado: request.estado,
+            rol: request.rol,
+        }
+    }
+}

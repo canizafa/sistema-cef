@@ -1,12 +1,11 @@
 use axum::{Router, routing::get};
 
 use crate::{
-    app_state::AppState,
-    routes::{
-        actividad_router, asistencia_router, auth_router, clase_router, cliente_router,
-        empleado_router, health_checker, membresia_router, pago_router, profesor_router,
-        reserva_router, sala_route::sala_router,
-    },
+    actividad::route::actividad_router, app::state::AppState, asistencia::route::asistencia_router,
+    auth::route::auth_router, clase::route::clase_router, cliente::route::cliente_router,
+    empleado::route::empleado_router, membresia::route::membresia_router, pago::route::pago_router,
+    profesor::route::profesor_router, reserva::route::reserva_router, routes::health_checker,
+    sala::route::sala_router,
 };
 
 pub fn router() -> Router<AppState> {

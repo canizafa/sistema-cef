@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE cliente\n            SET password = ?\n            WHERE email = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "64f029c36aa67ef91c0dbe61bdaff3e9aff5500f7b8e305896efddb290a8a400"
+}
