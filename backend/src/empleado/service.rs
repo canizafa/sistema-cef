@@ -115,10 +115,12 @@ pub async fn login_empleado(
     email: &str,
     password: &str,
 ) -> Result<Empleado, AppError> {
+    // Hasheamos la contraseña y verificamos
+    let hashed_password = auth::password::hash_password(password)?;
     let empleado = EmpleadoRepository::get_by_email(db, email)
         .await
         .map_err(AppError::from)?;
-    if auth::password::verify_password(password, &empleado.get_password_hash()).is_err() {
+    if auth::password::verify_password(&hashed_password, &empleado.get_password_hash()).is_err() {
         return Err(AppError::InvalidCredentials);
     }
     Ok(empleado)
