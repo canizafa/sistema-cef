@@ -23,10 +23,12 @@ pub struct UpdateEmpleadoRequest {
     pub rol: Rol,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct UpdatePasswordRequest {
     pub email: String,
-    pub password: String,
+    pub old_password: String,
+    pub new_password: String,
 }
 
 #[derive(Debug, Serialize)]

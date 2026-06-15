@@ -17,6 +17,8 @@ impl From<AsistenciaRow> for Asistencia {
 }
 
 pub struct AsistenciaRepository;
+
+#[allow(dead_code)]
 impl AsistenciaRepository {
     pub async fn create(pool: &SqlitePool, asistencia: &Asistencia) -> Result<Asistencia, DbError> {
         let row = sqlx::query_as::<_, AsistenciaRow>(
