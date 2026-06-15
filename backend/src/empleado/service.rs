@@ -121,7 +121,7 @@ pub async fn login_empleado(
         .await
         .map_err(AppError::from)?;
     tracing::info!("Empleado encontrado: {:?}", empleado);
-    if auth::password::verify_password(&empleado.get_password_hash(), password).is_err() {
+    if auth::password::verify_password(password, &empleado.get_password_hash()).is_err() {
         return Err(AppError::InvalidCredentials);
     }
     Ok(empleado)
