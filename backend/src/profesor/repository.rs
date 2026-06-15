@@ -107,28 +107,17 @@ impl ProfesorRepository {
 
         Ok(row.into())
     }
-    pub async fn delete(
-        pool: &SqlitePool,
-        dni: i64,
-        motivo_eliminacion: &str,
-    ) -> Result<(), DbError> {
-        let estado = Estado::Eliminado.to_string();
+    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
         sqlx::query!(
             r#"
-                UPDATE profesor
-                SET
-                    estado = ?,
-                    motivo_eliminacion = ?
-                WHERE dni_profesor = ?
-                "#,
-            estado,
-            motivo_eliminacion,
+                    DELETE FROM profesor
+                    WHERE dni_profesor = ?
+                    "#,
             dni
         )
         .execute(pool)
         .await
         .map_err(DbError::from)?;
-
         Ok(())
     }
 }
