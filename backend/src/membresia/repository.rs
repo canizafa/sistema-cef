@@ -1,21 +1,41 @@
-use super::*;
-use crate::app::ApiError;
+use crate::{
+    app::{errors::DbError, rol::Estado},
+    membresia::domain::Membresia,
+};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
-pub struct MembresiaRepository;
+#[derive(Debug, sqlx::FromRow)]
+struct MembresiaRow {
+    pub id_membresia: String,
+    pub tipo: String,
+    pub dni_cliente: i64,
+    pub estado: Estado,
+    pub fecha_inicio: String,
+    pub fecha_fin: Option<String>,
+}
+impl From<MembresiaRow> for Membresia {
+    fn from(value: MembresiaRow) -> Self {
+        Self::new(
+            value.id_membresia,
+            value.tipo,
+            value.dni_cliente,
+            value.estado,
+            value.fecha_inicio.parse::<NaiveDate>().unwrap(),
+            value.fecha_fin.map(|f| f.parse::<NaiveDate>().unwrap()),
+        )
+    }
+}
 
+pub struct MembresiaRepository;
 impl MembresiaRepository {
-    pub async fn create_membresia(
-        pool: &SqlitePool,
-        membresia: &Membresia,
-    ) -> Result<Membresia, ApiError> {
+    pub async fn create(pool: &SqlitePool, membresia: &Membresia) -> Result<Membresia, DbError> {
         let id = membresia.get_id_membresia();
-        let tipo = membresia.get_tipo();
-        let estado = membresia.get_estado().to_string();
+        let tipo = membresia.get_tipo_actividad();
+        let dni_cliente = membresia.get_dni_cliente();
+        let estado = membresia.get_estado();
 
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
-
         let fecha_fin = membresia
             .get_fecha_fin()
             .map(|f| f.format("%Y-%m-%d").to_string());
@@ -25,30 +45,54 @@ impl MembresiaRepository {
                    INSERT INTO membresias (
                        id_membresia,
                        tipo,
+                       dni_cliente,
                        estado,
                        fecha_inicio,
                        fecha_fin
                    )
-                   VALUES (?, ?, ?, ?, ?)
+                   VALUES (?, ?, ?, ?, ?, ?)
                    "#,
             id,
             tipo,
+            dni_cliente,
             estado,
             fecha_inicio,
             fecha_fin
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(membresia.clone())
     }
-    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Membresia>, ApiError> {
+    pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Vec<Membresia>, DbError> {
+        let rows = sqlx::query_as::<_, MembresiaRow>(
+            r#"
+                    SELECT
+                        id_membresia as "id_membresia!",
+                        tipo as "tipo!",
+                        dni_cliente as "dni_cliente!",
+                        estado as "estado!",
+                        fecha_inicio as "fecha_inicio!",
+                        fecha_fin as "fecha_fin!"
+                    FROM membresias
+                    WHERE dni_cliente = ?
+                    "#,
+        )
+        .bind(dni)
+        .fetch_all(pool)
+        .await
+        .map_err(DbError::from)?;
+        let membresias: Vec<Membresia> = rows.into_iter().map(Membresia::from).collect();
+        Ok(membresias)
+    }
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Membresia>, DbError> {
         let rows = sqlx::query!(
             r#"
                     SELECT
                         id_membresia as "id_membresia!",
                         tipo as "tipo!",
+                        dni_cliente as "dni_cliente!",
                         estado as "estado!",
                         fecha_inicio as "fecha_inicio!",
                         fecha_fin
@@ -57,7 +101,7 @@ impl MembresiaRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(rows
             .into_iter()
@@ -65,7 +109,8 @@ impl MembresiaRepository {
                 Membresia::new(
                     row.id_membresia,
                     row.tipo,
-                    crate::domain::Estado::from(row.estado),
+                    row.dni_cliente,
+                    Estado::from(row.estado),
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                     row.fecha_fin.map(|f: String| {
                         NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()
@@ -74,12 +119,13 @@ impl MembresiaRepository {
             })
             .collect())
     }
-    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Membresia, ApiError> {
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Membresia, DbError> {
         let row = sqlx::query!(
             r#"
                     SELECT
                         id_membresia as "id_membresia!",
                         tipo as "tipo!",
+                        dni_cliente as "dni_cliente!",
                         estado as "estado!",
                         fecha_inicio as "fecha_inicio!",
                         fecha_fin
@@ -90,24 +136,26 @@ impl MembresiaRepository {
         )
         .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Ok(Membresia::new(
             row.id_membresia,
             row.tipo,
-            crate::domain::Estado::from(row.estado),
+            row.dni_cliente,
+            Estado::from(row.estado),
             NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
             row.fecha_fin
                 .map(|f: String| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
         ))
     }
-    pub async fn update_membresia(
+    pub async fn update(
         pool: &SqlitePool,
         id: &str,
         membresia: &Membresia,
-    ) -> Result<Membresia, ApiError> {
-        let tipo = membresia.get_tipo();
+    ) -> Result<Membresia, DbError> {
+        let tipo = membresia.get_tipo_actividad();
         let estado = membresia.get_estado().to_string();
+        let dni_cliente = membresia.get_dni_cliente();
 
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
 
@@ -120,12 +168,14 @@ impl MembresiaRepository {
                     UPDATE membresias
                     SET
                         tipo = ?,
+                        dni_cliente = ?,
                         estado = ?,
                         fecha_inicio = ?,
                         fecha_fin = ?
                     WHERE id_membresia = ?
                     "#,
             tipo,
+            dni_cliente,
             estado,
             fecha_inicio,
             fecha_fin,
@@ -133,13 +183,11 @@ impl MembresiaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
         Self::get_by_id(pool, id).await
     }
-    pub async fn delete_membresia(pool: &SqlitePool, id: &str) -> Result<Membresia, ApiError> {
-        let membresia = Self::get_by_id(pool, id).await?;
-
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
                     DELETE FROM membresias
@@ -149,8 +197,8 @@ impl MembresiaRepository {
         )
         .execute(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(membresia)
+        Ok(())
     }
 }

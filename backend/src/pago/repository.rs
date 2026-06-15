@@ -1,11 +1,10 @@
-use super::*;
-use crate::app::ApiError;
+use crate::app::errors::DbError;
+use crate::pago::domain::Pago;
 use sqlx::SqlitePool;
 
 pub struct PagoRepository;
-
 impl PagoRepository {
-    pub async fn create_pago(pool: &SqlitePool, pago: &Pago) -> Result<Pago, ApiError> {
+    pub async fn create_pago(pool: &SqlitePool, pago: &Pago) -> Result<Pago, DbError> {
         let id_pago = pago.get_id_pago();
         let monto = pago.get_monto();
         let fecha = pago.get_fecha().format("%Y-%m-%d").to_string();
@@ -38,11 +37,11 @@ impl PagoRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(pago.clone())
     }
-    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Pago>, ApiError> {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Pago>, DbError> {
         let rows = sqlx::query!(
             r#"
                     SELECT
@@ -58,7 +57,7 @@ impl PagoRepository {
         )
         .fetch_all(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(rows
             .into_iter()
@@ -75,7 +74,7 @@ impl PagoRepository {
             })
             .collect())
     }
-    pub async fn get_pago(pool: &SqlitePool, id: &str) -> Result<Pago, ApiError> {
+    pub async fn get_pago(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
         let row = sqlx::query!(
             r#"
                    SELECT
@@ -93,7 +92,7 @@ impl PagoRepository {
         )
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(Pago::new(
             row.id_pago,
@@ -105,7 +104,7 @@ impl PagoRepository {
             row.reserva_paga,
         ))
     }
-    pub async fn delete_pago(pool: &SqlitePool, id: &str) -> Result<Pago, ApiError> {
+    pub async fn delete_pago(pool: &SqlitePool, id: &str) -> Result<Pago, DbError> {
         let pago = Self::get_pago(pool, id).await?;
 
         sqlx::query!(
@@ -117,7 +116,7 @@ impl PagoRepository {
         )
         .execute(pool)
         .await
-        .map_err(|e| ApiError::DatabaseError(e))?;
+        .map_err(DbError::from)?;
 
         Ok(pago)
     }

@@ -1,12 +1,15 @@
-use super::*;
-use crate::app::Estado;
+use crate::{
+    app::rol::Estado,
+    membresia::{dto::CreateMembresiaRequest, errors::MembresiaDomainError},
+};
 use chrono::NaiveDate;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct Membresia {
     id_membresia: String,
-    tipo: String,
+    tipo_actividad: String,
+    dni_cliente: i64,
     estado: Estado,
     fecha_inicio: NaiveDate,
     fecha_fin: Option<NaiveDate>,
@@ -15,14 +18,16 @@ pub struct Membresia {
 impl Membresia {
     pub fn new(
         id_membresia: String,
-        tipo: String,
+        tipo_actividad: String,
+        dni_cliente: i64,
         estado: Estado,
         fecha_inicio: NaiveDate,
         fecha_fin: Option<NaiveDate>,
     ) -> Self {
         Self {
             id_membresia,
-            tipo,
+            tipo_actividad,
+            dni_cliente,
             estado,
             fecha_inicio,
             fecha_fin,
@@ -31,8 +36,11 @@ impl Membresia {
     pub fn get_id_membresia(&self) -> &str {
         &self.id_membresia
     }
-    pub fn get_tipo(&self) -> String {
-        self.tipo.clone()
+    pub fn get_tipo_actividad(&self) -> String {
+        self.tipo_actividad.clone()
+    }
+    pub fn get_dni_cliente(&self) -> i64 {
+        self.dni_cliente
     }
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
@@ -44,24 +52,19 @@ impl Membresia {
         self.fecha_fin
     }
     // Domain no debe conocer apierror
-    pub fn validate_membresia(&self) -> Result<(), ApiError> {
+    pub fn validate_membresia(&self) -> Vec<MembresiaDomainError> {
+        let mut vec_errors = Vec::new();
         if self.fecha_inicio > self.fecha_fin.unwrap_or_default() {
-            return Err(ApiError::BadRequest(
-                "Fecha de inicio no puede ser posterior a la fecha de fin".to_string(),
-            ));
+            vec_errors.push(MembresiaDomainError::FechaInicioPosteriorAFechaFin);
         }
         if self.fecha_inicio < NaiveDate::from_ymd_opt(1900, 1, 1).unwrap_or_default() {
-            return Err(ApiError::BadRequest(
-                "Fecha de inicio no puede ser anterior a 1900-01-01".to_string(),
-            ));
+            vec_errors.push(MembresiaDomainError::FechaInicioAnteriorA1900);
         }
         if self.id_membresia.is_empty() {
-            return Err(ApiError::BadRequest(
-                "id_membresia no puede estar vacío".to_string(),
-            ));
+            vec_errors.push(MembresiaDomainError::IdMembresiaVacio);
         }
 
-        Ok(())
+        vec_errors
     }
 }
 
@@ -69,7 +72,8 @@ impl From<CreateMembresiaRequest> for Membresia {
     fn from(request: CreateMembresiaRequest) -> Self {
         Self {
             id_membresia: Uuid::new_v4().to_string(),
-            tipo: request.tipo,
+            tipo_actividad: request.tipo,
+            dni_cliente: request.dni_cliente,
             estado: request.estado,
             fecha_inicio: request.fecha_inicio,
             fecha_fin: None,

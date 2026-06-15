@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                DELETE FROM sala\n                WHERE id_sala = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "b3d9a4709a550a49a503dca9d42b95250dc7e9915eb25f9984543e676ed1d67d"
+}
