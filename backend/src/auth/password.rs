@@ -17,8 +17,9 @@ pub fn hash_password(password: &str) -> Result<String, AppError> {
 }
 
 pub fn verify_password(password: &str, hash: &str) -> Result<(), AppError> {
-    tracing::trace!("Verificando contraseña: {}", password);
-    tracing::trace!("Con hash: {}", hash);
+    tracing::info!("Verificando contraseña: {}", password);
+    tracing::info!("Con hash: {}", hash);
+
     let parsed_hash = PasswordHash::new(hash).map_err(|_| AppError::PasswordHashError)?;
     Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)

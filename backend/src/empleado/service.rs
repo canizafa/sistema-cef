@@ -115,12 +115,12 @@ pub async fn login_empleado(
     email: &str,
     password: &str,
 ) -> Result<Empleado, AppError> {
-    tracing::trace!("Iniciando login para empleado: {}", email);
-    tracing::trace!("Con contraseña: {}", password);
+    tracing::info!("Iniciando login para empleado: {}", email);
+    tracing::info!("Con contraseña: {}", password);
     let empleado = EmpleadoRepository::get_by_email(db, email)
         .await
         .map_err(AppError::from)?;
-    tracing::trace!("Empleado encontrado: {:?}", empleado);
+    tracing::info!("Empleado encontrado: {:?}", empleado);
     if auth::password::verify_password(&empleado.get_password_hash(), password).is_err() {
         return Err(AppError::InvalidCredentials);
     }
