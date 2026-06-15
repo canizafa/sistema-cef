@@ -47,6 +47,8 @@ async fn main() -> Result<(), AppError> {
         .map_err(AppError::from)?;
 
     tracing::info!(port = config.port, "Servidor iniciado");
+    tracing::info!("Cargando base de datos...");
+
     feed_database::seed_database(&app_state.db).await?;
 
     let app = root::router()
