@@ -32,22 +32,33 @@ pub enum DbError {
 impl From<sqlx::Error> for DbError {
     fn from(error: sqlx::Error) -> Self {
         match error {
-            sqlx::Error::RowNotFound => DbError::NotFound,
+            sqlx::Error::RowNotFound => {
+                tracing::error!("Registro no encontrado");
+                DbError::NotFound
+            }
             sqlx::Error::Database(db_err) => {
+                tracing::error!("Error de base de datos: {:?}", db_err);
                 if db_err.code().as_deref() == Some("2067") {
                     DbError::UniqueViolation(db_err.message().into())
                 } else {
                     DbError::QueryError(sqlx::Error::Database(db_err))
                 }
             }
-            sqlx::Error::PoolTimedOut | sqlx::Error::PoolClosed => DbError::ConnectionError,
-            other => DbError::QueryError(other),
+            sqlx::Error::PoolTimedOut | sqlx::Error::PoolClosed => {
+                tracing::error!("Error de conexión con la base de datos");
+                DbError::ConnectionError
+            }
+            other => {
+                tracing::error!("Error de query inesperado: {:?}", other);
+                DbError::QueryError(other)
+            }
         }
     }
 }
 
 impl From<sqlx::migrate::MigrateError> for DbError {
     fn from(error: sqlx::migrate::MigrateError) -> Self {
+        tracing::error!("Error de migración: {:?}", error);
         DbError::MigrateError(error)
     }
 }
@@ -103,11 +114,18 @@ impl From<DbError> for AppError {
                 tracing::error!("Error de migración inesperado: {:?}", e);
                 AppError::Internal
             }
-            DbError::NotFound => AppError::NotFound("El recurso solicitado no existe".into()),
+            DbError::NotFound => {
+                tracing::error!("Recurso no encontrado");
+                AppError::NotFound("El recurso solicitado no existe".into())
+            }
             DbError::UniqueViolation(_) => {
+                tracing::error!("Violación de unicidad");
                 AppError::Conflict("Ya existe un registro con esos datos".into())
             }
-            DbError::ConnectionError => AppError::ServiceUnavailable,
+            DbError::ConnectionError => {
+                tracing::error!("Error de conexión con la base de datos");
+                AppError::ServiceUnavailable
+            }
             DbError::QueryError(e) => {
                 // Loguear acá el error real sin exponerlo al front
                 tracing::error!("Error de query inesperado: {:?}", e);
