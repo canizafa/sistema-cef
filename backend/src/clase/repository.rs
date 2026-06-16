@@ -71,7 +71,6 @@ impl ClaseRepository {
                 dia,
                 horario,
                 cupo_base,
-                cupo_maximo,
                 estado,
                 descripcion,
                 id_actividad,
