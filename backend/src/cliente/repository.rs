@@ -54,7 +54,7 @@ impl ClienteRepository {
                 id_ficha
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING 
+            RETURNING
                 dni_cliente AS dni,
                 nombre_completo AS nombre,
                 email,
@@ -63,7 +63,7 @@ impl ClienteRepository {
                 estado,
                 password,
                 id_ficha,
-                'Cliente' AS rol
+                'cliente'
             "#,
         )
         .bind(cliente.get_dni())
@@ -93,7 +93,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente'
             FROM cliente c
             "#,
         )
@@ -116,7 +116,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente'
             FROM cliente c
             WHERE c.dni_cliente = ?
             "#,
@@ -141,7 +141,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente'
             FROM cliente c
             WHERE c.email = ?
             "#,
@@ -203,7 +203,7 @@ impl ClienteRepository {
                 UPDATE cliente
                 SET nombre_completo = ?
                 WHERE dni_cliente = ?
-                RETURNING 
+                RETURNING
                     dni_cliente AS dni,
                     nombre_completo AS nombre,
                     email,
@@ -212,7 +212,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'Cliente' AS rol
+                    'cliente'
                 "#,
         )
         .bind(nombre_apellido)
@@ -233,7 +233,7 @@ impl ClienteRepository {
                 UPDATE cliente
                 SET estado = ?
                 WHERE dni_cliente = ?
-                RETURNING 
+                RETURNING
                     dni_cliente AS dni,
                     nombre_completo AS nombre,
                     email,
@@ -242,7 +242,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'Cliente' AS rol
+                    'cliente'
                 "#,
         )
         .bind(estado)
