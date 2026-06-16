@@ -23,9 +23,9 @@ impl From<ClienteRow> for Cliente {
         Self::new(
             row.dni,
             row.nombre,
+            row.password,
             row.email,
             row.telefono,
-            row.password,
             row.fecha_nacimiento,
             row.estado,
             row.id_ficha,
@@ -63,7 +63,7 @@ impl ClienteRepository {
                 estado,
                 password,
                 id_ficha,
-                'cliente'
+                'cliente' AS rol
             "#,
         )
         .bind(cliente.get_dni())
@@ -93,7 +93,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'cliente'
+                'cliente' AS rol
             FROM cliente c
             "#,
         )
@@ -116,7 +116,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'cliente'
+                'cliente' AS rol
             FROM cliente c
             WHERE c.dni_cliente = ?
             "#,
@@ -141,7 +141,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'cliente'
+                'cliente' AS rol
             FROM cliente c
             WHERE c.email = ?
             "#,
@@ -212,7 +212,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'cliente'
+                    'cliente' AS rol
                 "#,
         )
         .bind(nombre_apellido)
@@ -242,7 +242,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'cliente'
+                    'cliente' AS rol
                 "#,
         )
         .bind(estado)
