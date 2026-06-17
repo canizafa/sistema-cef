@@ -34,6 +34,11 @@ export function Header() {
                                     Mis Reservas
                                 </Link>
                             )}
+                            {user?.rol === 'cliente' && (
+                                <Link to="/membresia" className="text-sm font-medium hover:text-brand">
+                                    Membresía
+                                </Link>
+                            )}
                             <Link to="/perfil" className="text-sm font-medium hover:text-brand">
                                 Mi perfil
                             </Link>
