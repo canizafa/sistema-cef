@@ -15,9 +15,19 @@ interface PagoResponse {
     sandbox_init_point: string;
 }
 
+interface ConfirmarPagoRequest {
+    monto: number;
+    tipo: string;
+    fecha: string;
+}
+
 export const pagosService = {
     async crearPago(data: CreatePagoRequest): Promise<PagoResponse> {
         const response = await api.post<PagoResponse>('/pagos/create', data);
         return response.data;
+    },
+
+    async confirmarPago(data: ConfirmarPagoRequest): Promise<void> {
+        await api.post('/pagos/confirmar', data);
     },
 };

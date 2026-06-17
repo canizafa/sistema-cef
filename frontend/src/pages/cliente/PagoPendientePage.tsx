@@ -1,7 +1,12 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 
 export function PagoPendientePage() {
+    useEffect(() => {
+        localStorage.removeItem('pending_membresia');
+    }, []);
+
     return (
         <div className='min-h-screen flex flex-col'>
             <Header />

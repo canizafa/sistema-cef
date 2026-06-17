@@ -4,14 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export type EstadoCuenta = 'activo' | 'inactivo'
-export type EstadoMembresia = 'vigente' | 'vencida' | 'sin-membresia'
 
 interface ClienteCardProps {
   dni: number
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
-  estadoMembresia: EstadoMembresia
   onEditar?: () => void
   onToggleEstado?: () => void
   onEliminar?: () => void
@@ -26,23 +24,11 @@ function getBadgeCuenta(estado: EstadoCuenta) {
   }
 }
 
-function getBadgeMembresia(estado: EstadoMembresia) {
-  switch (estado) {
-    case 'vigente':
-      return <Badge className="bg-success text-white">Membresía vigente</Badge>
-    case 'vencida':
-      return <Badge className="bg-destructive text-white">Membresía vencida</Badge>
-    case 'sin-membresia':
-      return <Badge className="bg-gray-500 text-white">Sin membresía</Badge>
-  }
-}
-
 export function ClienteCard({
   dni,
   nombreApellido,
   email,
   estadoCuenta,
-  estadoMembresia,
   onEditar,
   onToggleEstado,
   onEliminar,
@@ -59,7 +45,6 @@ export function ClienteCard({
       </CardHeader>
 
       <CardContent className="space-y-1 pb-3">
-        <div className="mb-1.5">{getBadgeMembresia(estadoMembresia)}</div>
         <div className="flex items-center gap-2 text-sm">
           <Mail className="w-4 h-4 text-destructive" />
           <span className="font-medium text-destructive">Mail:</span>

@@ -12,7 +12,7 @@ export type ClaseDTO = {
     descripcion: string;
     id_actividad: string;
     id_sala: string;
-    dni_profesor: number;  
+    dni_profesor: number;
 };
 
 export type NuevaClaseData = {
@@ -52,31 +52,30 @@ export type NuevaListaEsperaData = {
 export const clasesService = {
     async getClases(): Promise<ClaseDTO[]> {
         const response = await api.get('/clase/get-all');
-        console.log('response.data:', response.data);
         return response.data.clases ?? response.data;
     },
+
     async crearClase(data: NuevaClaseData) {
         const response = await api.post('/clase/create', data);
         return response.data;
     },
 
-    async getClase(params: unknown) {
-        const response = await api.get('/clase/get-clase', { params });
+    async getClase(id: string) {
+        const response = await api.get(`/clase/get-clase/${id}`);
         return response.data;
     },
 
-    async actualizarClase(data: unknown) {
-        const response = await api.post('/clase/update-clase', data);
+    async actualizarClase(id: string, data: unknown) {
+        const response = await api.put(`/clase/update-clase/${id}`, data);
         return response.data;
     },
 
-    async eliminarClase(data: unknown) {
-        const response = await api.post('/clase/delete-clase', data);
+    async eliminarClase(id: string) {
+        const response = await api.delete(`/clase/delete-clase/${id}`);
         return response.data;
     },
 };
 
-// reservas
 export const reservasService = {
     async crearReserva(data: NuevaReservaData) {
         const response = await api.post('/reservas/create', data);

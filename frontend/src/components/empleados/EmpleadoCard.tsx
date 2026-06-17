@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
-type EstadoEmpleado = 'alta' | 'baja'
+type EstadoEmpleado = 'alta' | 'baja' | 'eliminado'
 type RolEmpleado = 'duenio' | 'empleado' | 'profesor'
 
 interface EmpleadoCardProps {
@@ -18,6 +18,12 @@ interface EmpleadoCardProps {
   onEliminar?: () => void
 }
 
+function getBadgeEstado(estado: EstadoEmpleado) {
+  if (estado === 'alta') return <Badge className="bg-success text-white">Activo</Badge>
+  if (estado === 'baja') return <Badge className="bg-gray-400 text-white">Inactivo</Badge>
+  return <Badge className="bg-destructive text-white">Eliminado</Badge>
+}
+
 export function EmpleadoCard({
   dni,
   nombreApellido,
@@ -29,6 +35,8 @@ export function EmpleadoCard({
   onActivar,
   onEliminar,
 }: EmpleadoCardProps) {
+  const eliminado = estado === 'eliminado'
+
   return (
     <Card className="bg-surface border-border">
       <CardHeader className="pb-2">
@@ -37,11 +45,7 @@ export function EmpleadoCard({
             <CardTitle className="text-base font-semibold text-primary">{nombreApellido}</CardTitle>
             <CardDescription className="text-sm text-gray-500 mt-0.5">{rol}</CardDescription>
           </div>
-          {estado === 'alta' ? (
-            <Badge className="bg-success text-white">Activo</Badge>
-          ) : (
-            <Badge className="bg-gray-400 text-white">Inactivo</Badge>
-          )}
+          {getBadgeEstado(estado)}
         </div>
       </CardHeader>
 
@@ -58,43 +62,45 @@ export function EmpleadoCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 pt-0">
-        <div className="flex gap-2 w-full">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-            Editar
+      {!eliminado && (
+        <CardFooter className="flex flex-col gap-2 pt-0">
+          <div className="flex gap-2 w-full">
+            <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
+              Editar
+            </Button>
+            {estado === 'alta' ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
+                onClick={onDesactivar}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Desactivar
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={onActivar}
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Activar
+              </Button>
+            )}
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="w-full"
+            onClick={onEliminar}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Eliminar empleado
           </Button>
-          {estado === 'alta' ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
-              onClick={onDesactivar}
-            >
-              <X className="w-4 h-4 mr-2" />
-              Desactivar
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={onActivar}
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Activar
-            </Button>
-          )}
-        </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="w-full"
-          onClick={onEliminar}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Eliminar empleado
-        </Button>
-      </CardFooter>
+        </CardFooter>
+      )}
     </Card>
   )
 }

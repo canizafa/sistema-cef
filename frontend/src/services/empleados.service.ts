@@ -21,11 +21,11 @@ export interface UpdateEmpleado {
 
 export const empleadoService = {
     async registrarEmpleado(data: RegistrarEmpleado): Promise<void> {
-        await api.post('/auth/register-empleado', data);
+        await api.post('/empleados/create', data);
     },
 
-    async getEmpleado(params: unknown) {
-        const response = await api.get('/empleados/get-empleado', { params });
+    async getEmpleado(dni: number) {
+        const response = await api.get(`/empleados/get-empleado-by-dni/${dni}`);
         return response.data;
     },
 
