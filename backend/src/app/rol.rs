@@ -20,6 +20,7 @@ pub enum Estado {
     Baja,
     Eliminado,
     SinCupo,
+    Extendido,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]

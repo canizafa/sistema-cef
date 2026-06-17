@@ -8,8 +8,22 @@ use crate::{
     cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
     empleado, ficha_medica,
 };
-use axum::http::request;
 use sqlx::SqlitePool;
+
+pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
+    let cliente = ClienteRepository::get_by_dni(db, request.dni)
+        .await
+        .map_err(AppError::from)?;
+
+    ClienteRepository::update_estado(
+        db,
+        cliente.get_dni(),
+        request.estado,
+        request.motivo_eliminacion,
+    )
+    .await
+    .map_err(AppError::from)
+}
 
 pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cliente, AppError> {
     //Verificamos si ya existe

@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize};
 pub struct CreateClaseRequest {
     pub dia: NaiveDate,
     pub horario: String,
-    pub cupo_maximo: i64,
     pub cupo_base: i64,
     pub estado: Estado,
     pub id_actividad: String,
@@ -23,6 +22,7 @@ pub struct ClaseResponse {
     pub dia_semana: String,
     pub horario: String,
     pub cupo_base: i64,
+    pub inscripciones: i64,
     pub estado: Estado,
     pub lleno: bool,
     pub dni_profesor: i64,
@@ -30,12 +30,6 @@ pub struct ClaseResponse {
     pub id_actividad: String,
     pub id_sala: String,
 }
-
-#[derive(Debug, Serialize)]
-pub struct ClaseListResponse {
-    pub clases: Vec<ClaseResponse>,
-}
-
 impl From<Clase> for ClaseResponse {
     fn from(value: Clase) -> Self {
         let dia_semana_castellano = match value.get_dia().format("%A").to_string().as_str() {
@@ -57,6 +51,7 @@ impl From<Clase> for ClaseResponse {
             dia_semana: dia_semana_castellano.to_string(),
             horario: value.get_horario().to_owned(),
             cupo_base: value.get_cupo_base(),
+            inscripciones: value.get_inscripciones(),
             estado: value.get_estado().to_owned(),
             lleno: value.is_lleno(),
             dni_profesor: value.get_dni_profesor(),

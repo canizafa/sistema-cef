@@ -94,3 +94,14 @@ pub async fn get_clientes_handler(
         clientes.into_iter().map(ClienteResponse::from).collect(),
     ))
 }
+
+#[instrument(name = "cliente.update_cliente", skip(state, request), err)]
+pub async fn update_cliente_handler(
+    State(state): State<AppState>,
+    Json(request): Json<ClienteRequest>,
+) -> Result<Json<ClienteResponse>, AppError> {
+    let cliente = cliente::service::update_cliente(&state.db, request)
+        .await
+        .map_err(AppError::from)?;
+    Ok(Json(ClienteResponse::from(cliente)))
+}

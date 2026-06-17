@@ -10,6 +10,7 @@ struct ClaseRow {
     horario: String,
     descripcion: String,
     cupo_base: i64,
+    inscripciones: i64,
     estado: Estado,
     id_sala: String,
     dni_profesor: i64,
@@ -23,6 +24,7 @@ impl From<ClaseRow> for Clase {
             row.horario,
             row.descripcion,
             row.cupo_base,
+            row.inscripciones,
             row.estado,
             row.id_sala,
             row.dni_profesor,
@@ -41,18 +43,20 @@ impl ClaseRepository {
                    dia,
                    horario,
                    cupo_base,
+                   inscripciones,
                    estado,
                    descripcion,
                    id_actividad,
                    id_sala,
                    dni_profesor
                )
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         )
         .bind(&clase.get_id())
         .bind(&clase.get_dia())
         .bind(&clase.get_horario())
         .bind(&clase.get_cupo_base())
+        .bind(&clase.get_inscripciones())
         .bind(&clase.get_estado())
         .bind(&clase.get_descripcion())
         .bind(&clase.get_id_actividad())
@@ -71,7 +75,7 @@ impl ClaseRepository {
                 dia,
                 horario,
                 cupo_base,
-                cupo_maximo,
+                inscripciones,
                 estado,
                 descripcion,
                 id_actividad,
@@ -93,6 +97,7 @@ impl ClaseRepository {
                 dia,
                 horario,
                 cupo_base,
+                inscripciones,
                 estado,
                 descripcion,
                 id_actividad,

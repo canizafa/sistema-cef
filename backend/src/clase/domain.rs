@@ -14,6 +14,7 @@ pub struct Clase {
     horario: String,
     descripcion: String,
     cupo_base: i64,
+    inscripciones: i64,
     estado: Estado,
     id_sala: String,
     dni_profesor: i64,
@@ -27,6 +28,7 @@ impl Clase {
         horario: String,
         descripcion: String,
         cupo_base: i64,
+        inscripciones: i64,
         estado: Estado,
         id_sala: String,
         dni_profesor: i64,
@@ -38,6 +40,7 @@ impl Clase {
             horario,
             descripcion,
             cupo_base,
+            inscripciones: 0,
             estado,
             id_sala,
             dni_profesor,
@@ -62,6 +65,10 @@ impl Clase {
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
+    pub fn get_inscripciones(&self) -> i64 {
+        self.inscripciones
+    }
+
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
@@ -128,13 +135,25 @@ impl Clase {
         }
         errors
     }
+
     pub fn is_lleno(&self) -> bool {
-        self.cupo_base <= 0 || matches!(self.estado, Estado::SinCupo)
+        self.inscripciones >= self.cupo_base
     }
+
     pub fn descontar_cupo(&mut self) {
-        if self.cupo_base > 0 {
-            self.cupo_base -= 1;
-        }
+        let _ = match self.estado {
+            Estado::Activo => {
+                if self.cupo_base > 0 {
+                    self.cupo_base -= 1;
+                }
+            }
+            Estado::SinCupo => {}
+            Estado::Extendido => {
+                if self.cupo_base > 0 {
+                    self.cupo_base -= 1;
+                }
+            }
+        };
     }
 }
 
