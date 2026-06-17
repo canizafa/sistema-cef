@@ -1,4 +1,5 @@
 use crate::app::errors::DbError;
+use crate::app::rol::Estado;
 use crate::empleado::domain::Empleado;
 use sqlx::SqlitePool;
 
@@ -11,18 +12,20 @@ struct EmpleadoRow {
     genero: String,
     estado: String,
     rol: String,
+    motivo_eliminacion: Option<String>,
 }
 impl From<EmpleadoRow> for Empleado {
     fn from(row: EmpleadoRow) -> Self {
-        Empleado {
-            dni_empleado: row.dni_empleado,
-            nombre_apellido: row.nombre_apellido,
-            password_hash: row.password,
-            mail: row.mail,
-            genero: row.genero,
-            estado: row.estado,
-            rol: row.rol.into(),
-        }
+        Empleado::new(
+            row.dni_empleado,
+            row.nombre_apellido,
+            row.password,
+            row.mail,
+            row.genero,
+            row.estado,
+            row.rol.into(),
+            row.motivo_eliminacion,
+        )
     }
 }
 
@@ -38,7 +41,7 @@ impl EmpleadoRepository {
                    password,
                    genero,
                    estado,
-                   rol
+                   rol,
                )
                VALUES (?, ?, ?, ?, ?, ?, ?)
                RETURNING dni_empleado, nombre_apellido, mail, password, genero, estado, rol
@@ -179,16 +182,18 @@ impl EmpleadoRepository {
                     mail = ?,
                     genero = ?,
                     estado = ?,
-                    rol = ?
+                    rol = ?,
+                    motivo_eliminacion = ?
                 WHERE dni_empleado = ?
                 RETURNING *
                 "#,
         )
-        .bind(empleado.nombre_apellido.clone())
-        .bind(empleado.mail.clone())
-        .bind(empleado.genero.clone())
-        .bind(empleado.estado.clone())
-        .bind(empleado.rol.to_string())
+        .bind(empleado.get_nombre_apellido())
+        .bind(empleado.get_mail())
+        .bind(empleado.get_genero())
+        .bind(empleado.get_estado())
+        .bind(empleado.get_rol().to_string())
+        .bind(empleado.get_motivo_eliminacion())
         .bind(dni)
         .fetch_one(pool)
         .await
@@ -197,12 +202,20 @@ impl EmpleadoRepository {
         Ok(row.into())
     }
 
-    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
+    pub async fn delete(
+        pool: &SqlitePool,
+        dni: i64,
+        estado: Estado,
+        motivo_eliminacion: String,
+    ) -> Result<(), DbError> {
         sqlx::query!(
             r#"
-                DELETE FROM empleado
+                UPDATE empleado
+                SET estado = ?, motivo_eliminacion = ?
                 WHERE dni_empleado = ?
                 "#,
+            estado,
+            motivo_eliminacion,
             dni
         )
         .execute(pool)

@@ -32,8 +32,16 @@ pub struct ClienteRequest {
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
+    pub motivo_eliminacion: Option<String>,
     pub estado: Estado,
     pub id_ficha: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EliminarClienteRequest {
+    pub dni: i64,
+    pub estado: Estado,
+    pub motivo_eliminacion: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -45,6 +53,7 @@ pub struct ClienteResponse {
     pub fecha_nacimiento: NaiveDate,
     pub estado: Estado,
     pub rol: Rol,
+    pub motivo_eliminacion: Option<String>,
     pub id_ficha: String,
 }
 impl From<Cliente> for ClienteResponse {
@@ -57,6 +66,7 @@ impl From<Cliente> for ClienteResponse {
             fecha_nacimiento: cliente.get_fecha_nacimiento(),
             estado: cliente.get_estado(),
             rol: cliente.get_rol(),
+            motivo_eliminacion: cliente.get_motivo_eliminacion(),
             id_ficha: cliente.get_id_ficha().to_string(),
         }
     }

@@ -5,9 +5,10 @@ use crate::{
         mailer::{self, Mailer},
     },
     auth,
-    cliente::dto::{ClienteRequest, UpdatePasswordRequest},
+    cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
     empleado, ficha_medica,
 };
+use axum::http::request;
 use sqlx::SqlitePool;
 
 pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cliente, AppError> {
@@ -134,13 +135,18 @@ pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Re
 
 pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
     let cliente = Cliente::try_from(request)?;
-    ClienteRepository::update_estado(db, cliente.get_dni(), cliente.get_estado())
-        .await
-        .map_err(AppError::from)
+    ClienteRepository::update_estado(
+        db,
+        cliente.get_dni(),
+        cliente.get_estado(),
+        cliente.get_motivo_eliminacion(),
+    )
+    .await
+    .map_err(AppError::from)
 }
 
-pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {
-    ClienteRepository::delete(db, dni)
+pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<(), AppError> {
+    ClienteRepository::delete(db, request.dni, request.estado, request.motivo_eliminacion)
         .await
         .map_err(AppError::from)
 }

@@ -2,7 +2,9 @@ use crate::{
     app::{errors::AppError, state::AppState},
     empleado::{
         self,
-        dto::{CreateEmpleadoRequest, EmpleadoResponse, UpdateEmpleadoRequest},
+        dto::{
+            CreateEmpleadoRequest, EliminarEmpleadoRequest, EmpleadoResponse, UpdateEmpleadoRequest,
+        },
     },
 };
 use axum::{
@@ -69,12 +71,12 @@ pub async fn update_empleado_handler(
     Ok(Json(EmpleadoResponse::from(empleado)))
 }
 
-#[instrument(name = "empleado.delete", skip(state), fields(dni = id), err)]
+#[instrument(name = "empleado.delete", skip(state), fields(dni = body.dni), err)]
 pub async fn delete_empleado_handler(
     State(state): State<AppState>,
-    Path(id): Path<i64>,
+    Json(body): Json<EliminarEmpleadoRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    empleado::service::delete(&state.db, id)
+    empleado::service::delete(&state.db, body)
         .await
         .map_err(AppError::from)?;
     Ok(StatusCode::OK.into_response())

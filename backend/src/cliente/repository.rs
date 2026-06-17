@@ -15,6 +15,7 @@ pub struct ClienteRow {
     password: String,
     fecha_nacimiento: NaiveDate,
     estado: Estado,
+    motivo_eliminacion: Option<String>,
     id_ficha: String,
     rol: Rol,
 }
@@ -28,6 +29,7 @@ impl From<ClienteRow> for Cliente {
             row.telefono,
             row.fecha_nacimiento,
             row.estado,
+            row.motivo_eliminacion,
             row.id_ficha,
             row.rol,
         )
@@ -227,11 +229,13 @@ impl ClienteRepository {
         pool: &SqlitePool,
         id: i64,
         estado: Estado,
+        motivo_eliminacion: Option<String>,
     ) -> Result<Cliente, DbError> {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
                 UPDATE cliente
-                SET estado = ?
+                SET estado = ?,
+                motivo_eliminacion = ?
                 WHERE dni_cliente = ?
                 RETURNING
                     dni_cliente AS dni,
@@ -241,11 +245,13 @@ impl ClienteRepository {
                     fecha_nacimiento,
                     estado,
                     password,
+                    motivo_eliminacion,
                     id_ficha,
                     'cliente' AS rol
                 "#,
         )
         .bind(estado)
+        .bind(motivo_eliminacion)
         .bind(id)
         .fetch_one(pool)
         .await
@@ -253,8 +259,15 @@ impl ClienteRepository {
 
         Ok(row.into())
     }
-    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
-        sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
+    pub async fn delete(
+        pool: &SqlitePool,
+        dni: i64,
+        estado: Estado,
+        motivo_eliminacion: Option<String>,
+    ) -> Result<(), DbError> {
+        sqlx::query("UPDATE cliente SET estado = ?, motivo_eliminacion = ? WHERE dni_cliente = ?")
+            .bind(estado)
+            .bind(motivo_eliminacion)
             .bind(dni)
             .execute(pool)
             .await
