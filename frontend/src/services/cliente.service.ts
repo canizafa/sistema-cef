@@ -1,12 +1,5 @@
 import api from './api';
 
-export interface FichaMedicaResponse {
-    id_ficha: string;
-    enfermedades: boolean;
-    operaciones_quirurgicas: boolean;
-    detalle: string;
-}
-
 export interface ClienteResponse {
     dni: number;
     nombre_apellido: string;
@@ -15,36 +8,21 @@ export interface ClienteResponse {
     fecha_nacimiento: string;
     estado: string;
     rol: string;
-    ficha_medica: FichaMedicaResponse;
-}
-
-export interface UpdateClienteRequest {
-    dni: number;
-    nombre_apellido: string;
-    email: string;
-    telefono: string;
-    fecha_nacimiento: string;
-    estado: string;
-    rol: string;
-    ficha_medica: {
-        enfermedades: boolean;
-        operaciones_quirurgicas: boolean;
-        detalle: string;
-    };
+    id_ficha: string;
 }
 
 export const clienteService = {
+    async getClientes(): Promise<ClienteResponse[]> {
+        const response = await api.get<ClienteResponse[]>('/clientes/get-all');
+        return response.data;
+    },
+
     async getPerfil(dni: number): Promise<ClienteResponse> {
         const response = await api.get<ClienteResponse>(`/clientes/get-cliente/${dni}`);
         return response.data;
     },
 
-    async updatePerfil(dni: number, data: UpdateClienteRequest): Promise<void> {
-        await api.put(`/clientes/update-cliente/${dni}`, data);
+    async eliminarCliente(dni: number): Promise<void> {
+        await api.delete(`/clientes/delete-cliente/${dni}`);
     },
-
-    async getClientes(): Promise<ClienteResponse[]> {
-    const response = await api.get<{ clientes: ClienteResponse[] }>('/clientes/get-clientes');
-    return response.data.clientes;
-},
 };

@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
-type EstadoProfesor = 'alta' | 'baja'
+type EstadoProfesor = 'alta' | 'baja' | 'eliminado'
 
 interface ProfesorCardProps {
   dni: number
@@ -34,8 +34,10 @@ export function ProfesorCard({
           </div>
           {estado === 'alta' ? (
             <Badge className="bg-success text-white">Activo</Badge>
-          ) : (
+          ) : estado === 'baja' ? (
             <Badge className="bg-gray-400 text-white">Inactivo</Badge>
+          ) : (
+            <Badge className="bg-red-700 text-white">Eliminado</Badge>
           )}
         </div>
       </CardHeader>
@@ -49,41 +51,45 @@ export function ProfesorCard({
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 pt-0 border-none">
-        <div className="flex gap-2 w-full">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-            Editar
+        {estado !== 'eliminado' && (
+          <div className="flex gap-2 w-full">
+            <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
+              Editar
+            </Button>
+            {estado === 'alta' ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
+                onClick={onDesactivar}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Desactivar
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={onActivar}
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Activar
+              </Button>
+            )}
+          </div>
+        )}
+        {estado !== 'eliminado' && (
+          <Button
+            variant="destructive"
+            size="sm"
+            className="w-full"
+            onClick={onEliminar}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Eliminar profesor
           </Button>
-          {estado === 'alta' ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
-              onClick={onDesactivar}
-            >
-              <X className="w-4 h-4 mr-2" />
-              Desactivar
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={onActivar}
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Activar
-            </Button>
-          )}
-        </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="w-full"
-          onClick={onEliminar}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Eliminar profesor
-        </Button>
+        )}
       </CardFooter>
     </Card>
   )

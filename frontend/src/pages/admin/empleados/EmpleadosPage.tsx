@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { toast } from 'sonner'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
 import { EliminarEmpleadoModal } from '@/components/empleados/EliminarEmpleadoModal'
 import { empleadoService } from '@/services/empleados.service'
@@ -69,8 +70,9 @@ export function EmpleadosPage() {
       setEmpleados((prev) =>
         prev.map((e) => e.dni === dni ? { ...e, estado: 'baja' as EstadoEmpleado } : e)
       )
+      toast.success('Empleado desactivado correctamente')
     } catch {
-      setError('No se pudo desactivar el empleado')
+      toast.error('No se pudo desactivar el empleado')
     }
   }
 
@@ -89,8 +91,9 @@ export function EmpleadosPage() {
       setEmpleados((prev) =>
         prev.map((e) => e.dni === dni ? { ...e, estado: 'alta' as EstadoEmpleado } : e)
       )
+      toast.success('Empleado activado correctamente')
     } catch {
-      setError('No se pudo activar el empleado')
+      toast.error('No se pudo activar el empleado')
     }
   }
 
