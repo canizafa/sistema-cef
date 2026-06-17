@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { ClienteCard } from '@/components/clientes/ClienteCard'
+import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 
 type EstadoCuenta = 'activo' | 'inactivo'
-type EstadoMembresia = 'vigente' | 'vencida' | 'sin-membresia'
 type FiltroCliente = 'todos' | 'activo' | 'inactivo'
 
 interface Cliente {
@@ -11,24 +11,39 @@ interface Cliente {
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
-  estadoMembresia: EstadoMembresia
 }
 
 const CLIENTES_EJEMPLO: Cliente[] = [
-  { dni: 40112233, nombreApellido: 'Lola López',       email: 'lolalopez@gmail.com',  estadoCuenta: 'activo',   estadoMembresia: 'vigente' },
-  { dni: 38554120, nombreApellido: 'Sebastián Juárez', email: 'sebajuarez@gmail.com', estadoCuenta: 'activo',   estadoMembresia: 'vencida' },
-  { dni: 35221890, nombreApellido: 'Carlos Díaz',      email: 'cdiaz@hotmail.com',    estadoCuenta: 'activo',   estadoMembresia: 'sin-membresia' },
-  { dni: 41330775, nombreApellido: 'Martina Ruiz',     email: 'mruiz@gmail.com',      estadoCuenta: 'inactivo', estadoMembresia: 'sin-membresia' },
+  { dni: 40112233, nombreApellido: 'Lola López',       email: 'lolalopez@gmail.com',  estadoCuenta: 'activo' },
+  { dni: 38554120, nombreApellido: 'Sebastián Juárez', email: 'sebajuarez@gmail.com', estadoCuenta: 'activo' },
+  { dni: 35221890, nombreApellido: 'Carlos Díaz',      email: 'cdiaz@hotmail.com',    estadoCuenta: 'activo' },
+  { dni: 41330775, nombreApellido: 'Martina Ruiz',     email: 'mruiz@gmail.com',      estadoCuenta: 'inactivo' },
 ]
 
 const normalizar = (texto: string) =>
   texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
 export function ClientesPage() {
+  const [clientes, setClientes] = useState<Cliente[]>(CLIENTES_EJEMPLO)
   const [filtro, setFiltro] = useState<FiltroCliente>('todos')
   const [busquedaNombre, setBusquedaNombre] = useState('')
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
+  const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
 
-  const clientesFiltrados = CLIENTES_EJEMPLO.filter((c) => {
+  const handleEliminar = (dni: number) => {
+    const cliente = clientes.find((c) => c.dni === dni)
+    if (!cliente) return
+    setClienteAEliminar(cliente)
+    setModalEliminarAbierto(true)
+  }
+
+  const handleEliminarConfirmado = () => {
+    if (!clienteAEliminar) return
+    setClientes((prev) => prev.filter((c) => c.dni !== clienteAEliminar.dni))
+    setClienteAEliminar(null)
+  }
+
+  const clientesFiltrados = clientes.filter((c) => {
     const matchEstado =
       filtro === 'activo' ? c.estadoCuenta === 'activo' :
       filtro === 'inactivo' ? c.estadoCuenta === 'inactivo' :
@@ -107,13 +122,25 @@ export function ClientesPage() {
             nombreApellido={c.nombreApellido}
             email={c.email}
             estadoCuenta={c.estadoCuenta}
-            estadoMembresia={c.estadoMembresia}
             onEditar={() => console.log('editar', c.dni)}
             onToggleEstado={() => console.log('toggle estado', c.dni)}
-            onEliminar={() => console.log('eliminar', c.dni)}
+            onEliminar={() => handleEliminar(c.dni)}
           />
         ))}
       </div>
+
+      {clienteAEliminar && (
+        <EliminarClienteModal
+          open={modalEliminarAbierto}
+          onOpenChange={setModalEliminarAbierto}
+          cliente={{
+            dni: clienteAEliminar.dni,
+            nombre_apellido: clienteAEliminar.nombreApellido,
+            email: clienteAEliminar.email,
+          }}
+          onEliminado={handleEliminarConfirmado}
+        />
+      )}
     </main>
   )
 }
