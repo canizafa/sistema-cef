@@ -76,10 +76,10 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ClaseRepository::delete(db, id).await?;
     Ok(())
 }
-pub async fn descontar_cupo(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     let sala = sala::service::get_by_id(db, clase.get_id_sala()).await?;
-    clase.descontar_cupo(sala.get_capacidad_maxima());
+    clase.aumentar_inscripciones(sala.get_capacidad_maxima());
     ClaseRepository::update(db, id, &clase).await?;
     Ok(())
 }

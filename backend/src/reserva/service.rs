@@ -27,7 +27,7 @@ pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Re
         ));
     }
     //Descontar cupo de la clase
-    clase::service::descontar_cupo(db, &reserva.get_id_clase()).await?;
+    clase::service::aumentar_inscripciones(db, &reserva.get_id_clase()).await?;
     //Guardar la reserva
     ReservaRepository::create(db, &reserva)
         .await
