@@ -56,7 +56,7 @@ impl ClaseRepository {
         .bind(&clase.get_dia())
         .bind(&clase.get_horario())
         .bind(&clase.get_cupo_base())
-        .bind(&clase.get_inscripciones())
+        .bind(0)
         .bind(&clase.get_estado())
         .bind(&clase.get_descripcion())
         .bind(&clase.get_id_actividad())

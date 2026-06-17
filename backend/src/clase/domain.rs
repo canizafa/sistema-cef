@@ -59,16 +59,15 @@ impl Clase {
     pub fn get_cupo_base(&self) -> i64 {
         self.cupo_base
     }
+    pub fn get_inscripciones(&self) -> i64 {
+        self.inscripciones
+    }
     pub fn get_estado(&self) -> &Estado {
         &self.estado
     }
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
-    pub fn get_inscripciones(&self) -> i64 {
-        self.inscripciones
-    }
-
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
