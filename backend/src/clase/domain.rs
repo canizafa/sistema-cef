@@ -136,24 +136,35 @@ impl Clase {
         errors
     }
 
+    pub fn update_clase(&mut self, estado: Estado, dni_profesor: i64) {
+        self.estado = estado;
+        self.dni_profesor = dni_profesor;
+    }
+
     pub fn is_lleno(&self) -> bool {
         self.inscripciones >= self.cupo_base
     }
 
-    pub fn descontar_cupo(&mut self) {
+    pub fn descontar_cupo(&mut self, sala_capacidad: i64) {
         let _ = match self.estado {
-            Estado::Activo => {
-                if self.cupo_base > 0 {
-                    self.cupo_base -= 1;
-                }
-            }
             Estado::SinCupo => {}
             Estado::Extendido => {
-                if self.cupo_base > 0 {
-                    self.cupo_base -= 1;
+                if self.cupo_base + self.inscripciones < sala_capacidad {
+                    self.inscripciones += 1;
                 }
             }
+            Estado::Alta => {
+                if self.cupo_base > 0 {
+                    self.inscripciones += 1;
+                }
+            }
+            _ => {
+                panic!("Estado no válido: {:?}", self.estado)
+            }
         };
+    }
+    pub fn extender_cupo(&mut self) {
+        self.estado = Estado::Extendido;
     }
 }
 
@@ -165,6 +176,7 @@ impl From<CreateClaseRequest> for Clase {
             dia: value.dia,
             horario: value.horario,
             descripcion: value.descripcion,
+            inscripciones: 0,
             cupo_base: value.cupo_base,
             estado: value.estado,
             id_sala: value.id_sala,

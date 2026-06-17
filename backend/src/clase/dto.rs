@@ -15,6 +15,13 @@ pub struct CreateClaseRequest {
     pub descripcion: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateClaseRequest {
+    pub id_clase: String,
+    pub dni_profesor: i64,
+    pub estado: Estado,
+}
+
 #[derive(Debug, Serialize)]
 pub struct ClaseResponse {
     pub id_clase: String,
@@ -59,5 +66,22 @@ impl From<Clase> for ClaseResponse {
             id_actividad: value.get_id_actividad().to_owned(),
             id_sala: value.get_id_sala().to_string(),
         }
+    }
+}
+
+impl From<(UpdateClaseRequest, Clase)> for Clase {
+    fn from(value: (UpdateClaseRequest, Clase)) -> Self {
+        Clase::new(
+            value.0.id_clase,
+            value.1.get_dia(),
+            value.1.get_horario().to_owned(),
+            value.1.get_descripcion().to_owned(),
+            value.1.get_cupo_base(),
+            value.1.get_inscripciones(),
+            value.0.estado,
+            value.1.get_id_sala().to_string(),
+            value.0.dni_profesor,
+            value.1.get_id_actividad().to_owned(),
+        )
     }
 }

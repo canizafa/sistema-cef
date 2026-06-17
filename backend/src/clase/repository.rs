@@ -118,21 +118,22 @@ impl ClaseRepository {
         let row = sqlx::query_as::<_, ClaseRow>(
             "UPDATE clase
             SET
-                dia = ?,
-                horario = ?,
-                cupo_base = ?,
                 estado = ?,
-                descripcion = ?,
-                id_sala = ?,
                 dni_profesor = ?
-            WHERE id_clase = ?",
+            WHERE id_clase = ?
+            RETURNING
+                id_clase,
+                dia,
+                horario,
+                cupo_base,
+                inscripciones,
+                estado,
+                descripcion,
+                id_actividad,
+                id_sala,
+                dni_profesor",
         )
-        .bind(clase.get_dia())
-        .bind(clase.get_horario())
-        .bind(clase.get_cupo_base())
         .bind(clase.get_estado())
-        .bind(clase.get_descripcion())
-        .bind(clase.get_id_sala())
         .bind(clase.get_dni_profesor())
         .bind(id)
         .fetch_one(pool)
