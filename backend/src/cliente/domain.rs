@@ -15,6 +15,7 @@ pub struct Cliente {
     telefono: String,
     fecha_nacimiento: NaiveDate,
     estado: Estado,
+    motivo_eliminacion: Option<String>,
     id_ficha: String,
     rol: Rol,
 }
@@ -28,6 +29,7 @@ impl Cliente {
         telefono: String,
         fecha_nacimiento: NaiveDate,
         estado: Estado,
+        motivo_eliminacion: Option<String>,
         id_ficha: String,
         rol: Rol,
     ) -> Self {
@@ -39,6 +41,7 @@ impl Cliente {
             telefono,
             fecha_nacimiento,
             estado,
+            motivo_eliminacion,
             id_ficha,
             rol,
         }
@@ -60,6 +63,9 @@ impl Cliente {
     }
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
+    }
+    pub fn get_motivo_eliminacion(&self) -> Option<String> {
+        self.motivo_eliminacion.clone()
     }
     pub fn get_id_ficha(&self) -> &str {
         &self.id_ficha
@@ -144,6 +150,7 @@ impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
         (request, password_hash, id_ficha): (CreateClienteRequest, String, String),
     ) -> Result<Self, Self::Error> {
         let cliente = Self {
+            motivo_eliminacion: None,
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash,
@@ -166,6 +173,7 @@ impl TryFrom<ClienteRequest> for Cliente {
 
     fn try_from(request: ClienteRequest) -> Result<Self, Self::Error> {
         let cliente = Self {
+            motivo_eliminacion: request.motivo_eliminacion,
             dni: request.dni,
             nombre_apellido: request.nombre_apellido,
             password_hash: String::new(),
