@@ -1,5 +1,5 @@
 use super::domain::Empleado;
-use crate::app::rol::Rol;
+use crate::app::rol::{Estado, Rol};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -21,6 +21,7 @@ pub struct UpdateEmpleadoRequest {
     pub genero: String,
     pub estado: String,
     pub rol: Rol,
+    pub motivo_eliminacion: Option<String>,
 }
 
 #[allow(dead_code)]
@@ -31,6 +32,13 @@ pub struct UpdatePasswordRequest {
     pub new_password: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct EliminarEmpleadoRequest {
+    pub dni: i64,
+    pub estado: Estado,
+    pub motivo_eliminacion: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct EmpleadoResponse {
     pub dni: i64,
@@ -39,6 +47,7 @@ pub struct EmpleadoResponse {
     pub genero: String,
     pub estado: String,
     pub rol: Rol,
+    pub motivo_eliminacion: Option<String>,
 }
 
 impl From<Empleado> for EmpleadoResponse {
@@ -50,6 +59,7 @@ impl From<Empleado> for EmpleadoResponse {
             genero: empleado.get_genero(),
             estado: empleado.get_estado(),
             rol: empleado.get_rol(),
+            motivo_eliminacion: empleado.get_motivo_eliminacion(),
         }
     }
 }

@@ -18,6 +18,7 @@ pub enum Rol {
 pub enum Estado {
     Alta,
     Baja,
+    Eliminado,
     SinCupo,
 }
 
@@ -80,6 +81,7 @@ impl ToString for Rol {
 impl ToString for Estado {
     fn to_string(&self) -> String {
         match self {
+            Estado::Eliminado => "eliminado".to_string(),
             Estado::SinCupo => "sin_cupo".to_string(),
             Estado::Alta => "alta".to_string(),
             Estado::Baja => "baja".to_string(),
