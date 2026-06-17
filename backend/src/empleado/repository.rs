@@ -1,4 +1,5 @@
 use crate::app::errors::DbError;
+use crate::app::rol::Estado;
 use crate::empleado::domain::Empleado;
 use sqlx::SqlitePool;
 
@@ -201,12 +202,20 @@ impl EmpleadoRepository {
         Ok(row.into())
     }
 
-    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
+    pub async fn delete(
+        pool: &SqlitePool,
+        dni: i64,
+        estado: Estado,
+        motivo_eliminacion: String,
+    ) -> Result<(), DbError> {
         sqlx::query!(
             r#"
-                DELETE FROM empleado
+                UPDATE empleado
+                SET estado = ?, motivo_eliminacion = ?
                 WHERE dni_empleado = ?
                 "#,
+            estado,
+            motivo_eliminacion,
             dni
         )
         .execute(pool)

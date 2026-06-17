@@ -37,6 +37,13 @@ pub struct ClienteRequest {
     pub id_ficha: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct EliminarClienteRequest {
+    pub dni: i64,
+    pub estado: Estado,
+    pub motivo_eliminacion: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct ClienteResponse {
     pub dni: i64,

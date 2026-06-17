@@ -8,7 +8,7 @@ pub struct CreateMembresiaRequest {
     pub dni_cliente: i64,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: Option<NaiveDate>,
+    pub fecha_fin: NaiveDate,
 }
 
 #[derive(Debug, Serialize)]
@@ -18,7 +18,7 @@ pub struct MembresiaResponse {
     pub dni_cliente: i64,
     pub estado: Estado,
     pub fecha_inicio: NaiveDate,
-    pub fecha_fin: Option<NaiveDate>,
+    pub fecha_fin: NaiveDate,
 }
 
 impl From<Membresia> for MembresiaResponse {

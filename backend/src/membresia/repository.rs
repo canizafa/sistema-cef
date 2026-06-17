@@ -12,7 +12,7 @@ struct MembresiaRow {
     pub dni_cliente: i64,
     pub estado: Estado,
     pub fecha_inicio: String,
-    pub fecha_fin: Option<String>,
+    pub fecha_fin: String,
 }
 impl From<MembresiaRow> for Membresia {
     fn from(value: MembresiaRow) -> Self {
@@ -22,7 +22,7 @@ impl From<MembresiaRow> for Membresia {
             value.dni_cliente,
             value.estado,
             value.fecha_inicio.parse::<NaiveDate>().unwrap(),
-            value.fecha_fin.map(|f| f.parse::<NaiveDate>().unwrap()),
+            value.fecha_fin.parse::<NaiveDate>().unwrap(),
         )
     }
 }
@@ -36,9 +36,7 @@ impl MembresiaRepository {
         let estado = membresia.get_estado();
 
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
-        let fecha_fin = membresia
-            .get_fecha_fin()
-            .map(|f| f.format("%Y-%m-%d").to_string());
+        let fecha_fin = membresia.get_fecha_fin().format("%Y-%m-%d").to_string();
 
         sqlx::query!(
             r#"
@@ -95,7 +93,7 @@ impl MembresiaRepository {
                         dni_cliente as "dni_cliente!",
                         estado as "estado!",
                         fecha_inicio as "fecha_inicio!",
-                        fecha_fin
+                        fecha_fin as "fecha_fin!"
                     FROM membresias
                     "#
         )
@@ -112,9 +110,7 @@ impl MembresiaRepository {
                     row.dni_cliente,
                     Estado::from(row.estado),
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
-                    row.fecha_fin.map(|f: String| {
-                        NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()
-                    }),
+                    NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
                 )
             })
             .collect())
@@ -128,7 +124,7 @@ impl MembresiaRepository {
                         dni_cliente as "dni_cliente!",
                         estado as "estado!",
                         fecha_inicio as "fecha_inicio!",
-                        fecha_fin
+                        fecha_fin as "fecha_fin!"
                     FROM membresias
                     WHERE id_membresia = ?
                     "#,
@@ -144,8 +140,7 @@ impl MembresiaRepository {
             row.dni_cliente,
             Estado::from(row.estado),
             NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
-            row.fecha_fin
-                .map(|f: String| NaiveDate::parse_from_str(&f, "%Y-%m-%d").unwrap_or_default()),
+            NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
         ))
     }
     pub async fn update(
@@ -159,9 +154,7 @@ impl MembresiaRepository {
 
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
 
-        let fecha_fin = membresia
-            .get_fecha_fin()
-            .map(|f| f.format("%Y-%m-%d").to_string());
+        let fecha_fin = membresia.get_fecha_fin().format("%Y-%m-%d").to_string();
 
         sqlx::query!(
             r#"

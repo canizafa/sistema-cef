@@ -6,7 +6,7 @@ use crate::{
     auth, cliente,
     empleado::{
         domain::Empleado,
-        dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
+        dto::{CreateEmpleadoRequest, EliminarEmpleadoRequest, UpdateEmpleadoRequest},
         repository::EmpleadoRepository,
     },
 };
@@ -59,10 +59,15 @@ pub async fn update(
         .map_err(AppError::from)
 }
 
-pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {
-    EmpleadoRepository::delete(db, dni)
-        .await
-        .map_err(AppError::from)
+pub async fn delete(db: &SqlitePool, request: EliminarEmpleadoRequest) -> Result<(), AppError> {
+    EmpleadoRepository::delete(
+        db,
+        request.dni,
+        request.estado,
+        request.motivo_eliminacion.unwrap_or_default(),
+    )
+    .await
+    .map_err(AppError::from)
 }
 
 pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<Empleado, AppError> {

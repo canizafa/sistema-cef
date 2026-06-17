@@ -1,7 +1,7 @@
 use super::dto::{ClienteResponse, CreateClienteRequest};
 use crate::app::{errors::AppError, state::AppState};
 use crate::cliente;
-use crate::cliente::dto::{ClienteRequest, UpdatePasswordRequest};
+use crate::cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest};
 use axum::{
     Json,
     extract::{Path, State},
@@ -76,12 +76,12 @@ pub async fn reset_password_handler(
     Ok(())
 }
 
-#[instrument(name = "cliente.delete", skip(state), fields(dni = id), err)]
+#[instrument(name = "cliente.delete", skip(state), fields(dni = request.dni), err)]
 pub async fn delete_cliente_handler(
     State(state): State<AppState>,
-    Path(id): Path<i64>,
+    Json(request): Json<EliminarClienteRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    cliente::service::delete(&state.db, id).await?;
+    cliente::service::delete(&state.db, request).await?;
     Ok(StatusCode::OK)
 }
 

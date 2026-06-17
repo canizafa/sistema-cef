@@ -259,8 +259,15 @@ impl ClienteRepository {
 
         Ok(row.into())
     }
-    pub async fn delete(pool: &SqlitePool, dni: i64) -> Result<(), DbError> {
-        sqlx::query("DELETE FROM cliente WHERE dni_cliente = ?")
+    pub async fn delete(
+        pool: &SqlitePool,
+        dni: i64,
+        estado: Estado,
+        motivo_eliminacion: Option<String>,
+    ) -> Result<(), DbError> {
+        sqlx::query("UPDATE cliente SET estado = ?, motivo_eliminacion = ? WHERE dni_cliente = ?")
+            .bind(estado)
+            .bind(motivo_eliminacion)
             .bind(dni)
             .execute(pool)
             .await
