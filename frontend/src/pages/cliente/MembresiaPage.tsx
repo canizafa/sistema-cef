@@ -31,7 +31,7 @@ export function MembresiaPage() {
         if (!user) return;
         setPagandoId(actividad.id);
         try {
-            const hoy = new Date().toISOString().slice(0, 10);
+            const hoy = new Date().toLocaleDateString('en-CA');
             const pago = await pagosService.crearPago({
                 titulo: `Membresía - ${actividad.nombre}`,
                 monto: PRECIO_MEMBRESIA,
