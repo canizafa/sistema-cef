@@ -134,9 +134,14 @@ pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Re
 
 pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
     let cliente = Cliente::try_from(request)?;
-    ClienteRepository::update_estado(db, cliente.get_dni(), cliente.get_estado())
-        .await
-        .map_err(AppError::from)
+    ClienteRepository::update_estado(
+        db,
+        cliente.get_dni(),
+        cliente.get_estado(),
+        cliente.get_motivo_eliminacion(),
+    )
+    .await
+    .map_err(AppError::from)
 }
 
 pub async fn delete(db: &SqlitePool, dni: i64) -> Result<(), AppError> {

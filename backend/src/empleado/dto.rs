@@ -21,6 +21,7 @@ pub struct UpdateEmpleadoRequest {
     pub genero: String,
     pub estado: String,
     pub rol: Rol,
+    pub motivo_eliminacion: Option<String>,
 }
 
 #[allow(dead_code)]
@@ -39,6 +40,7 @@ pub struct EmpleadoResponse {
     pub genero: String,
     pub estado: String,
     pub rol: Rol,
+    pub motivo_eliminacion: Option<String>,
 }
 
 impl From<Empleado> for EmpleadoResponse {
@@ -50,6 +52,7 @@ impl From<Empleado> for EmpleadoResponse {
             genero: empleado.get_genero(),
             estado: empleado.get_estado(),
             rol: empleado.get_rol(),
+            motivo_eliminacion: empleado.get_motivo_eliminacion(),
         }
     }
 }

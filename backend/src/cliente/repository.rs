@@ -229,6 +229,7 @@ impl ClienteRepository {
         pool: &SqlitePool,
         id: i64,
         estado: Estado,
+        motivo_eliminacion: Option<String>,
     ) -> Result<Cliente, DbError> {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
@@ -243,6 +244,7 @@ impl ClienteRepository {
                     fecha_nacimiento,
                     estado,
                     password,
+                    motivo_eliminacion,
                     id_ficha,
                     'Cliente' AS rol
                 "#,
