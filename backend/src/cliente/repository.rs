@@ -234,7 +234,8 @@ impl ClienteRepository {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
                 UPDATE cliente
-                SET estado = ?
+                SET estado = ?,
+                motivo_eliminacion = ?
                 WHERE dni_cliente = ?
                 RETURNING
                     dni_cliente AS dni,
@@ -250,6 +251,7 @@ impl ClienteRepository {
                 "#,
         )
         .bind(estado)
+        .bind(motivo_eliminacion)
         .bind(id)
         .fetch_one(pool)
         .await

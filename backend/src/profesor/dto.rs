@@ -18,6 +18,7 @@ pub struct ProfesorResponse {
     pub nombre_completo: String,
     pub genero: Genero,
     pub estado: Estado,
+    pub motivo_eliminacion: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -34,6 +35,7 @@ impl From<Profesor> for ProfesorResponse {
             nombre_completo: profesor.get_nombre_completo().to_owned(),
             genero: profesor.get_genero().to_owned(),
             estado: profesor.get_estado().to_owned(),
+            motivo_eliminacion: profesor.get_motivo_eliminacion(),
         }
     }
 }

@@ -13,10 +13,17 @@ struct ProfesorRow {
     nombre: String,
     genero: Genero,
     estado: Estado,
+    motivo_eliminacion: Option<String>,
 }
 impl From<ProfesorRow> for Profesor {
     fn from(row: ProfesorRow) -> Self {
-        Profesor::new(row.dni_profesor, row.nombre, row.genero, row.estado)
+        Profesor::new(
+            row.dni_profesor,
+            row.nombre,
+            row.genero,
+            row.estado,
+            row.motivo_eliminacion,
+        )
     }
 }
 

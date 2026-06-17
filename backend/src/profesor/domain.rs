@@ -9,15 +9,23 @@ pub struct Profesor {
     nombre_completo: String,
     genero: Genero,
     estado: Estado,
+    motivo_eliminacion: Option<String>,
 }
 
 impl Profesor {
-    pub fn new(dni: i64, nombre_completo: String, genero: Genero, estado: Estado) -> Self {
+    pub fn new(
+        dni: i64,
+        nombre_completo: String,
+        genero: Genero,
+        estado: Estado,
+        motivo_eliminacion: Option<String>,
+    ) -> Self {
         Self {
             dni,
             nombre_completo,
             genero,
             estado,
+            motivo_eliminacion,
         }
     }
     pub fn get_dni(&self) -> i64 {
@@ -34,6 +42,9 @@ impl Profesor {
 
     pub fn get_estado(&self) -> &Estado {
         &self.estado
+    }
+    pub fn get_motivo_eliminacion(&self) -> Option<String> {
+        self.motivo_eliminacion.clone()
     }
     pub fn validate_profesor(&self) -> Vec<ProfesorDomainError> {
         let mut errors = Vec::new();
@@ -55,6 +66,7 @@ impl From<CreateProfesorRequest> for Profesor {
             nombre_completo: value.nombre_completo,
             genero: value.genero,
             estado: value.estado,
+            motivo_eliminacion: None,
         }
     }
 }

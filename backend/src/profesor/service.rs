@@ -27,6 +27,7 @@ pub async fn create(
         request.nombre_completo,
         request.genero,
         request.estado,
+        None,
     );
     ProfesorRepository::create(pool, &profesor).await?;
     Ok(profesor)
