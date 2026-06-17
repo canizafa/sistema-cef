@@ -6,7 +6,7 @@ pub mod clase;
 pub mod cliente;
 pub mod empleado;
 pub mod ficha_medica;
-// pub mod lista_espera;
+pub mod lista_espera;
 pub mod membresia;
 pub mod mercado_pago;
 pub mod pago;
