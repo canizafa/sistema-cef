@@ -1,7 +1,29 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
+import { membresiaService } from '@/services/membresia.service';
+import { useAuth } from '@/context/AuthContext';
 
 export function PagoExitoPage() {
+    const { user } = useAuth();
+    const [esMembresía, setEsMembresia] = useState(false);
+
+    useEffect(() => {
+        const raw = localStorage.getItem('pending_membresia');
+        if (!raw) return;
+        try {
+            const { tipo, dni } = JSON.parse(raw) as { tipo: string; dni: number };
+            const dniEfectivo = dni ?? user?.dni;
+            if (!dniEfectivo) return;
+            membresiaService.crearMembresia(tipo, dniEfectivo).finally(() => {
+                localStorage.removeItem('pending_membresia');
+            });
+            setEsMembresia(true);
+        } catch {
+            localStorage.removeItem('pending_membresia');
+        }
+    }, [user]);
+
     return (
         <div className='min-h-screen flex flex-col'>
             <Header />
@@ -9,10 +31,15 @@ export function PagoExitoPage() {
                 <div className='w-full max-w-sm text-center space-y-4'>
                     <h1 className='text-2xl font-bold'>Pago exitoso</h1>
                     <p className='text-sm text-gray-500'>
-                        Tu pago fue procesado correctamente. Tu clase fue reservada.
+                        {esMembresía
+                            ? 'Tu membresía fue activada correctamente.'
+                            : 'Tu pago fue procesado correctamente. Tu clase fue reservada.'}
                     </p>
-                    <Link to='/clases' className='text-brand hover:underline text-sm block'>
-                        Volver a clases
+                    <Link
+                        to={esMembresía ? '/membresia' : '/clases'}
+                        className='text-brand hover:underline text-sm block'
+                    >
+                        {esMembresía ? 'Ver mi membresía' : 'Volver a clases'}
                     </Link>
                 </div>
             </main>
