@@ -20,13 +20,14 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
             Rol::Cliente,
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
-        Ok(AuthResponse {
+        return Ok(AuthResponse {
             dni: cliente.get_dni(),
             email: cliente.get_mail(),
             access_token: jwt_token,
             rol: Rol::Cliente,
-        })
-    } else if let Ok(empleado) =
+        });
+    }
+    if let Ok(empleado) =
         empleado::service::login_empleado(db, &request.email, &request.password).await
     {
         let jwt_token = jwt::generar_token(

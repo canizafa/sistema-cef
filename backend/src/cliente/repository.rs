@@ -23,9 +23,9 @@ impl From<ClienteRow> for Cliente {
         Self::new(
             row.dni,
             row.nombre,
+            row.password,
             row.email,
             row.telefono,
-            row.password,
             row.fecha_nacimiento,
             row.estado,
             row.id_ficha,
@@ -54,7 +54,7 @@ impl ClienteRepository {
                 id_ficha
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING 
+            RETURNING
                 dni_cliente AS dni,
                 nombre_completo AS nombre,
                 email,
@@ -63,7 +63,7 @@ impl ClienteRepository {
                 estado,
                 password,
                 id_ficha,
-                'Cliente' AS rol
+                'cliente' AS rol
             "#,
         )
         .bind(cliente.get_dni())
@@ -93,7 +93,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente' AS rol
             FROM cliente c
             "#,
         )
@@ -116,7 +116,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente' AS rol
             FROM cliente c
             WHERE c.dni_cliente = ?
             "#,
@@ -141,7 +141,7 @@ impl ClienteRepository {
                 c.estado,
                 c.password,
                 c.id_ficha,
-                'Cliente' AS rol
+                'cliente' AS rol
             FROM cliente c
             WHERE c.email = ?
             "#,
@@ -203,7 +203,7 @@ impl ClienteRepository {
                 UPDATE cliente
                 SET nombre_completo = ?
                 WHERE dni_cliente = ?
-                RETURNING 
+                RETURNING
                     dni_cliente AS dni,
                     nombre_completo AS nombre,
                     email,
@@ -212,7 +212,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'Cliente' AS rol
+                    'cliente' AS rol
                 "#,
         )
         .bind(nombre_apellido)
@@ -233,7 +233,7 @@ impl ClienteRepository {
                 UPDATE cliente
                 SET estado = ?
                 WHERE dni_cliente = ?
-                RETURNING 
+                RETURNING
                     dni_cliente AS dni,
                     nombre_completo AS nombre,
                     email,
@@ -242,7 +242,7 @@ impl ClienteRepository {
                     estado,
                     password,
                     id_ficha,
-                    'Cliente' AS rol
+                    'cliente' AS rol
                 "#,
         )
         .bind(estado)
