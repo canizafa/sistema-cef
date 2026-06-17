@@ -11,6 +11,7 @@ pub struct Membresia {
     tipo_actividad: String,
     dni_cliente: i64,
     estado: Estado,
+    id_actividad: String,
     fecha_inicio: NaiveDate,
     fecha_fin: NaiveDate,
 }
@@ -21,6 +22,7 @@ impl Membresia {
         tipo_actividad: String,
         dni_cliente: i64,
         estado: Estado,
+        id_actividad: String,
         fecha_inicio: NaiveDate,
         fecha_fin: NaiveDate,
     ) -> Self {
@@ -29,6 +31,7 @@ impl Membresia {
             tipo_actividad,
             dni_cliente,
             estado,
+            id_actividad,
             fecha_inicio,
             fecha_fin,
         }
@@ -44,6 +47,9 @@ impl Membresia {
     }
     pub fn get_estado(&self) -> Estado {
         self.estado.clone()
+    }
+    pub fn get_id_actividad(&self) -> String {
+        self.id_actividad.clone()
     }
     pub fn get_fecha_inicio(&self) -> NaiveDate {
         self.fecha_inicio.clone()
@@ -72,6 +78,7 @@ impl From<CreateMembresiaRequest> for Membresia {
     fn from(request: CreateMembresiaRequest) -> Self {
         Self {
             id_membresia: Uuid::new_v4().to_string(),
+            id_actividad: request.id_actividad,
             tipo_actividad: request.tipo,
             dni_cliente: request.dni_cliente,
             estado: request.estado,
