@@ -131,6 +131,11 @@ impl Clase {
     pub fn is_lleno(&self) -> bool {
         self.cupo_base <= 0 || matches!(self.estado, Estado::SinCupo)
     }
+    pub fn descontar_cupo(&mut self) {
+        if self.cupo_base > 0 {
+            self.cupo_base -= 1;
+        }
+    }
 }
 
 impl From<CreateClaseRequest> for Clase {

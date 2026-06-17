@@ -70,3 +70,9 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ClaseRepository::delete(db, id).await?;
     Ok(())
 }
+pub async fn descontar_cupo(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let mut clase = ClaseRepository::get_by_id(db, id).await?;
+    clase.descontar_cupo();
+    ClaseRepository::update(db, id, &clase).await?;
+    Ok(())
+}
