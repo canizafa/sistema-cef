@@ -32,14 +32,14 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     {
         let jwt_token = jwt::generar_token(
             empleado.get_dni(),
-            Rol::Empleado,
+            empleado.get_rol(),
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
         Ok(AuthResponse {
             dni: empleado.get_dni(),
             email: empleado.get_mail(),
             access_token: jwt_token,
-            rol: Rol::Empleado,
+            rol: empleado.get_rol(),
         })
     } else {
         return Err(AppError::InvalidCredentials);
