@@ -75,7 +75,6 @@ impl ClaseRepository {
                 dia,
                 horario,
                 cupo_base,
-                inscripciones,
                 estado,
                 descripcion,
                 id_actividad,
