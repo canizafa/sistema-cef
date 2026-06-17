@@ -35,11 +35,14 @@ export const membresiaService = {
 
     async crearMembresia(tipo: string, dni: number): Promise<void> {
         const hoy = new Date().toLocaleDateString('en-CA');
+        const fechaFinDate = new Date();
+        fechaFinDate.setDate(fechaFinDate.getDate() + 30);
+        const fin = fechaFinDate.toLocaleDateString('en-CA');
         await api.post('/membresias/create', {
             tipo,
             estado: 'alta',
             fecha_inicio: hoy,
-            fecha_fin: null,
+            fecha_fin: fin,
             dni_cliente: String(dni),
         });
     },

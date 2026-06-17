@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
-import { membresiaService } from '@/services/membresia.service';
+import { membresiaService, PRECIO_MEMBRESIA } from '@/services/membresia.service';
+import { pagosService } from '@/services/pagos.service';
 import { useAuth } from '@/context/AuthContext';
 
 export function PagoExitoPage() {
@@ -18,6 +19,13 @@ export function PagoExitoPage() {
             membresiaService.crearMembresia(tipo, dniEfectivo).finally(() => {
                 localStorage.removeItem('pending_membresia');
             });
+            pagosService
+                .confirmarPago({
+                    monto: PRECIO_MEMBRESIA,
+                    tipo: 'membresia',
+                    fecha: new Date().toLocaleDateString('en-CA'),
+                })
+                .catch(() => {});
             setEsMembresia(true);
         } catch {
             localStorage.removeItem('pending_membresia');
