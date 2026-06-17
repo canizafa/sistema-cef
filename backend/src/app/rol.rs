@@ -6,7 +6,6 @@ use sqlx::prelude::Type;
 #[sqlx(rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
 pub enum Rol {
-    Profesor,
     Empleado,
     Cliente,
     Duenio,
@@ -57,11 +56,13 @@ impl From<String> for Genero {
 impl From<String> for Rol {
     fn from(s: String) -> Self {
         match s.to_lowercase().as_str() {
-            "profesor" => Rol::Profesor,
             "empleado" => Rol::Empleado,
             "cliente" => Rol::Cliente,
             "duenio" => Rol::Duenio,
-            _ => Rol::Profesor,
+            _ => {
+                tracing::info!("Rol no válido");
+                panic!("El rol enviado no existe")
+            }
         }
     }
 }
@@ -69,7 +70,6 @@ impl From<String> for Rol {
 impl ToString for Rol {
     fn to_string(&self) -> String {
         match self {
-            Rol::Profesor => "profesor".to_string(),
             Rol::Empleado => "empleado".to_string(),
             Rol::Cliente => "cliente".to_string(),
             Rol::Duenio => "duenio".to_string(),
