@@ -20,6 +20,7 @@ pub enum Estado {
     Baja,
     Eliminado,
     SinCupo,
+    Extendido,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
@@ -85,6 +86,7 @@ impl ToString for Estado {
             Estado::SinCupo => "sin_cupo".to_string(),
             Estado::Alta => "alta".to_string(),
             Estado::Baja => "baja".to_string(),
+            _ => panic!("Estado no válido"),
         }
     }
 }

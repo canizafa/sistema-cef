@@ -2,7 +2,11 @@ use sqlx::SqlitePool;
 
 use crate::{
     app::errors::{AppError, FieldError},
-    clase::{domain::Clase, dto::CreateClaseRequest, repository::ClaseRepository},
+    clase::{
+        domain::Clase,
+        dto::{CreateClaseRequest, UpdateClaseRequest},
+        repository::ClaseRepository,
+    },
     sala,
 };
 
@@ -59,14 +63,23 @@ pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Clase, AppError> {
 pub async fn update(
     db: &SqlitePool,
     id: &str,
-    request: CreateClaseRequest,
+    request: UpdateClaseRequest,
 ) -> Result<Clase, AppError> {
-    let _ = ClaseRepository::get_by_id(db, id).await?;
-    let updated_clase = Clase::from(request);
-    ClaseRepository::update(db, id, &updated_clase).await?;
-    Ok(updated_clase)
+    //Verificar si existe la clase antes de actualizar
+    let mut clase = ClaseRepository::get_by_id(db, id).await?;
+    //Actualizar los campos de la clase
+    clase.update_clase(request.estado, request.dni_profesor);
+    ClaseRepository::update(db, id, &clase).await?;
+    Ok(clase)
 }
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ClaseRepository::delete(db, id).await?;
+    Ok(())
+}
+pub async fn descontar_cupo(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let mut clase = ClaseRepository::get_by_id(db, id).await?;
+    let sala = sala::service::get_by_id(db, clase.get_id_sala()).await?;
+    clase.descontar_cupo(sala.get_capacidad_maxima());
+    ClaseRepository::update(db, id, &clase).await?;
     Ok(())
 }
