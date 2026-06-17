@@ -14,6 +14,7 @@ pub struct Clase {
     horario: String,
     descripcion: String,
     cupo_base: i64,
+    inscripciones: i64,
     estado: Estado,
     id_sala: String,
     dni_profesor: i64,
@@ -27,6 +28,7 @@ impl Clase {
         horario: String,
         descripcion: String,
         cupo_base: i64,
+        inscripciones: i64,
         estado: Estado,
         id_sala: String,
         dni_profesor: i64,
@@ -38,6 +40,7 @@ impl Clase {
             horario,
             descripcion,
             cupo_base,
+            inscripciones: 0,
             estado,
             id_sala,
             dni_profesor,
@@ -62,6 +65,10 @@ impl Clase {
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
+    pub fn get_inscripciones(&self) -> i64 {
+        self.inscripciones
+    }
+
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
@@ -128,8 +135,36 @@ impl Clase {
         }
         errors
     }
+
+    pub fn update_clase(&mut self, estado: Estado, dni_profesor: i64) {
+        self.estado = estado;
+        self.dni_profesor = dni_profesor;
+    }
+
     pub fn is_lleno(&self) -> bool {
-        self.cupo_base <= 0 || matches!(self.estado, Estado::SinCupo)
+        self.inscripciones >= self.cupo_base
+    }
+
+    pub fn descontar_cupo(&mut self, sala_capacidad: i64) {
+        let _ = match self.estado {
+            Estado::SinCupo => {}
+            Estado::Extendido => {
+                if self.cupo_base + self.inscripciones < sala_capacidad {
+                    self.inscripciones += 1;
+                }
+            }
+            Estado::Alta => {
+                if self.cupo_base > 0 {
+                    self.inscripciones += 1;
+                }
+            }
+            _ => {
+                panic!("Estado no válido: {:?}", self.estado)
+            }
+        };
+    }
+    pub fn extender_cupo(&mut self) {
+        self.estado = Estado::Extendido;
     }
 }
 
@@ -141,6 +176,7 @@ impl From<CreateClaseRequest> for Clase {
             dia: value.dia,
             horario: value.horario,
             descripcion: value.descripcion,
+            inscripciones: 0,
             cupo_base: value.cupo_base,
             estado: value.estado,
             id_sala: value.id_sala,

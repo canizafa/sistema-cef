@@ -1,5 +1,6 @@
 use crate::{
     app::errors::{AppError, FieldError},
+    clase,
     reserva::{domain::Reserva, dto::CreateReservaRequest, repository::ReservaRepository},
 };
 use sqlx::SqlitePool;
@@ -25,6 +26,8 @@ pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Re
             "Ya existe una reserva para esta actividad y cliente".to_string(),
         ));
     }
+    //Descontar cupo de la clase
+    clase::service::descontar_cupo(db, &reserva.get_id_clase()).await?;
     //Guardar la reserva
     ReservaRepository::create(db, &reserva)
         .await

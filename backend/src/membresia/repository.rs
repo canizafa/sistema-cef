@@ -8,6 +8,7 @@ use sqlx::SqlitePool;
 #[derive(Debug, sqlx::FromRow)]
 struct MembresiaRow {
     pub id_membresia: String,
+    pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
     pub estado: Estado,
@@ -21,6 +22,7 @@ impl From<MembresiaRow> for Membresia {
             value.tipo,
             value.dni_cliente,
             value.estado,
+            value.id_actividad,
             value.fecha_inicio.parse::<NaiveDate>().unwrap(),
             value.fecha_fin.parse::<NaiveDate>().unwrap(),
         )
@@ -31,6 +33,7 @@ pub struct MembresiaRepository;
 impl MembresiaRepository {
     pub async fn create(pool: &SqlitePool, membresia: &Membresia) -> Result<Membresia, DbError> {
         let id = membresia.get_id_membresia();
+        let id_actividad = membresia.get_id_actividad();
         let tipo = membresia.get_tipo_actividad();
         let dni_cliente = membresia.get_dni_cliente();
         let estado = membresia.get_estado();
@@ -45,15 +48,17 @@ impl MembresiaRepository {
                        tipo,
                        dni_cliente,
                        estado,
+                       id_actividad,
                        fecha_inicio,
                        fecha_fin
                    )
-                   VALUES (?, ?, ?, ?, ?, ?)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)
                    "#,
             id,
             tipo,
             dni_cliente,
             estado,
+            id_actividad,
             fecha_inicio,
             fecha_fin
         )
@@ -71,6 +76,7 @@ impl MembresiaRepository {
                         tipo,
                         dni_cliente,
                         estado,
+                        id_actividad,
                         fecha_inicio,
                         fecha_fin
                     FROM membresias
@@ -92,6 +98,7 @@ impl MembresiaRepository {
                         tipo as "tipo!",
                         dni_cliente as "dni_cliente!",
                         estado as "estado!",
+                        id_actividad as "id_actividad!",
                         fecha_inicio as "fecha_inicio!",
                         fecha_fin as "fecha_fin!"
                     FROM membresias
@@ -109,6 +116,7 @@ impl MembresiaRepository {
                     row.tipo,
                     row.dni_cliente,
                     Estado::from(row.estado),
+                    row.id_actividad,
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                     NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
                 )
@@ -123,6 +131,7 @@ impl MembresiaRepository {
                         tipo as "tipo!",
                         dni_cliente as "dni_cliente!",
                         estado as "estado!",
+                        id_actividad as "id_actividad!",
                         fecha_inicio as "fecha_inicio!",
                         fecha_fin as "fecha_fin!"
                     FROM membresias
@@ -139,6 +148,7 @@ impl MembresiaRepository {
             row.tipo,
             row.dni_cliente,
             Estado::from(row.estado),
+            row.id_actividad,
             NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
             NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
         ))
@@ -151,6 +161,7 @@ impl MembresiaRepository {
         let tipo = membresia.get_tipo_actividad();
         let estado = membresia.get_estado().to_string();
         let dni_cliente = membresia.get_dni_cliente();
+        let id_actividad = membresia.get_id_actividad();
 
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
 
@@ -163,6 +174,7 @@ impl MembresiaRepository {
                         tipo = ?,
                         dni_cliente = ?,
                         estado = ?,
+                        id_actividad = ?,
                         fecha_inicio = ?,
                         fecha_fin = ?
                     WHERE id_membresia = ?
@@ -170,6 +182,7 @@ impl MembresiaRepository {
             tipo,
             dni_cliente,
             estado,
+            id_actividad,
             fecha_inicio,
             fecha_fin,
             id

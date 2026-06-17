@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateMembresiaRequest {
+    pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
     pub estado: Estado,
@@ -14,6 +15,7 @@ pub struct CreateMembresiaRequest {
 #[derive(Debug, Serialize)]
 pub struct MembresiaResponse {
     pub id_membresia: String,
+    pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
     pub estado: Estado,
@@ -25,6 +27,7 @@ impl From<Membresia> for MembresiaResponse {
     fn from(membresia: Membresia) -> Self {
         Self {
             id_membresia: membresia.get_id_membresia().to_string(),
+            id_actividad: membresia.get_id_actividad().to_string(),
             tipo: membresia.get_tipo_actividad().to_string(),
             dni_cliente: membresia.get_dni_cliente(),
             estado: membresia.get_estado(),
