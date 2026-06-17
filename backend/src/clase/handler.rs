@@ -15,6 +15,7 @@ pub async fn create_clase_handler(
     State(state): State<AppState>,
     Json(request): Json<CreateClaseRequest>,
 ) -> Result<Json<ClaseResponse>, AppError> {
+    tracing::info!("{:?}", request);
     let id = uuid::Uuid::new_v4().to_string();
     let clase = clase::service::create(&state.db, request, &id).await?;
     Ok(Json(ClaseResponse::from(clase)))

@@ -144,7 +144,7 @@ impl Clase {
         self.inscripciones >= self.cupo_base
     }
 
-    pub fn descontar_cupo(&mut self, sala_capacidad: i64) {
+    pub fn aumentar_inscripciones(&mut self, sala_capacidad: i64) {
         let _ = match self.estado {
             Estado::SinCupo => {}
             Estado::Extendido => {
