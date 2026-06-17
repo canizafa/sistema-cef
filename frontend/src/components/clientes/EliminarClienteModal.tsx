@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -10,36 +9,35 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Mail, IdCard } from "lucide-react";
-import { empleadoService } from "@/services/empleados.service";
-import type { UpdateEmpleado } from "@/services/empleados.service";
 
-interface EliminarEmpleadoModalProps {
+interface EliminarClienteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  empleado: UpdateEmpleado & { nombre_apellido: string };
+  cliente: {
+    dni: number;
+    nombre_apellido: string;
+    email: string;
+  };
   onEliminado?: () => void;
 }
 
-export function EliminarEmpleadoModal({
+export function EliminarClienteModal({
   open,
   onOpenChange,
-  empleado,
+  cliente,
   onEliminado,
-}: EliminarEmpleadoModalProps) {
-  const navigate = useNavigate();
+}: EliminarClienteModalProps) {
   const [loading, setLoading] = useState(false);
   const [motivo, setMotivo] = useState('');
 
   async function handleEliminar() {
     setLoading(true);
     try {
-      await empleadoService.eliminarEmpleado(empleado.dni);
+      // TODO: conectar al back cuando esté listo
+      // await clienteService.eliminarCliente(cliente.dni);
       onOpenChange(false);
       onEliminado?.();
-      toast.success("Empleado eliminado con éxito");
-      navigate("/admin/empleados");
-    } catch {
-      toast.error("No se pudo eliminar el empleado");
+      toast.success("Cliente eliminado con éxito");
     } finally {
       setLoading(false);
     }
@@ -51,23 +49,23 @@ export function EliminarEmpleadoModal({
         <DialogHeader>
           <DialogTitle>Confirmar eliminación</DialogTitle>
           <DialogDescription>
-            Revisá los datos del empleado antes de continuar.
+            Revisá los datos del cliente antes de continuar.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 py-1">
           <p className="font-medium text-base" style={{ color: "#D01F25" }}>
-            {empleado.nombre_apellido}
+            {cliente.nombre_apellido}
           </p>
 
           <div className="flex items-center gap-2 text-sm">
             <IdCard className="w-4 h-4" style={{ color: "#4B5563" }} />
-            <span style={{ color: "#4B5563" }}>{empleado.dni}</span>
+            <span style={{ color: "#4B5563" }}>{cliente.dni}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm">
             <Mail className="w-4 h-4" style={{ color: "#4B5563" }} />
-            <span style={{ color: "#4B5563" }}>{empleado.mail}</span>
+            <span style={{ color: "#4B5563" }}>{cliente.email}</span>
           </div>
 
           <div className="space-y-1 pt-1">
