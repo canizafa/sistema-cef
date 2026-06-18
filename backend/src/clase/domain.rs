@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{
-    app::rol::Estado,
+    clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
 use chrono::{NaiveDate, NaiveTime};
@@ -15,7 +15,7 @@ pub struct Clase {
     descripcion: String,
     cupo_base: i64,
     inscripciones: i64,
-    estado: Estado,
+    estado: EstadoClase,
     id_sala: String,
     dni_profesor: i64,
     id_actividad: String,
@@ -29,7 +29,7 @@ impl Clase {
         descripcion: String,
         cupo_base: i64,
         inscripciones: i64,
-        estado: Estado,
+        estado: EstadoClase,
         id_sala: String,
         dni_profesor: i64,
         id_actividad: String,
@@ -62,7 +62,7 @@ impl Clase {
     pub fn get_inscripciones(&self) -> i64 {
         self.inscripciones
     }
-    pub fn get_estado(&self) -> &Estado {
+    pub fn get_estado(&self) -> &EstadoClase {
         &self.estado
     }
     pub fn get_id_sala(&self) -> &str {
@@ -135,7 +135,7 @@ impl Clase {
         errors
     }
 
-    pub fn update_clase(&mut self, estado: Estado, dni_profesor: i64) {
+    pub fn update_clase(&mut self, estado: EstadoClase, dni_profesor: i64) {
         self.estado = estado;
         self.dni_profesor = dni_profesor;
     }
@@ -146,13 +146,13 @@ impl Clase {
 
     pub fn aumentar_inscripciones(&mut self, sala_capacidad: i64) {
         let _ = match self.estado {
-            Estado::SinCupo => {}
-            Estado::Extendido => {
+            EstadoClase::SinCupo => {}
+            EstadoClase::Extendido => {
                 if self.cupo_base + self.inscripciones < sala_capacidad {
                     self.inscripciones += 1;
                 }
             }
-            Estado::Alta => {
+            EstadoClase::Alta => {
                 if self.cupo_base > 0 {
                     self.inscripciones += 1;
                 }
@@ -163,7 +163,7 @@ impl Clase {
         };
     }
     pub fn extender_cupo(&mut self) {
-        self.estado = Estado::Extendido;
+        self.estado = EstadoClase::Extendido;
     }
 }
 
