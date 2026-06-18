@@ -1,0 +1,41 @@
+use crate::{
+    usuarios::profesor::domain::Profesor,
+    usuarios::{estado::EstadoUsuario, genero::GeneroUsuario},
+};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize)]
+pub struct CreateProfesorRequest {
+    pub dni: i64,
+    pub nombre_completo: String,
+    pub genero: GeneroUsuario,
+    pub estado: EstadoUsuario,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ProfesorResponse {
+    pub dni: i64,
+    pub nombre_completo: String,
+    pub genero: GeneroUsuario,
+    pub estado: EstadoUsuario,
+    pub motivo_eliminacion: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EliminarProfesorRequest {
+    pub profesor_dni: i64,
+    pub estado: EstadoUsuario,
+    pub motivo_eliminacion: String,
+}
+
+impl From<Profesor> for ProfesorResponse {
+    fn from(profesor: Profesor) -> Self {
+        Self {
+            dni: profesor.get_dni(),
+            nombre_completo: profesor.get_nombre_completo().to_owned(),
+            genero: profesor.get_genero().to_owned(),
+            estado: profesor.get_estado().to_owned(),
+            motivo_eliminacion: profesor.get_motivo_eliminacion(),
+        }
+    }
+}
