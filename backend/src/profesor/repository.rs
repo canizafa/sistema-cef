@@ -39,7 +39,7 @@ impl ProfesorRepository {
                         estado
                     )
                     VALUES (?, ?, ?, ?)
-                    RETURNING dni_profesor, nombre, genero, estado
+                    RETURNING dni_profesor, nombre, genero, estado, motivo_eliminacion
                     "#,
         )
         .bind(profesor.get_dni())
@@ -59,7 +59,8 @@ impl ProfesorRepository {
                         dni_profesor,
                         nombre,
                         genero,
-                        estado
+                        estado,
+                        motivo_eliminacion
                     FROM profesor
                     WHERE dni_profesor = ?
                     "#,
@@ -78,7 +79,8 @@ impl ProfesorRepository {
                         dni_profesor,
                         nombre,
                         genero,
-                        estado
+                        estado,
+                        motivo_eliminacion
                     FROM profesor
                     "#,
         )
@@ -101,7 +103,7 @@ impl ProfesorRepository {
                         genero = ?,
                         estado = ?
                     WHERE dni_profesor = ?
-                    RETURNING dni_profesor, nombre, genero, estado
+                    RETURNING dni_profesor, nombre, genero, estado, motivo_eliminacion
                     "#,
         )
         .bind(profesor.get_nombre_completo())
