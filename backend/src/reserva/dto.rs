@@ -13,6 +13,7 @@ pub struct CreateReservaRequest {
 
 #[derive(Debug, Serialize)]
 pub struct ReservaResponse {
+    pub id_reserva: String,
     pub fecha: NaiveDate,
     pub tipo: String,
     pub estado: Estado,
@@ -28,6 +29,7 @@ pub struct ReservaListResponse {
 impl From<Reserva> for ReservaResponse {
     fn from(reserva: Reserva) -> Self {
         Self {
+            id_reserva: reserva.get_id().to_string(),
             fecha: reserva.get_fecha_reserva(),
             tipo: reserva.get_tipo(),
             estado: reserva.get_estado(),

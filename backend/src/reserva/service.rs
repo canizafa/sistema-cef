@@ -20,7 +20,8 @@ pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Re
         .await
         .map_err(AppError::from)?;
     if reservas_existentes.iter().any(|r| {
-        r.get_tipo() == reserva.get_tipo() && r.get_dni_cliente() == reserva.get_dni_cliente()
+        r.get_id_clase() == reserva.get_id_clase()
+            && r.get_dni_cliente() == reserva.get_dni_cliente()
     }) {
         return Err(AppError::Conflict(
             "Ya existe una reserva para esta actividad y cliente".to_string(),
