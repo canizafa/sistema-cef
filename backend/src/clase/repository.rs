@@ -37,31 +37,43 @@ pub struct ClaseRepository;
 impl ClaseRepository {
     pub async fn create(pool: &SqlitePool, clase: &Clase) -> Result<Clase, DbError> {
         let row = sqlx::query_as::<_, ClaseRow>(
-            "INSERT INTO clase
-               (
-                   id_clase,
-                   dia,
-                   horario,
-                   cupo_base,
-                   inscripciones,
-                   estado,
-                   descripcion,
-                   id_actividad,
-                   id_sala,
-                   dni_profesor
-               )
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            r#"
+                INSERT INTO clase (
+                    id_clase,
+                    dia,
+                    horario,
+                    cupo_base,
+                    inscripciones,
+                    estado,
+                    descripcion,
+                    id_actividad,
+                    id_sala,
+                    dni_profesor
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                RETURNING
+                    id_clase,
+                    dia,
+                    horario,
+                    descripcion,
+                    cupo_base,
+                    inscripciones,
+                    estado,
+                    id_sala,
+                    dni_profesor,
+                    id_actividad
+                "#,
         )
-        .bind(&clase.get_id())
-        .bind(&clase.get_dia())
-        .bind(&clase.get_horario())
-        .bind(&clase.get_cupo_base())
-        .bind(&clase.get_inscripciones())
-        .bind(&clase.get_estado())
-        .bind(&clase.get_descripcion())
-        .bind(&clase.get_id_actividad())
-        .bind(&clase.get_id_sala())
-        .bind(&clase.get_dni_profesor())
+        .bind(clase.get_id())
+        .bind(clase.get_dia())
+        .bind(clase.get_horario())
+        .bind(clase.get_cupo_base())
+        .bind(clase.get_inscripciones())
+        .bind(clase.get_estado())
+        .bind(clase.get_descripcion())
+        .bind(clase.get_id_actividad())
+        .bind(clase.get_id_sala())
+        .bind(clase.get_dni_profesor())
         .fetch_one(pool)
         .await
         .map_err(DbError::from)?;
@@ -75,6 +87,7 @@ impl ClaseRepository {
                 dia,
                 horario,
                 cupo_base,
+                inscripciones,
                 estado,
                 descripcion,
                 id_actividad,
