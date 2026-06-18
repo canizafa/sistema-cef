@@ -40,7 +40,7 @@ impl Clase {
             horario,
             descripcion,
             cupo_base,
-            inscripciones: 0,
+            inscripciones,
             estado,
             id_sala,
             dni_profesor,

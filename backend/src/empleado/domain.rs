@@ -1,5 +1,5 @@
 use crate::{
-    app::rol::Rol,
+    app::rol::{Estado, Rol},
     empleado::{
         dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
         errors::EmpleadoDomainError,
@@ -13,7 +13,7 @@ pub struct Empleado {
     password_hash: String,
     mail: String,
     genero: String,
-    estado: String,
+    estado: Estado,
     rol: Rol,
     motivo_eliminacion: Option<String>,
 }
@@ -25,7 +25,7 @@ impl Empleado {
         password_hash: String,
         mail: String,
         genero: String,
-        estado: String,
+        estado: Estado,
         rol: Rol,
         motivo_eliminacion: Option<String>,
     ) -> Self {
@@ -52,7 +52,7 @@ impl Empleado {
     pub fn get_genero(&self) -> String {
         self.genero.clone()
     }
-    pub fn get_estado(&self) -> String {
+    pub fn get_estado(&self) -> Estado {
         self.estado.clone()
     }
     pub fn get_rol(&self) -> Rol {

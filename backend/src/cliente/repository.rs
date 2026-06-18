@@ -52,10 +52,11 @@ impl ClienteRepository {
                 telefono,
                 fecha_nacimiento,
                 estado,
+                motivo_eliminacion,
                 password,
                 id_ficha
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 dni_cliente AS dni,
                 nombre_completo AS nombre,
@@ -63,6 +64,7 @@ impl ClienteRepository {
                 telefono,
                 fecha_nacimiento,
                 estado,
+                motivo_eliminacion,
                 password,
                 id_ficha,
                 'cliente' AS rol
@@ -74,6 +76,7 @@ impl ClienteRepository {
         .bind(cliente.get_telefono())
         .bind(cliente.get_fecha_nacimiento())
         .bind(cliente.get_estado())
+        .bind(cliente.get_motivo_eliminacion())
         .bind(cliente.get_password_hash())
         .bind(id_ficha)
         .fetch_one(pool)
@@ -93,6 +96,7 @@ impl ClienteRepository {
                 c.telefono,
                 c.fecha_nacimiento,
                 c.estado,
+                c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
                 'cliente' AS rol
@@ -116,6 +120,7 @@ impl ClienteRepository {
                 c.telefono,
                 c.fecha_nacimiento,
                 c.estado,
+                c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
                 'cliente' AS rol
@@ -141,6 +146,7 @@ impl ClienteRepository {
                 c.telefono,
                 c.fecha_nacimiento,
                 c.estado,
+                c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
                 'cliente' AS rol
@@ -212,6 +218,7 @@ impl ClienteRepository {
                     telefono,
                     fecha_nacimiento,
                     estado,
+                    motivo_eliminacion,
                     password,
                     id_ficha,
                     'cliente' AS rol
@@ -244,8 +251,8 @@ impl ClienteRepository {
                     telefono,
                     fecha_nacimiento,
                     estado,
-                    password,
                     motivo_eliminacion,
+                    password,
                     id_ficha,
                     'cliente' AS rol
                 "#,

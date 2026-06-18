@@ -2,6 +2,7 @@ use super::dto::{ClienteResponse, CreateClienteRequest};
 use crate::app::{errors::AppError, state::AppState};
 use crate::cliente;
 use crate::cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest};
+use crate::ficha_medica::dto::FichaMedicaResponse;
 use axum::{
     Json,
     extract::{Path, State},
@@ -26,9 +27,12 @@ pub async fn create_cliente_handler(
 pub async fn get_cliente_handler(
     State(state): State<AppState>,
     Path(id): Path<i64>,
-) -> Result<Json<ClienteResponse>, AppError> {
-    let cliente = cliente::service::get_by_dni(&state.db, id).await?;
-    Ok(Json(ClienteResponse::from(cliente)))
+) -> Result<Json<(ClienteResponse, FichaMedicaResponse)>, AppError> {
+    let (cliente, ficha_medica) = cliente::service::get_by_dni(&state.db, id).await?;
+    Ok(Json((
+        ClienteResponse::from(cliente),
+        FichaMedicaResponse::from(ficha_medica),
+    )))
 }
 
 #[instrument(name = "cliente.update", skip(state, request), fields(dni = id), err)]

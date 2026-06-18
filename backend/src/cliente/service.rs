@@ -6,7 +6,8 @@ use crate::{
     },
     auth,
     cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
-    empleado, ficha_medica,
+    empleado,
+    ficha_medica::{self, domain::FichaMedica},
 };
 use axum::http::request;
 use sqlx::SqlitePool;
@@ -64,10 +65,14 @@ pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cl
     Ok(cliente)
 }
 
-pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<Cliente, AppError> {
-    ClienteRepository::get_by_dni(db, dni)
+pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<(Cliente, FichaMedica), AppError> {
+    let cliente = ClienteRepository::get_by_dni(db, dni)
         .await
-        .map_err(AppError::from)
+        .map_err(AppError::from)?;
+    let ficha = ficha_medica::service::get_by_id(db, &cliente.get_id_ficha())
+        .await
+        .map_err(AppError::from)?;
+    Ok((cliente, ficha))
 }
 
 pub async fn get_by_email(db: &SqlitePool, email: &str) -> Result<Cliente, AppError> {
