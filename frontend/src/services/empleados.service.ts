@@ -46,9 +46,14 @@ export const empleadoService = {
     async activarEmpleado(empleado: UpdateEmpleado) {
         return this.actualizarEmpleado(empleado.dni, { ...empleado, estado: 'alta' });
     },
-
-    async eliminarEmpleado(dni: number) {
-        const response = await api.delete(`/empleados/delete-empleado/${dni}`);
-        return response.data;
-    },
+async eliminarEmpleado(dni: number, motivo: string): Promise<void> {
+    await api.delete(`/empleados/delete-empleado/${dni}`, {
+        data: {
+            dni: dni,
+            estado: 'baja',
+            motivo_eliminacion: motivo,
+        },
+        headers: { 'Content-Type': 'application/json' }
+    });
+},
 };

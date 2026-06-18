@@ -3,24 +3,26 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
-export type EstadoCuenta = 'activo' | 'inactivo'
+export type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 
 interface ClienteCardProps {
   dni: number
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
-  onEditar?: () => void
+  motivoEliminacion?: string | null
   onToggleEstado?: () => void
   onEliminar?: () => void
 }
 
 function getBadgeCuenta(estado: EstadoCuenta) {
   switch (estado) {
-    case 'activo':
+    case 'alta':
       return <Badge className="bg-success text-white">Activo</Badge>
-    case 'inactivo':
+    case 'baja':
       return <Badge className="bg-gray-400 text-white">Inactivo</Badge>
+    case 'eliminado':
+      return <Badge className="bg-red-700 text-white">Eliminado</Badge>
   }
 }
 
@@ -29,11 +31,11 @@ export function ClienteCard({
   nombreApellido,
   email,
   estadoCuenta,
-  onEditar,
+  motivoEliminacion,
   onToggleEstado,
   onEliminar,
 }: ClienteCardProps) {
-  const activo = estadoCuenta === 'activo'
+  const activo = estadoCuenta === 'alta'
 
   return (
     <Card className="bg-surface border-border">
@@ -55,18 +57,21 @@ export function ClienteCard({
           <span className="font-medium text-destructive">DNI:</span>
           <span className="text-gray-700">{dni.toLocaleString('es-AR')}</span>
         </div>
+        {estadoCuenta === 'eliminado' && motivoEliminacion && (
+          <div className="flex items-start gap-2 text-sm pt-1">
+            <span className="font-medium text-destructive">Motivo:</span>
+            <span className="text-gray-700">{motivoEliminacion}</span>
+          </div>
+        )}
       </CardContent>
 
-      <CardFooter className="flex-col gap-2 pt-0 border-none">
-        <div className="flex gap-2 w-full">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onEditar}>
-            Editar cliente
-          </Button>
+      {estadoCuenta !== 'eliminado' && (
+        <CardFooter className="flex-col gap-2 pt-0 border-none">
           {activo ? (
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
+              className="w-full border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20"
               onClick={onToggleEstado}
             >
               <X className="w-4 h-4 mr-2" />
@@ -76,24 +81,24 @@ export function ClienteCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
+              className="w-full"
               onClick={onToggleEstado}
             >
               <Check className="w-4 h-4 mr-2" />
               Activar
             </Button>
           )}
-        </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="w-full"
-          onClick={onEliminar}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Eliminar cliente
-        </Button>
-      </CardFooter>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="w-full"
+            onClick={onEliminar}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Eliminar cliente
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   )
 }

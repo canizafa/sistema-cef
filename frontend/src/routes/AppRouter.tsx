@@ -37,7 +37,7 @@ import { NuevoProfesorPage } from '@/pages/admin/profesores/NuevoProfesorPage';
 import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
-import { NuevoClientePage } from '@/pages/admin/clientes/NuevoClientePage';
+
 
 
 // Admin - Asistencias y Reportes
@@ -86,7 +86,7 @@ export const AppRouter = () => {
                                 
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
-                <Route path="clientes/nuevo" element={<NuevoClientePage />} />
+            
               
 
                 {/* Asistencias */}

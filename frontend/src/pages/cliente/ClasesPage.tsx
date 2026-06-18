@@ -5,12 +5,14 @@ import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
 import { clasesService, type ClaseDTO } from '@/services/clases.service'
 import { actividadService, type Actividad } from '@/services/actividad.service'
+import { profesorService, type Profesor } from '@/services/profesor.service'
 import { pagosService } from '@/services/pagos.service'
 
 export function ClasesPage() {
   const { user } = useAuth()
   const [clases, setClases] = useState<ClaseDTO[]>([])
   const [actividades, setActividades] = useState<Actividad[]>([])
+  const [profesores, setProfesores] = useState<Profesor[]>([])
   const [reservadas, setReservadas] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,12 +23,14 @@ export function ClasesPage() {
   useEffect(() => {
     async function cargar() {
       try {
-        const [dataClases, dataActividades] = await Promise.all([
+        const [dataClases, dataActividades, dataProfesores] = await Promise.all([
           clasesService.getClases(),
           actividadService.getActividades(),
+          profesorService.getProfesores(),
         ])
         setClases(dataClases)
         setActividades(dataActividades)
+        setProfesores(dataProfesores)
       } catch {
         setError('No se pudieron cargar las clases.')
       } finally {
@@ -38,6 +42,10 @@ export function ClasesPage() {
 
   function getNombreActividad(idActividad: string): string {
     return actividades.find((a) => String(a.id) === String(idActividad))?.nombre ?? idActividad
+  }
+
+  function getNombreProfesor(dniProfesor: number): string {
+    return profesores.find((p) => p.dni === dniProfesor)?.nombre_completo ?? 'Sin asignar'
   }
 
   function getEstadoReserva(clase: ClaseDTO): EstadoReserva {
@@ -89,6 +97,14 @@ export function ClasesPage() {
     // TODO: implementar cuando el back tenga el endpoint de lista de espera
   }
 
+  // Agrupar clases por actividad
+  const clasesPorActividad = clases.reduce((acc, clase) => {
+    const nombre = getNombreActividad(clase.id_actividad)
+    if (!acc[nombre]) acc[nombre] = []
+    acc[nombre].push(clase)
+    return acc
+  }, {} as Record<string, ClaseDTO[]>)
+
   if (loading) return <p className="p-8 text-muted text-sm">Cargando clases...</p>
   if (error) return <p className="p-8 text-destructive text-sm">{error}</p>
 
@@ -106,20 +122,32 @@ export function ClasesPage() {
         {clases.length === 0 ? (
           <p className="text-sm text-muted">No hay clases disponibles por el momento.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {clases.map((clase) => (
-              <ClaseCardCliente
-                key={clase.id_clase}
-                idClase={clase.id_clase}
-                diaSemana={clase.dia_semana}
-                horario={clase.horario}
-                descripcion={clase.descripcion}
-                estadoReserva={getEstadoReserva(clase)}
-                idActividad={getNombreActividad(clase.id_actividad)}
-                onReservar={() => handleReservar(clase)}
-                onCancelar={() => handleCancelar(clase.id_clase)}
-                onListaEspera={() => handleListaEspera(clase)}
-              />
+          <div className="space-y-8">
+            {Object.entries(clasesPorActividad).map(([nombreActividad, clasesDelGrupo]) => (
+              <div key={nombreActividad}>
+                <h2 className="text-lg font-semibold text-primary capitalize mb-3">{nombreActividad}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {clasesDelGrupo.map((clase) => (
+                    <ClaseCardCliente
+                      key={clase.id_clase}
+                      idClase={clase.id_clase}
+                      dia={clase.dia}
+                      diaSemana={clase.dia_semana}
+                      horario={clase.horario}
+                      descripcion={clase.descripcion}
+                      lleno={clase.lleno}
+                      estadoReserva={getEstadoReserva(clase)}
+                      idActividad={getNombreActividad(clase.id_actividad)}
+                      idSala={clase.id_sala}
+                      dniProfesor={clase.dni_profesor}
+                      nombreProfesor={getNombreProfesor(clase.dni_profesor)}
+                      onReservar={() => handleReservar(clase)}
+                      onCancelar={() => handleCancelar(clase.id_clase)}
+                      onListaEspera={() => handleListaEspera(clase)}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

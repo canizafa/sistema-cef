@@ -34,16 +34,18 @@ export function EliminarProfesorModal({
   async function handleEliminar() {
     setLoading(true);
     try {
+      const tieneClases = await profesorService.tieneClasesAsociadas(profesor.dni);
+      if (tieneClases) {
+        toast.error("No se puede eliminar un profesor con clases asociadas");
+        return;
+      }
+
       await profesorService.eliminarProfesor(profesor.dni, motivo);
       onOpenChange(false);
       onEliminado?.();
       toast.success("Profesor eliminado con éxito");
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        toast.error("No se puede eliminar a un profesor con clases asociadas");
-      } else {
-        toast.error("No se pudo eliminar el profesor");
-      }
+    } catch {
+      toast.error("No se pudo eliminar el profesor");
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,7 @@ export function EliminarProfesorModal({
             <textarea
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
-              placeholder="Ingresá el motivo por el cual se elimina este profesor..."
+              placeholder="Ingresá el motivo de la eliminación"
               rows={3}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand"
               style={{ color: '#1A1A1A' }}

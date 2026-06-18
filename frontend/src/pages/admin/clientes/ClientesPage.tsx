@@ -1,34 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { ClienteCard } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
+import { clienteService } from '@/services/cliente.service'
 
-type EstadoCuenta = 'activo' | 'inactivo'
-type FiltroCliente = 'todos' | 'activo' | 'inactivo'
+type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
+type FiltroCliente = 'todos' | 'alta' | 'baja' | 'eliminado'
 
 interface Cliente {
   dni: number
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
+  motivoEliminacion: string | null
 }
-
-const CLIENTES_EJEMPLO: Cliente[] = [
-  { dni: 40112233, nombreApellido: 'Lola López',       email: 'lolalopez@gmail.com',  estadoCuenta: 'activo' },
-  { dni: 38554120, nombreApellido: 'Sebastián Juárez', email: 'sebajuarez@gmail.com', estadoCuenta: 'activo' },
-  { dni: 35221890, nombreApellido: 'Carlos Díaz',      email: 'cdiaz@hotmail.com',    estadoCuenta: 'activo' },
-  { dni: 41330775, nombreApellido: 'Martina Ruiz',     email: 'mruiz@gmail.com',      estadoCuenta: 'inactivo' },
-]
 
 const normalizar = (texto: string) =>
   texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
 export function ClientesPage() {
-  const [clientes, setClientes] = useState<Cliente[]>(CLIENTES_EJEMPLO)
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<FiltroCliente>('todos')
   const [busquedaNombre, setBusquedaNombre] = useState('')
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
+
+  useEffect(() => {
+    clienteService.getClientes()
+      .then((data) => {
+        setClientes(data.map((c) => ({
+          dni: c.dni,
+          nombreApellido: c.nombre_apellido,
+          email: c.email,
+          estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
+          motivoEliminacion: c.motivo_eliminacion,
+        })))
+      })
+      .catch(() => setError('No se pudieron cargar los clientes'))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleEliminar = (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
@@ -39,41 +51,41 @@ export function ClientesPage() {
 
   const handleEliminarConfirmado = () => {
     if (!clienteAEliminar) return
-    setClientes((prev) => prev.filter((c) => c.dni !== clienteAEliminar.dni))
+    setClientes((prev) =>
+      prev.map((c) =>
+        c.dni === clienteAEliminar.dni
+          ? { ...c, estadoCuenta: 'eliminado' as EstadoCuenta }
+          : c
+      )
+    )
     setClienteAEliminar(null)
   }
 
   const clientesFiltrados = clientes.filter((c) => {
-    const matchEstado =
-      filtro === 'activo' ? c.estadoCuenta === 'activo' :
-      filtro === 'inactivo' ? c.estadoCuenta === 'inactivo' :
-      true
-
-    if (busquedaNombre.trim() === '') {
-      return matchEstado
+    if (busquedaNombre.trim() !== '') {
+      return normalizar(c.nombreApellido)
+        .startsWith(normalizar(busquedaNombre.trim()))
     }
 
-    const matchNombre = normalizar(c.nombreApellido)
-      .startsWith(normalizar(busquedaNombre.trim()))
-
-    return matchEstado && matchNombre
+    if (filtro === 'alta') return c.estadoCuenta === 'alta'
+    if (filtro === 'baja') return c.estadoCuenta === 'baja'
+    if (filtro === 'eliminado') return c.estadoCuenta === 'eliminado'
+    return c.estadoCuenta !== 'eliminado'
   })
 
   const mensajeVacio = () => {
     if (busquedaNombre.trim() !== '') {
-      if (filtro === 'activo') return 'No existe un cliente activo con ese nombre y apellido.'
-      if (filtro === 'inactivo') return 'No existe un cliente inactivo con ese nombre y apellido.'
       return 'No existe un cliente con ese nombre y apellido.'
     }
-    if (filtro === 'activo') return 'No existen clientes activos en el sistema.'
-    if (filtro === 'inactivo') return 'No existen clientes inactivos en el sistema.'
-    return 'No hay clientes registrados en el sistema.'
+    if (filtro === 'todos') return 'No hay clientes registrados en el sistema.'
+    return 'No existen clientes con el filtro solicitado.'
   }
 
   const tabs: { label: string; value: FiltroCliente }[] = [
     { label: 'Todos', value: 'todos' },
-    { label: 'Activos', value: 'activo' },
-    { label: 'Inactivos', value: 'inactivo' },
+    { label: 'Activos', value: 'alta' },
+    { label: 'Inactivos', value: 'baja' },
+    { label: 'Eliminados', value: 'eliminado' },
   ]
 
   return (
@@ -99,10 +111,15 @@ export function ClientesPage() {
           <button
             key={tab.value}
             onClick={() => setFiltro(tab.value)}
+            disabled={busquedaNombre.trim() !== ''}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors
-              ${filtro === tab.value
+              ${filtro === tab.value && busquedaNombre.trim() === ''
                 ? 'bg-brand text-white'
-                : 'bg-border text-gray-500 hover:bg-muted hover:text-white'
+                : 'bg-border text-gray-500'
+              }
+              ${busquedaNombre.trim() !== ''
+                ? 'opacity-40 cursor-not-allowed'
+                : 'hover:bg-muted hover:text-white'
               }`}
           >
             {tab.label}
@@ -110,7 +127,10 @@ export function ClientesPage() {
         ))}
       </div>
 
-      {clientesFiltrados.length === 0 && (
+      {loading && <p className="text-sm text-muted">Cargando clientes...</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {!loading && !error && clientesFiltrados.length === 0 && (
         <p className="text-sm" style={{ color: '#4B5563' }}>{mensajeVacio()}</p>
       )}
 
@@ -122,7 +142,7 @@ export function ClientesPage() {
             nombreApellido={c.nombreApellido}
             email={c.email}
             estadoCuenta={c.estadoCuenta}
-            onEditar={() => console.log('editar', c.dni)}
+            motivoEliminacion={c.motivoEliminacion}
             onToggleEstado={() => console.log('toggle estado', c.dni)}
             onEliminar={() => handleEliminar(c.dni)}
           />
