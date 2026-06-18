@@ -9,7 +9,7 @@ pub struct CreateEmpleadoRequest {
     pub password: String,
     pub mail: String,
     pub genero: String,
-    pub estado: String,
+    pub estado: Estado,
     pub rol: Rol,
 }
 
@@ -19,7 +19,7 @@ pub struct UpdateEmpleadoRequest {
     pub nombre_apellido: String,
     pub mail: String,
     pub genero: String,
-    pub estado: String,
+    pub estado: Estado,
     pub rol: Rol,
     pub motivo_eliminacion: Option<String>,
 }
@@ -45,7 +45,7 @@ pub struct EmpleadoResponse {
     pub nombre_apellido: String,
     pub mail: String,
     pub genero: String,
-    pub estado: String,
+    pub estado: Estado,
     pub rol: Rol,
     pub motivo_eliminacion: Option<String>,
 }
