@@ -9,6 +9,7 @@ interface ProfesorCardProps {
   dni: number
   nombreCompleto: string
   estado: EstadoProfesor
+  motivoEliminacion?: string | null
   onEditar?: () => void
   onDesactivar?: () => void
   onActivar?: () => void
@@ -19,6 +20,7 @@ export function ProfesorCard({
   dni,
   nombreCompleto,
   estado,
+  motivoEliminacion,
   onEditar,
   onDesactivar,
   onActivar,
@@ -48,6 +50,12 @@ export function ProfesorCard({
           <span className="font-medium text-destructive">DNI:</span>
           <span className="text-gray-700">{dni}</span>
         </div>
+        {estado === 'eliminado' && motivoEliminacion && (
+          <div className="flex items-start gap-2 text-sm pt-1">
+            <span className="font-medium text-destructive">Motivo:</span>
+            <span className="text-gray-700">{motivoEliminacion}</span>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 pt-0 border-none">

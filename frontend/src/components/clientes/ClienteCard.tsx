@@ -10,6 +10,7 @@ interface ClienteCardProps {
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
+  motivoEliminacion?: string | null
   onToggleEstado?: () => void
   onEliminar?: () => void
 }
@@ -30,6 +31,7 @@ export function ClienteCard({
   nombreApellido,
   email,
   estadoCuenta,
+  motivoEliminacion,
   onToggleEstado,
   onEliminar,
 }: ClienteCardProps) {
@@ -55,6 +57,12 @@ export function ClienteCard({
           <span className="font-medium text-destructive">DNI:</span>
           <span className="text-gray-700">{dni.toLocaleString('es-AR')}</span>
         </div>
+        {estadoCuenta === 'eliminado' && motivoEliminacion && (
+          <div className="flex items-start gap-2 text-sm pt-1">
+            <span className="font-medium text-destructive">Motivo:</span>
+            <span className="text-gray-700">{motivoEliminacion}</span>
+          </div>
+        )}
       </CardContent>
 
       {estadoCuenta !== 'eliminado' && (

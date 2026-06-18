@@ -4,8 +4,8 @@ export interface Profesor {
     dni: number;
     nombre_completo: string;
     estado: string;
+    motivo_eliminacion?: string | null;
 }
-
 export interface CreateProfesor {
     dni: number;
     nombre_completo: string;

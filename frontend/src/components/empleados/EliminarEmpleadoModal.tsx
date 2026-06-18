@@ -33,7 +33,7 @@ export function EliminarEmpleadoModal({
   async function handleEliminar() {
     setLoading(true);
     try {
-      await empleadoService.eliminarEmpleado(empleado.dni);
+      await empleadoService.eliminarEmpleado(empleado.dni, motivo);
       onOpenChange(false);
       onEliminado?.();
       toast.success("Empleado eliminado con éxito");

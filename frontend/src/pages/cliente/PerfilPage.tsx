@@ -59,7 +59,7 @@ export function PerfilPage() {
     }
 
     async function handleGuardarPerfil() {
-        if (!user) return;
+        if (!user || !perfil) return;
         setEditError(null);
         setEditExito(false);
 
@@ -77,21 +77,17 @@ export function PerfilPage() {
 
         setEditLoading(true);
         try {
-            await clienteService.updatePerfil(user.dni, {
-                dni: perfil!.dni,
+            const updated = await clienteService.updatePerfil({
+                dni: perfil.dni,
                 nombre_apellido: editForm.nombre_apellido.trim(),
-                email: perfil!.email,
-                telefono: perfil!.telefono,
+                email: perfil.email,
+                telefono: perfil.telefono,
                 fecha_nacimiento: editForm.fecha_nacimiento,
-                estado: perfil!.estado,
-                rol: perfil!.rol,
-                ficha_medica: {
-                    enfermedades: perfil!.ficha_medica.enfermedades,
-                    operaciones_quirurgicas: perfil!.ficha_medica.operaciones_quirurgicas,
-                    detalle: perfil!.ficha_medica.detalle,
-                },
+                motivo_eliminacion: perfil.motivo_eliminacion,
+                estado: perfil.estado,
+                id_ficha: perfil.id_ficha,
             });
-            setPerfil((prev) => prev ? { ...prev, nombre_apellido: editForm.nombre_apellido.trim(), fecha_nacimiento: editForm.fecha_nacimiento } : prev);
+            setPerfil(updated);
             setEditando(false);
             setEditExito(true);
         } catch {
@@ -161,14 +157,27 @@ export function PerfilPage() {
                                     <form onSubmit={(e) => { e.preventDefault(); handleGuardarPerfil(); }} className='space-y-3'>
                                         <div className='space-y-1'>
                                             <label htmlFor='edit_nombre' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Nombre y apellido</label>
-                                            <input id='edit_nombre' value={editForm.nombre_apellido} onChange={(e) => setEditForm((p) => ({ ...p, nombre_apellido: e.target.value }))} required className='flex h-10 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm' />
+                                            <input
+                                                id='edit_nombre'
+                                                value={editForm.nombre_apellido}
+                                                onChange={(e) => setEditForm((p) => ({ ...p, nombre_apellido: e.target.value }))}
+                                                required
+                                                className='flex h-10 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm'
+                                            />
                                         </div>
                                         <CampoInfo label='DNI' valor={perfil.dni.toString()} />
                                         <CampoInfo label='Email' valor={perfil.email} />
                                         <CampoInfo label='Teléfono' valor={perfil.telefono} />
                                         <div className='space-y-1'>
                                             <label htmlFor='edit_fecha' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Fecha de nacimiento</label>
-                                            <input id='edit_fecha' type='date' value={editForm.fecha_nacimiento} onChange={(e) => setEditForm((p) => ({ ...p, fecha_nacimiento: e.target.value }))} required className='flex h-10 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm' />
+                                            <input
+                                                id='edit_fecha'
+                                                type='date'
+                                                value={editForm.fecha_nacimiento}
+                                                onChange={(e) => setEditForm((p) => ({ ...p, fecha_nacimiento: e.target.value }))}
+                                                required
+                                                className='flex h-10 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm'
+                                            />
                                         </div>
                                         <button type='submit' aria-hidden='true' className='hidden' />
                                     </form>
@@ -180,21 +189,6 @@ export function PerfilPage() {
                                         <CampoInfo label='Teléfono' valor={perfil.telefono} />
                                         <CampoInfo label='Fecha de nacimiento' valor={perfil.fecha_nacimiento.slice(0, 10).split('-').reverse().join('/')} />
                                     </>
-                                )}
-                            </div>
-
-                            <div className='border border-gray-200 rounded-lg p-5 space-y-4'>
-                                <h2 className='text-sm font-semibold text-gray-700'>Ficha médica</h2>
-                                <CampoInfo
-                                    label='Enfermedades'
-                                    valor={perfil.ficha_medica.enfermedades ? 'Sí' : 'No'}
-                                />
-                                <CampoInfo
-                                    label='Operaciones quirúrgicas'
-                                    valor={perfil.ficha_medica.operaciones_quirurgicas ? 'Sí' : 'No'}
-                                />
-                                {perfil.ficha_medica.detalle && (
-                                    <CampoInfo label='Detalle' valor={perfil.ficha_medica.detalle} />
                                 )}
                             </div>
 

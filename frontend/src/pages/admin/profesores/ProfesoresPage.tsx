@@ -13,6 +13,7 @@ interface Profesor {
   dni: number
   nombreCompleto: string
   estado: EstadoProfesor
+  motivoEliminacion: string | null
 }
 
 const normalizar = (texto: string) =>
@@ -34,7 +35,8 @@ export function ProfesoresPage() {
         setProfesores(data.map((p: any) => ({
           dni: p.dni,
           nombreCompleto: p.nombre_completo,
-          estado: p.estado,
+          estado: p.motivo_eliminacion ? 'eliminado' : p.estado,
+          motivoEliminacion: p.motivo_eliminacion ?? null,
         })))
       })
       .catch(() => setError('No se pudieron cargar los profesores'))
@@ -48,14 +50,12 @@ export function ProfesoresPage() {
   const handleDesactivar = async (dni: number) => {
     const profesor = profesores.find((p) => p.dni === dni)
     if (!profesor) return
-
     try {
       const tieneClases = await profesorService.tieneClasesAsociadas(dni)
       if (tieneClases) {
         toast.error('No se puede desactivar un profesor con clases asociadas')
         return
       }
-
       await profesorService.desactivarProfesor({
         dni: profesor.dni,
         nombre_completo: profesor.nombreCompleto,
@@ -204,6 +204,7 @@ export function ProfesoresPage() {
             dni={profesor.dni}
             nombreCompleto={profesor.nombreCompleto}
             estado={profesor.estado}
+            motivoEliminacion={profesor.motivoEliminacion}
             onEditar={() => handleEditar(profesor.dni)}
             onDesactivar={() => handleDesactivar(profesor.dni)}
             onActivar={() => handleActivar(profesor.dni)}

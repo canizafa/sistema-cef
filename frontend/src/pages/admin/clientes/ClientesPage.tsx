@@ -12,6 +12,7 @@ interface Cliente {
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
+  motivoEliminacion: string | null
 }
 
 const normalizar = (texto: string) =>
@@ -33,7 +34,8 @@ export function ClientesPage() {
           dni: c.dni,
           nombreApellido: c.nombre_apellido,
           email: c.email,
-          estadoCuenta: c.estado as EstadoCuenta,
+          estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
+          motivoEliminacion: c.motivo_eliminacion,
         })))
       })
       .catch(() => setError('No se pudieron cargar los clientes'))
@@ -49,7 +51,13 @@ export function ClientesPage() {
 
   const handleEliminarConfirmado = () => {
     if (!clienteAEliminar) return
-    setClientes((prev) => prev.filter((c) => c.dni !== clienteAEliminar.dni))
+    setClientes((prev) =>
+      prev.map((c) =>
+        c.dni === clienteAEliminar.dni
+          ? { ...c, estadoCuenta: 'eliminado' as EstadoCuenta }
+          : c
+      )
+    )
     setClienteAEliminar(null)
   }
 
@@ -134,6 +142,7 @@ export function ClientesPage() {
             nombreApellido={c.nombreApellido}
             email={c.email}
             estadoCuenta={c.estadoCuenta}
+            motivoEliminacion={c.motivoEliminacion}
             onToggleEstado={() => console.log('toggle estado', c.dni)}
             onEliminar={() => handleEliminar(c.dni)}
           />

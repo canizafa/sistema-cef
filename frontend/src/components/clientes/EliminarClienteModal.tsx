@@ -34,7 +34,7 @@ export function EliminarClienteModal({
   async function handleEliminar() {
     setLoading(true);
     try {
-      await clienteService.eliminarCliente(cliente.dni);
+      await clienteService.eliminarCliente(cliente.dni, motivo);
       onOpenChange(false);
       onEliminado?.();
       toast.success("Cliente eliminado con éxito");
