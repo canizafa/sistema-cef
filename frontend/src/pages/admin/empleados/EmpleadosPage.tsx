@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { toast } from 'sonner'
 import { EmpleadoCard } from '@/components/empleados/EmpleadoCard'
 import { EliminarEmpleadoModal } from '@/components/empleados/EliminarEmpleadoModal'
 import { empleadoService } from '@/services/empleados.service'
 
-type EstadoEmpleado = 'alta' | 'baja'
+type EstadoEmpleado = 'alta' | 'baja' | 'eliminado'
 type RolEmpleado = 'duenio' | 'empleado' | 'profesor'
-type FiltroEmpleado = 'todos' | 'alta' | 'baja'
+type FiltroEmpleado = 'todos' | 'alta' | 'baja' | 'eliminado'
 
 interface Empleado {
   dni: number
@@ -16,6 +17,7 @@ interface Empleado {
   genero: string
   estado: EstadoEmpleado
   rol: RolEmpleado
+  motivoEliminacion: string | null
 }
 
 const normalizar = (texto: string) =>
@@ -42,8 +44,9 @@ export function EmpleadosPage() {
             nombreApellido: e.nombre_apellido,
             mail: e.mail,
             genero: e.genero,
-            estado: e.estado,
+            estado: e.motivo_eliminacion ? 'eliminado' : e.estado,
             rol: e.rol,
+            motivoEliminacion: e.motivo_eliminacion ?? null,
           })))
       })
       .catch(() => setError('No se pudieron cargar los empleados'))
@@ -69,8 +72,9 @@ export function EmpleadosPage() {
       setEmpleados((prev) =>
         prev.map((e) => e.dni === dni ? { ...e, estado: 'baja' as EstadoEmpleado } : e)
       )
+      toast.success('Empleado desactivado correctamente')
     } catch {
-      setError('No se pudo desactivar el empleado')
+      toast.error('No se pudo desactivar el empleado')
     }
   }
 
@@ -89,8 +93,9 @@ export function EmpleadosPage() {
       setEmpleados((prev) =>
         prev.map((e) => e.dni === dni ? { ...e, estado: 'alta' as EstadoEmpleado } : e)
       )
+      toast.success('Empleado activado correctamente')
     } catch {
-      setError('No se pudo activar el empleado')
+      toast.error('No se pudo activar el empleado')
     }
   }
 
@@ -103,7 +108,13 @@ export function EmpleadosPage() {
 
   const handleEliminarConfirmado = () => {
     if (!empleadoAEliminar) return
-    setEmpleados((prev) => prev.filter((e) => e.dni !== empleadoAEliminar.dni))
+    setEmpleados((prev) =>
+      prev.map((e) =>
+        e.dni === empleadoAEliminar.dni
+          ? { ...e, estado: 'eliminado' as EstadoEmpleado }
+          : e
+      )
+    )
     setEmpleadoAEliminar(null)
   }
 
@@ -113,24 +124,25 @@ export function EmpleadosPage() {
         .startsWith(normalizar(busquedaNombre.trim()))
     }
 
-    return filtro === 'alta' ? e.estado === 'alta' :
-           filtro === 'baja' ? e.estado === 'baja' :
-           true
+    if (filtro === 'alta') return e.estado === 'alta'
+    if (filtro === 'baja') return e.estado === 'baja'
+    if (filtro === 'eliminado') return e.estado === 'eliminado'
+    return e.estado !== 'eliminado'
   })
 
   const mensajeVacio = () => {
     if (busquedaNombre.trim() !== '') {
       return 'No existe un empleado con ese nombre y apellido.'
     }
-    if (filtro === 'alta') return 'No existen empleados activos en el sistema.'
-    if (filtro === 'baja') return 'No existen empleados inactivos en el sistema.'
-    return 'No hay empleados registrados en el sistema.'
+    if (filtro === 'todos') return 'No hay empleados registrados en el sistema.'
+    return 'No existen empleados con el filtro solicitado.'
   }
 
   const tabs: { label: string; value: FiltroEmpleado }[] = [
     { label: 'Todos', value: 'todos' },
     { label: 'Activos', value: 'alta' },
     { label: 'Inactivos', value: 'baja' },
+    { label: 'Eliminados', value: 'eliminado' },
   ]
 
   return (
@@ -196,6 +208,7 @@ export function EmpleadosPage() {
             mail={empleado.mail}
             estado={empleado.estado}
             rol={empleado.rol}
+            motivoEliminacion={empleado.motivoEliminacion}
             onEditar={() => handleEditar(empleado.dni)}
             onDesactivar={() => handleDesactivar(empleado.dni)}
             onActivar={() => handleActivar(empleado.dni)}

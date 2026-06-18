@@ -1,8 +1,17 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 
 export function PagoFalloPage() {
-    const navigate = useNavigate();
+    const [reintentoPath, setReintentoPath] = useState('/clases');
+
+    useEffect(() => {
+        const eraMembresia = !!localStorage.getItem('pending_membresia');
+        if (eraMembresia) {
+            setReintentoPath('/membresia');
+            localStorage.removeItem('pending_membresia');
+        }
+    }, []);
 
     return (
         <div className='min-h-screen flex flex-col'>
@@ -13,12 +22,12 @@ export function PagoFalloPage() {
                     <p className='text-sm text-gray-500'>
                         No se pudo realizar el pago por saldo insuficiente.
                     </p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90'
+                    <Link
+                        to={reintentoPath}
+                        className='w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 flex items-center justify-center'
                     >
                         Intentar de nuevo
-                    </button>
+                    </Link>
                     <Link to='/clases' className='text-brand hover:underline text-sm block'>
                         Volver a clases
                     </Link>

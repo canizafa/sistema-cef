@@ -21,11 +21,11 @@ export interface UpdateEmpleado {
 
 export const empleadoService = {
     async registrarEmpleado(data: RegistrarEmpleado): Promise<void> {
-        await api.post('/auth/register-empleado', data);
+        await api.post('/empleados/create', data);
     },
 
-    async getEmpleado(params: unknown) {
-        const response = await api.get('/empleados/get-empleado', { params });
+    async getEmpleado(dni: number) {
+        const response = await api.get(`/empleados/get-empleado-by-dni/${dni}`);
         return response.data;
     },
 
@@ -46,9 +46,14 @@ export const empleadoService = {
     async activarEmpleado(empleado: UpdateEmpleado) {
         return this.actualizarEmpleado(empleado.dni, { ...empleado, estado: 'alta' });
     },
-
-    async eliminarEmpleado(dni: number) {
-        const response = await api.delete(`/empleados/delete-empleado/${dni}`);
-        return response.data;
-    },
+async eliminarEmpleado(dni: number, motivo: string): Promise<void> {
+    await api.delete(`/empleados/delete-empleado/${dni}`, {
+        data: {
+            dni: dni,
+            estado: 'baja',
+            motivo_eliminacion: motivo,
+        },
+        headers: { 'Content-Type': 'application/json' }
+    });
+},
 };

@@ -6,13 +6,14 @@ import { ProfesorCard } from '@/components/empleados/ProfesorCard'
 import { EliminarProfesorModal } from '@/components/empleados/EliminarProfesorModal'
 import { profesorService } from '@/services/profesor.service'
 
-type EstadoProfesor = 'alta' | 'baja'
-type FiltroProfesor = 'todos' | 'alta' | 'baja'
+type EstadoProfesor = 'alta' | 'baja' | 'eliminado'
+type FiltroProfesor = 'todos' | 'alta' | 'baja' | 'eliminado'
 
 interface Profesor {
   dni: number
   nombreCompleto: string
   estado: EstadoProfesor
+  motivoEliminacion: string | null
 }
 
 const normalizar = (texto: string) =>
@@ -34,7 +35,8 @@ export function ProfesoresPage() {
         setProfesores(data.map((p: any) => ({
           dni: p.dni,
           nombreCompleto: p.nombre_completo,
-          estado: p.estado,
+          estado: p.motivo_eliminacion ? 'eliminado' : p.estado,
+          motivoEliminacion: p.motivo_eliminacion ?? null,
         })))
       })
       .catch(() => setError('No se pudieron cargar los profesores'))
@@ -48,15 +50,12 @@ export function ProfesoresPage() {
   const handleDesactivar = async (dni: number) => {
     const profesor = profesores.find((p) => p.dni === dni)
     if (!profesor) return
-
     try {
-      // ✅ Verificar si tiene clases asociadas
       const tieneClases = await profesorService.tieneClasesAsociadas(dni)
       if (tieneClases) {
         toast.error('No se puede desactivar un profesor con clases asociadas')
         return
       }
-
       await profesorService.desactivarProfesor({
         dni: profesor.dni,
         nombre_completo: profesor.nombreCompleto,
@@ -93,7 +92,6 @@ export function ProfesoresPage() {
     const profesor = profesores.find((p) => p.dni === dni)
     if (!profesor) return
     try {
-      // ✅ Verificar si tiene clases asociadas
       const tieneClases = await profesorService.tieneClasesAsociadas(dni)
       if (tieneClases) {
         toast.error('No se puede eliminar un profesor con clases asociadas')
@@ -108,7 +106,13 @@ export function ProfesoresPage() {
 
   const handleEliminarConfirmado = () => {
     if (!profesorAEliminar) return
-    setProfesores((prev) => prev.filter((p) => p.dni !== profesorAEliminar.dni))
+    setProfesores((prev) =>
+      prev.map((p) =>
+        p.dni === profesorAEliminar.dni
+          ? { ...p, estado: 'eliminado' as EstadoProfesor }
+          : p
+      )
+    )
     setProfesorAEliminar(null)
   }
 
@@ -117,24 +121,26 @@ export function ProfesoresPage() {
       return normalizar(p.nombreCompleto)
         .startsWith(normalizar(busquedaNombre.trim()))
     }
-    return filtro === 'alta' ? p.estado === 'alta' :
-           filtro === 'baja' ? p.estado === 'baja' :
-           true
+
+    if (filtro === 'alta') return p.estado === 'alta'
+    if (filtro === 'baja') return p.estado === 'baja'
+    if (filtro === 'eliminado') return p.estado === 'eliminado'
+    return p.estado !== 'eliminado'
   })
 
   const mensajeVacio = () => {
     if (busquedaNombre.trim() !== '') {
       return 'No existe un profesor con ese nombre y apellido.'
     }
-    if (filtro === 'alta') return 'No existen profesores activos en el sistema.'
-    if (filtro === 'baja') return 'No existen profesores inactivos en el sistema.'
-    return 'No hay profesores registrados en el sistema.'
+    if (filtro === 'todos') return 'No hay profesores registrados en el sistema.'
+    return 'No existen profesores con el filtro solicitado.'
   }
 
   const tabs: { label: string; value: FiltroProfesor }[] = [
     { label: 'Todos', value: 'todos' },
     { label: 'Activos', value: 'alta' },
     { label: 'Inactivos', value: 'baja' },
+    { label: 'Eliminados', value: 'eliminado' },
   ]
 
   return (
@@ -198,6 +204,7 @@ export function ProfesoresPage() {
             dni={profesor.dni}
             nombreCompleto={profesor.nombreCompleto}
             estado={profesor.estado}
+            motivoEliminacion={profesor.motivoEliminacion}
             onEditar={() => handleEditar(profesor.dni)}
             onDesactivar={() => handleDesactivar(profesor.dni)}
             onActivar={() => handleActivar(profesor.dni)}

@@ -1,5 +1,3 @@
-// Página para crear una nueva clase.
-// Solo accesible para recepcionista y dueño (protegido desde App.tsx).
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clasesService, type EstadoClase } from '@/services/clases.service';
@@ -11,21 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-function getDiaSemana(fecha: string): string {
-    if (!fecha) return '';
-    const [year, month, day] = fecha.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    return DIAS_SEMANA[date.getDay()];
-}
-
 export function NuevaClasePage() {
     const [form, setForm] = useState({
         dia: '',
         horario: '',
         cupo_base: '',
-        cupo_maximo: '',
         id_actividad: '',
         id_sala: '',
         dni_profesor: '',
@@ -80,20 +68,24 @@ export function NuevaClasePage() {
             return;
         }
 
+        const fechaSeleccionada = new Date(`${form.dia}T${form.horario}`);
+        const ahora = new Date();
+        if (fechaSeleccionada <= ahora) {
+            setError('No se puede crear una clase en una fecha del pasado');
+            return;
+        }
+
         const salaSeleccionada = salas.find((s) => String(s.id) === form.id_sala);
         if (salaSeleccionada) {
             if (Number(form.cupo_base) > salaSeleccionada.capacidad_maxima) {
                 setError('La clase no pudo darse de alta porque el cupo base ingresado supera al máximo de la sala');
                 return;
             }
-            if (Number(form.cupo_maximo) > salaSeleccionada.capacidad_maxima) {
-                setError('La clase no pudo darse de alta porque el cupo máximo ingresado supera al máximo de la sala');
-                return;
-            }
         }
 
         try {
             const clases = await clasesService.getClases();
+
             const salaOcupada = clases.some(
                 (c) => c.id_sala === form.id_sala && c.dia === form.dia && c.horario === form.horario
             );
@@ -101,8 +93,15 @@ export function NuevaClasePage() {
                 setError('Sala no disponible para ese día y horario');
                 return;
             }
+
+            const profesorOcupado = clases.some(
+                (c) => c.dni_profesor === Number(form.dni_profesor) && c.dia === form.dia && c.horario === form.horario
+            );
+            if (profesorOcupado) {
+                setError('El profesor ya cuenta con una clase en el día y horario seleccionados');
+                return;
+            }
         } catch {
-            setError('No se pudo verificar la disponibilidad de la sala');
             return;
         }
 
@@ -110,10 +109,9 @@ export function NuevaClasePage() {
         try {
             await clasesService.crearClase({
                 dia: form.dia,
-                dia_semana: getDiaSemana(form.dia),
                 horario: form.horario,
                 cupo_base: Number(form.cupo_base),
-                cupo_maximo: Number(form.cupo_maximo),
+                cupo_maximo: Number(form.cupo_base),
                 estado: 'alta' as EstadoClase,
                 id_actividad: String(form.id_actividad),
                 id_sala: String(form.id_sala),
@@ -123,7 +121,7 @@ export function NuevaClasePage() {
             setSuccess('Clase creada correctamente');
             setTimeout(() => navigate('/admin/clases'), 1500);
         } catch {
-            setError('Error al crear la clase. Revisá los datos.');
+            // sin mensaje
         } finally {
             setLoading(false);
         }
@@ -148,12 +146,6 @@ export function NuevaClasePage() {
                     <div className="space-y-1">
                         <Label htmlFor="cupo_base">Cupo base</Label>
                         <Input id="cupo_base" name="cupo_base" type="number" min="1" placeholder="15" value={form.cupo_base} onChange={handleChange} required />
-                    </div>
-
-                    <div className="space-y-1">
-                        <Label htmlFor="cupo_maximo">Cupo máximo</Label>
-                        <Input id="cupo_maximo" name="cupo_maximo" type="number" min="0" placeholder="1" value={form.cupo_maximo} onChange={handleChange} required />
-                        <p className="text-xs text-muted">Lugares reservados fuera del cupo general</p>
                     </div>
 
                     <div className="space-y-1">
