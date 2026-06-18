@@ -6,9 +6,8 @@ use chrono::NaiveDate;
 pub struct ListaEspera {
     id_espera: String,
     tipo: String,
-    fecha_ingreso: NaiveDate,
     id_clase: String,
-    clientes_en_espera: Vec<Cliente>,
+    clientes_en_espera: Vec<ClienteListaEspera>,
 }
 
 impl ListaEspera {
