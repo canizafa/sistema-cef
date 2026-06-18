@@ -1,4 +1,4 @@
-use crate::{app::rol::Estado, membresia::domain::Membresia};
+use crate::{membresia::domain::Membresia, membresia::estado::EstadoMembresia};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +7,7 @@ pub struct CreateMembresiaRequest {
     pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
-    pub estado: Estado,
+    pub estado: EstadoMembresia,
     pub fecha_inicio: NaiveDate,
     pub fecha_fin: NaiveDate,
 }
@@ -18,7 +18,7 @@ pub struct MembresiaResponse {
     pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
-    pub estado: Estado,
+    pub estado: EstadoMembresia,
     pub fecha_inicio: NaiveDate,
     pub fecha_fin: NaiveDate,
 }

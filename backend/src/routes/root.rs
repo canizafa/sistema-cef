@@ -1,11 +1,21 @@
 use axum::{Router, routing::get};
 
 use crate::{
-    actividad::route::actividad_router, app::state::AppState, asistencia::route::asistencia_router,
-    auth::route::auth_router, clase::route::clase_router, cliente::route::cliente_router,
-    empleado::route::empleado_router, membresia::route::membresia_router, pago::route::pago_router,
-    profesor::route::profesor_router, reserva::route::reserva_router, routes::health_checker,
+    actividad::route::actividad_router,
+    app::state::AppState,
+    asistencia::route::asistencia_router,
+    auth::route::auth_router,
+    clase::route::clase_router,
+    membresia::route::membresia_router,
+    notificaciones::route::notificaciones_route,
+    pago::route::pago_router,
+    reserva::route::reserva_router,
+    routes::health_checker,
     sala::route::sala_router,
+    usuarios::{
+        cliente::route::cliente_router, empleado::route::empleado_router,
+        profesor_route::profesor_router,
+    },
 };
 
 pub fn router() -> Router<AppState> {
@@ -20,6 +30,7 @@ pub fn router() -> Router<AppState> {
         .nest("/api/auth", auth_router())
         .nest("/api/asistencia", asistencia_router())
         .nest("/api/profesores", profesor_router())
+        .nest("/api/notificaciones", notificaciones_route())
         .nest("/api/salas", sala_router())
         .nest("/api/actividades", actividad_router())
 }

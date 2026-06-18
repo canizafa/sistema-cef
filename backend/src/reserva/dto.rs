@@ -1,4 +1,4 @@
-use crate::{app::rol::Estado, reserva::domain::Reserva};
+use crate::reserva::{domain::Reserva, estado::EstadoReserva};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct CreateReservaRequest {
     pub fecha: NaiveDate,
     pub tipo: String,
-    pub estado: Estado,
+    pub estado: EstadoReserva,
     pub dni_cliente: i64,
     pub id_clase: String,
 }
@@ -16,7 +16,7 @@ pub struct ReservaResponse {
     pub id_reserva: String,
     pub fecha: NaiveDate,
     pub tipo: String,
-    pub estado: Estado,
+    pub estado: EstadoReserva,
     pub dni_cliente: i64,
     pub id_clase: String,
 }

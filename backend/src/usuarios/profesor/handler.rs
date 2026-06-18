@@ -1,6 +1,6 @@
 use crate::{
     app::{errors::AppError, state::AppState},
-    profesor::{
+    usuarios::profesor::{
         self,
         dto::{CreateProfesorRequest, EliminarProfesorRequest, ProfesorResponse},
     },

@@ -1,6 +1,6 @@
 use crate::{
-    app::rol::{Estado, Genero},
-    profesor::domain::Profesor,
+    usuarios::profesor::domain::Profesor,
+    usuarios::{estado::EstadoUsuario, genero::GeneroUsuario},
 };
 use serde::{Deserialize, Serialize};
 
@@ -8,23 +8,23 @@ use serde::{Deserialize, Serialize};
 pub struct CreateProfesorRequest {
     pub dni: i64,
     pub nombre_completo: String,
-    pub genero: Genero,
-    pub estado: Estado,
+    pub genero: GeneroUsuario,
+    pub estado: EstadoUsuario,
 }
 
 #[derive(Debug, Serialize)]
 pub struct ProfesorResponse {
     pub dni: i64,
     pub nombre_completo: String,
-    pub genero: Genero,
-    pub estado: Estado,
+    pub genero: GeneroUsuario,
+    pub estado: EstadoUsuario,
     pub motivo_eliminacion: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EliminarProfesorRequest {
     pub profesor_dni: i64,
-    pub estado: Estado,
+    pub estado: EstadoUsuario,
     pub motivo_eliminacion: String,
 }
 

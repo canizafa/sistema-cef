@@ -1,8 +1,10 @@
 use super::dto::{ClienteResponse, CreateClienteRequest};
 use crate::app::{errors::AppError, state::AppState};
-use crate::cliente;
-use crate::cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest};
 use crate::ficha_medica::dto::FichaMedicaResponse;
+use crate::usuarios::cliente;
+use crate::usuarios::cliente::dto::{
+    ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest,
+};
 use axum::{
     Json,
     extract::{Path, State},

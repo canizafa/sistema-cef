@@ -12,6 +12,6 @@ pub fn cliente_router() -> Router<AppState> {
         .route("/update-cliente", put(update_cliente_handler))
         .route("/update-password/", put(update_password_handler))
         .route("/reset-password/{email}", put(reset_password_handler))
-        .route("/delete-cliente/{id}", delete(delete_cliente_handler))
+        .route("/delete-cliente", delete(delete_cliente_handler))
         .route("/get-all", get(get_clientes_handler))
 }
