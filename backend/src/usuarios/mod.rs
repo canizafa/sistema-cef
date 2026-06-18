@@ -7,4 +7,5 @@ mod cliente;
 mod empleado;
 mod estado;
 mod genero;
+mod profesor;
 mod rol;

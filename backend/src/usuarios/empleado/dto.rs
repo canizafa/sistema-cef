@@ -1,5 +1,5 @@
 use super::domain::Empleado;
-use crate::app::rol::{Estado, Rol};
+use crate::usuarios::{estado::EstadoUsuario, rol::RolUsuario};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -9,8 +9,8 @@ pub struct CreateEmpleadoRequest {
     pub password: String,
     pub mail: String,
     pub genero: String,
-    pub estado: Estado,
-    pub rol: Rol,
+    pub estado: EstadoUsuario,
+    pub rol: RolUsuario,
 }
 
 #[derive(Debug, Deserialize)]
@@ -19,8 +19,8 @@ pub struct UpdateEmpleadoRequest {
     pub nombre_apellido: String,
     pub mail: String,
     pub genero: String,
-    pub estado: Estado,
-    pub rol: Rol,
+    pub estado: EstadoUsuario,
+    pub rol: RolUsuario,
     pub motivo_eliminacion: Option<String>,
 }
 
@@ -35,7 +35,7 @@ pub struct UpdatePasswordRequest {
 #[derive(Debug, Deserialize)]
 pub struct EliminarEmpleadoRequest {
     pub dni: i64,
-    pub estado: Estado,
+    pub estado: EstadoUsuario,
     pub motivo_eliminacion: Option<String>,
 }
 
@@ -45,8 +45,8 @@ pub struct EmpleadoResponse {
     pub nombre_apellido: String,
     pub mail: String,
     pub genero: String,
-    pub estado: Estado,
-    pub rol: Rol,
+    pub estado: EstadoUsuario,
+    pub rol: RolUsuario,
     pub motivo_eliminacion: Option<String>,
 }
 
