@@ -1,4 +1,4 @@
-import { Clock, Calendar, Dumbbell } from 'lucide-react'
+import { Clock, Calendar, Users, Dumbbell, DoorOpen, UserRound } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -7,11 +7,16 @@ export type EstadoReserva = 'disponible' | 'sin-cupo' | 'reservada'
 
 interface ClaseCardClienteProps {
   idClase: string
+  dia: string
   diaSemana: string
   horario: string
   descripcion: string
+  lleno: boolean
   estadoReserva: EstadoReserva
   idActividad: string
+  idSala: string
+  dniProfesor: number
+  nombreProfesor: string
   onReservar?: () => void
   onCancelar?: () => void
   onListaEspera?: () => void
@@ -29,11 +34,16 @@ function getBadge(estado: EstadoReserva) {
 }
 
 export function ClaseCardCliente({
+  dia,
   diaSemana,
   horario,
   descripcion,
+  lleno,
   estadoReserva,
   idActividad,
+  idSala,
+  dniProfesor,
+  nombreProfesor,
   onReservar,
   onCancelar,
   onListaEspera,
@@ -53,7 +63,12 @@ export function ClaseCardCliente({
       <CardContent className="space-y-1.5 pb-3">
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-destructive" />
-          <span className="font-medium text-destructive">Día:</span>
+          <span className="font-medium text-destructive">Fecha inicio:</span>
+          <span className="text-gray-700">{dia ? dia.split('-').reverse().join('/') : '-'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Calendar className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Días de la semana:</span>
           <span className="text-gray-700">{diaSemana}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -62,9 +77,24 @@ export function ClaseCardCliente({
           <span className="text-gray-700">{horario}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
+          <Users className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Disponibilidad:</span>
+          <span className="text-gray-700">{lleno ? 'Sin lugares' : 'Con lugares'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
           <Dumbbell className="w-4 h-4 text-destructive" />
           <span className="font-medium text-destructive">Actividad:</span>
           <span className="text-gray-700">{idActividad}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <DoorOpen className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Sala:</span>
+          <span className="text-gray-700">{idSala}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <UserRound className="w-4 h-4 text-destructive" />
+          <span className="font-medium text-destructive">Profesor:</span>
+          <span className="text-gray-700">{nombreProfesor} — (DNI: {dniProfesor})</span>
         </div>
       </CardContent>
 
