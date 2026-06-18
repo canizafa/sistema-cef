@@ -59,16 +59,15 @@ impl Clase {
     pub fn get_cupo_base(&self) -> i64 {
         self.cupo_base
     }
+    pub fn get_inscripciones(&self) -> i64 {
+        self.inscripciones
+    }
     pub fn get_estado(&self) -> &Estado {
         &self.estado
     }
     pub fn get_id_sala(&self) -> &str {
         &self.id_sala
     }
-    pub fn get_inscripciones(&self) -> i64 {
-        self.inscripciones
-    }
-
     pub fn get_descripcion(&self) -> &str {
         &self.descripcion
     }
@@ -145,7 +144,7 @@ impl Clase {
         self.inscripciones >= self.cupo_base
     }
 
-    pub fn descontar_cupo(&mut self, sala_capacidad: i64) {
+    pub fn aumentar_inscripciones(&mut self, sala_capacidad: i64) {
         let _ = match self.estado {
             Estado::SinCupo => {}
             Estado::Extendido => {
