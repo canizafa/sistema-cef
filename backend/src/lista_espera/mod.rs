@@ -1,4 +1,4 @@
-mod cola_cliente;
+mod cliente_espera;
 mod domain;
 mod dto;
 mod errors;
