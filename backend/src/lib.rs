@@ -10,7 +10,6 @@ pub mod membresia;
 pub mod mercado_pago;
 pub mod notificaciones;
 pub mod pago;
-pub mod profesor;
 pub mod reserva;
 pub mod routes;
 pub mod sala;
