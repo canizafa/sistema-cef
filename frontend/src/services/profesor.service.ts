@@ -4,8 +4,8 @@ export interface Profesor {
     dni: number;
     nombre_completo: string;
     estado: string;
+    motivo_eliminacion?: string | null;
 }
-
 export interface CreateProfesor {
     dni: number;
     nombre_completo: string;
@@ -51,10 +51,10 @@ export const profesorService = {
     },
 
     async eliminarProfesor(dni: number, motivo: string): Promise<void> {
-        await api.delete('/profesores/delete-profesor', {
+        await api.delete(`/profesores/delete-profesor/${dni}`, {
             data: {
                 profesor_dni: dni,
-                estado: 'eliminado',
+                estado: 'baja',
                 motivo_eliminacion: motivo,
             }
         });

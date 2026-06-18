@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Mail, IdCard } from "lucide-react";
+import { clienteService } from "@/services/cliente.service";
 
 interface EliminarClienteModalProps {
   open: boolean;
@@ -33,11 +34,12 @@ export function EliminarClienteModal({
   async function handleEliminar() {
     setLoading(true);
     try {
-      // TODO: conectar al back cuando esté listo
-      // await clienteService.eliminarCliente(cliente.dni);
+      await clienteService.eliminarCliente(cliente.dni, motivo);
       onOpenChange(false);
       onEliminado?.();
       toast.success("Cliente eliminado con éxito");
+    } catch {
+      toast.error("No se pudo eliminar el cliente");
     } finally {
       setLoading(false);
     }

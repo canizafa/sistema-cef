@@ -17,7 +17,6 @@ export type ClaseDTO = {
 
 export type NuevaClaseData = {
     dia: string;
-    dia_semana: string;
     horario: string;
     cupo_base: number;
     cupo_maximo: number;
