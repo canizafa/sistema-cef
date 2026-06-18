@@ -1,4 +1,3 @@
-use crate::app::rol::Rol;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +28,7 @@ pub struct RegisterRequest {
     pub password: String,
     pub email: String,
     pub telefono: String,
-    pub rol: Rol,
+    pub rol: String,
     pub fecha_nacimiento: NaiveDate,
 }
 
@@ -38,5 +37,5 @@ pub struct AuthResponse {
     pub dni: i64,
     pub email: String,
     pub access_token: String,
-    pub rol: Rol,
+    pub rol: String,
 }

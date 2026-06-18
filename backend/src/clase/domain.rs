@@ -157,9 +157,6 @@ impl Clase {
                     self.inscripciones += 1;
                 }
             }
-            _ => {
-                panic!("Estado no válido: {:?}", self.estado)
-            }
         };
     }
     pub fn extender_cupo(&mut self) {

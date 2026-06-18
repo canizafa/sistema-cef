@@ -1,5 +1,6 @@
 use super::domain::Clase;
-use crate::app::{errors::DbError, rol::Estado};
+use crate::app::errors::DbError;
+use crate::clase::estado::EstadoClase;
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
@@ -11,7 +12,7 @@ struct ClaseRow {
     descripcion: String,
     cupo_base: i64,
     inscripciones: i64,
-    estado: Estado,
+    estado: EstadoClase,
     id_sala: String,
     dni_profesor: i64,
     id_actividad: String,

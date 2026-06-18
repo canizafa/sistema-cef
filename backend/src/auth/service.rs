@@ -3,12 +3,12 @@ use std::env;
 use sqlx::SqlitePool;
 
 use crate::{
-    app::{errors::AppError, mailer::Mailer, rol::Rol},
+    app::{errors::AppError, mailer::Mailer},
     auth::{
         dto::{AuthResponse, LoginRequest},
         jwt,
     },
-    cliente, empleado,
+    usuarios::{cliente, empleado},
 };
 
 pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthResponse, AppError> {
@@ -17,14 +17,14 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     {
         let jwt_token = jwt::generar_token(
             cliente.get_dni(),
-            Rol::Cliente,
+            "cliente".to_string(),
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
         return Ok(AuthResponse {
             dni: cliente.get_dni(),
             email: cliente.get_mail(),
             access_token: jwt_token,
-            rol: Rol::Cliente,
+            rol: "cliente".to_string(),
         });
     }
     if let Ok(empleado) =
@@ -32,14 +32,14 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     {
         let jwt_token = jwt::generar_token(
             empleado.get_dni(),
-            empleado.get_rol(),
+            "empleado".to_string(),
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
         Ok(AuthResponse {
             dni: empleado.get_dni(),
             email: empleado.get_mail(),
             access_token: jwt_token,
-            rol: empleado.get_rol(),
+            rol: "empleado".to_string(),
         })
     } else {
         return Err(AppError::InvalidCredentials);
