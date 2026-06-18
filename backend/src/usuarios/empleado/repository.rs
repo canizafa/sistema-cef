@@ -1,6 +1,6 @@
+use super::domain::Empleado;
 use crate::app::errors::DbError;
 use crate::app::rol::Estado;
-use crate::empleado::domain::Empleado;
 use sqlx::SqlitePool;
 
 #[derive(Debug, sqlx::FromRow)]

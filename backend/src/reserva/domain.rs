@@ -1,6 +1,5 @@
-use crate::{
-    app::rol::Estado,
-    reserva::{dto::CreateReservaRequest, errors::ReservaDomainError},
+use crate::reserva::{
+    dto::CreateReservaRequest, errors::ReservaDomainError, estado::EstadoReserva,
 };
 use chrono::NaiveDate;
 use uuid::Uuid;
@@ -8,7 +7,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct Reserva {
     id_reserva: String,
-    estado: Estado,
+    estado: EstadoReserva,
     tipo: String,
     fecha_reserva: NaiveDate,
     dni_cliente: i64,
@@ -18,7 +17,7 @@ pub struct Reserva {
 impl Reserva {
     pub fn new(
         id_reserva: String,
-        estado: Estado,
+        estado: EstadoReserva,
         tipo: String,
         fecha_reserva: NaiveDate,
         dni_cliente: i64,
@@ -38,7 +37,7 @@ impl Reserva {
         &self.id_reserva
     }
 
-    pub fn get_estado(&self) -> Estado {
+    pub fn get_estado(&self) -> EstadoReserva {
         self.estado.clone()
     }
 

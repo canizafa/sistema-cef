@@ -1,6 +1,6 @@
 use crate::{
-    app::{errors::DbError, rol::Estado},
-    reserva::domain::Reserva,
+    app::errors::DbError,
+    reserva::{domain::Reserva, estado::EstadoReserva},
 };
 use sqlx::SqlitePool;
 
@@ -60,7 +60,7 @@ impl ReservaRepository {
             .map(|row| {
                 Reserva::new(
                     row.id_reserva,
-                    Estado::from(row.estado),
+                    EstadoReserva::from(row.estado),
                     row.tipo,
                     chrono::NaiveDate::parse_from_str(&row.fecha_reserva, "%Y-%m-%d")
                         .unwrap_or(chrono::NaiveDate::from_ymd_opt(1970, 1, 1).unwrap()),
@@ -93,7 +93,7 @@ impl ReservaRepository {
 
         Ok(Reserva::new(
             row.id_reserva,
-            Estado::from(row.estado),
+            EstadoReserva::from(row.estado),
             row.tipo,
             chrono::NaiveDate::parse_from_str(&row.fecha_reserva, "%Y-%m-%d")
                 .unwrap_or(chrono::NaiveDate::from_ymd_opt(1970, 1, 1).unwrap()),

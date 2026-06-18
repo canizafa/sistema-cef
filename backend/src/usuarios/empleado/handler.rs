@@ -1,6 +1,6 @@
 use crate::{
     app::{errors::AppError, state::AppState},
-    empleado::{
+    usuarios::empleado::{
         self,
         dto::{
             CreateEmpleadoRequest, EliminarEmpleadoRequest, EmpleadoResponse, UpdateEmpleadoRequest,

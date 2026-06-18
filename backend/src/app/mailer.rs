@@ -55,4 +55,20 @@ impl Mailer {
 
         Ok(())
     }
+    pub async fn notify(&self, to: &str, subject: &str, body: &str) -> Result<(), AppError> {
+        let email = Message::builder()
+            .from(self.from.parse().map_err(|_| AppError::Internal)?)
+            .to(to.parse().map_err(|_| AppError::Internal)?)
+            .subject(subject)
+            .header(ContentType::TEXT_PLAIN)
+            .body(body.to_string())
+            .map_err(|_| AppError::Internal)?;
+
+        self.transport
+            .send(email)
+            .await
+            .map_err(|_| AppError::Internal)?;
+
+        Ok(())
+    }
 }

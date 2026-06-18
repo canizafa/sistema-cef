@@ -1,10 +1,8 @@
-use crate::{
-    app::rol::{Estado, Rol},
-    empleado::{
-        dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
-        errors::EmpleadoDomainError,
-    },
+use super::{
+    dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
+    errors::EmpleadoDomainError,
 };
+use crate::app::rol::{Estado, Rol};
 
 #[derive(Debug)]
 pub struct Empleado {

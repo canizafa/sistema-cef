@@ -1,8 +1,6 @@
 use super::domain::Cliente;
-use crate::app::{
-    errors::DbError,
-    rol::{Estado, Rol},
-};
+use crate::app::errors::DbError;
+use crate::usuarios::{estado::EstadoUsuario, rol::RolUsuario};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
@@ -14,10 +12,10 @@ pub struct ClienteRow {
     telefono: String,
     password: String,
     fecha_nacimiento: NaiveDate,
-    estado: Estado,
+    estado: EstadoUsuario,
     motivo_eliminacion: Option<String>,
     id_ficha: String,
-    rol: Rol,
+    rol: RolUsuario,
 }
 impl From<ClienteRow> for Cliente {
     fn from(row: ClienteRow) -> Self {
@@ -235,7 +233,7 @@ impl ClienteRepository {
     pub async fn update_estado(
         pool: &SqlitePool,
         id: i64,
-        estado: Estado,
+        estado: EstadoUsuario,
         motivo_eliminacion: Option<String>,
     ) -> Result<Cliente, DbError> {
         let row = sqlx::query_as::<_, ClienteRow>(
@@ -269,7 +267,7 @@ impl ClienteRepository {
     pub async fn delete(
         pool: &SqlitePool,
         dni: i64,
-        estado: Estado,
+        estado: EstadoUsuario,
         motivo_eliminacion: Option<String>,
     ) -> Result<(), DbError> {
         sqlx::query("UPDATE cliente SET estado = ?, motivo_eliminacion = ? WHERE dni_cliente = ?")
