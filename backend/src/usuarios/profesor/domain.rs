@@ -1,14 +1,14 @@
 use crate::{
-    app::rol::{Estado, Genero},
-    profesor::{dto::CreateProfesorRequest, errors::ProfesorDomainError},
+    usuarios::profesor::{dto::CreateProfesorRequest, errors::ProfesorDomainError},
+    usuarios::{estado::EstadoUsuario, genero::GeneroUsuario},
 };
 
 #[derive(Debug)]
 pub struct Profesor {
     dni: i64,
     nombre_completo: String,
-    genero: Genero,
-    estado: Estado,
+    genero: GeneroUsuario,
+    estado: EstadoUsuario,
     motivo_eliminacion: Option<String>,
 }
 
@@ -16,8 +16,8 @@ impl Profesor {
     pub fn new(
         dni: i64,
         nombre_completo: String,
-        genero: Genero,
-        estado: Estado,
+        genero: GeneroUsuario,
+        estado: EstadoUsuario,
         motivo_eliminacion: Option<String>,
     ) -> Self {
         Self {
@@ -36,11 +36,11 @@ impl Profesor {
         &self.nombre_completo
     }
 
-    pub fn get_genero(&self) -> &Genero {
+    pub fn get_genero(&self) -> &GeneroUsuario {
         &self.genero
     }
 
-    pub fn get_estado(&self) -> &Estado {
+    pub fn get_estado(&self) -> &EstadoUsuario {
         &self.estado
     }
     pub fn get_motivo_eliminacion(&self) -> Option<String> {

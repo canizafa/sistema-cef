@@ -101,10 +101,6 @@ Ejemplo de lista de errores de validación:
     ```json
     { "error": "Email o contraseña incorrectos" }
     ```
-  - `401 Unauthorized`
-    ```json
-    { "error": "Token invalido" }
-    ```
   - `500 Internal Server Error`
     ```json
     { "error": "Error de hash de contraseña" }
@@ -119,7 +115,7 @@ Ejemplo de lista de errores de validación:
 }
 ```
 - Respuesta: `200 OK`
-- Uso: enviar correo de restablecimiento de contraseña.
+- Uso: enviar correo de restablecimiento de contraseña para cliente o empleado.
 - Errores posibles:
   - `404 Not Found`
     ```json
@@ -133,7 +129,7 @@ Ejemplo de lista de errores de validación:
 ### PUT /api/auth/change-password/{dni}
 
 - Path param:
-  - `dni`: DNI del cliente
+  - `dni`: DNI del usuario (cliente o empleado).
 - Body:
 ```json
 {
@@ -172,11 +168,9 @@ Ejemplo de lista de errores de validación:
   "fecha_nacimiento": "1990-01-01",
   "estado": "alta",
   "ficha_medica": {
-    "altura": 180,
-    "peso": 75,
-    "enfermedades": "ninguna",
-    "alergias": "ninguna",
-    "medicacion": "ninguna"
+    "enfermedades": false,
+    "operaciones_quirurgicas": false,
+    "detalle": "sin detalles"
   }
 }
 ```
@@ -190,6 +184,7 @@ Ejemplo de lista de errores de validación:
   "fecha_nacimiento": "1990-01-01",
   "estado": "alta",
   "rol": "cliente",
+  "motivo_eliminacion": null,
   "id_ficha": "..."
 }
 ```
@@ -205,10 +200,10 @@ Ejemplo de lista de errores de validación:
       "details": [
         { "field": "dni", "message": "DNI demasiado corto" },
         { "field": "password", "message": "Contraseña muy corta" },
-        { "field": "name", "message": "Nombre no puede ser vacío" },
+        { "field": "nombre_apellido", "message": "Nombre no puede ser vacío" },
         { "field": "email", "message": "Email no puede ser vacío" },
-        { "field": "phone", "message": "Teléfono no puede ser vacío" },
-        { "field": "birth_date", "message": "Edad insuficiente" }
+        { "field": "telefono", "message": "Teléfono no puede ser vacío" },
+        { "field": "fecha_nacimiento", "message": "Edad insuficiente" }
       ]
     }
     ```
@@ -221,7 +216,13 @@ Ejemplo de lista de errores de validación:
 
 - Path param:
   - `id`: DNI del cliente
-- Respuesta: objeto Cliente.
+- Respuesta: arreglo JSON con cliente y ficha médica:
+```json
+[
+  { "dni": 12345678, "nombre_apellido": "Juan Pérez", ... },
+  { "id_ficha": "...", "enfermedades": false, "operaciones_quirurgicas": false, "detalle": "sin detalles" }
+]
+```
 - Errores posibles:
   - `404 Not Found`
     ```json
@@ -231,6 +232,24 @@ Ejemplo de lista de errores de validación:
     ```json
     { "error": "error interno del servidor" }
     ```
+
+### PUT /api/clientes/update-cliente
+
+- Body:
+```json
+{
+  "dni": 12345678,
+  "nombre_apellido": "Juan Pérez",
+  "email": "juan@ejemplo.com",
+  "telefono": "+541234567890",
+  "fecha_nacimiento": "1990-01-01",
+  "motivo_eliminacion": null,
+  "estado": "alta",
+  "id_ficha": "uuid-ficha"
+}
+```
+- Respuesta: objeto Cliente actualizado.
+- Nota: la implementación actual solo actualiza `nombre_apellido`.
 
 ### PUT /api/clientes/update-password/
 
@@ -252,15 +271,6 @@ Ejemplo de lista de errores de validación:
     ```json
     { "error": "Clave actual incorrecta, intente nuevamente" }
     ```
-  - `422 Unprocessable Entity`
-    ```json
-    {
-      "error": "errores de validación",
-      "details": [
-        { "field": "password", "message": "Contraseña muy corta" }
-      ]
-    }
-    ```
   - `500 Internal Server Error`
     ```json
     { "error": "Error de hash de contraseña" }
@@ -281,10 +291,16 @@ Ejemplo de lista de errores de validación:
     { "error": "error interno del servidor" }
     ```
 
-### DELETE /api/clientes/delete-cliente/{id}
+### DELETE /api/clientes/delete-cliente
 
-- Path param:
-  - `id`: DNI del cliente
+- Body:
+```json
+{
+  "dni": 12345678,
+  "estado": "baja",
+  "motivo_eliminacion": "cliente eliminado"
+}
+```
 - Respuesta: `200 OK`
 
 ### GET /api/clientes/get-all
@@ -337,8 +353,18 @@ Ejemplo de lista de errores de validación:
 
 ### DELETE /api/empleados/delete-empleado/{id}
 
-- Path param: `id` es DNI del empleado
+- Path param:
+  - `id`: DNI del empleado
+- Body:
+```json
+{
+  "dni": 12345678,
+  "estado": "baja",
+  "motivo_eliminacion": "empleado eliminado"
+}
+```
 - Respuesta: `200 OK`
+- Nota: el path param `id` existe en la ruta, pero el handler consume el identificador del JSON.
 
 ### GET /api/empleados/get-all
 
@@ -387,11 +413,12 @@ Ejemplo de lista de errores de validación:
 - Body:
 ```json
 {
+  "id_actividad": "uuid-actividad",
   "tipo": "premium",
   "dni_cliente": 12345678,
   "estado": "alta",
   "fecha_inicio": "2026-06-15",
-  "fecha_fin": null
+  "fecha_fin": "2026-12-15"
 }
 ```
 - Respuesta: objeto Membresía.
@@ -399,7 +426,7 @@ Ejemplo de lista de errores de validación:
 ### GET /api/membresias/get-membresia-dni/{id}
 
 - Path param: `id` es DNI del cliente
-- Respuesta: objeto Membresía.
+- Respuesta: lista de Membresías.
 
 ### GET /api/membresias/get-membresia-id/{id}
 
@@ -467,9 +494,7 @@ Ejemplo de lista de errores de validación:
 ```json
 {
   "dia": "2026-06-15",
-  "dia_semana": "Lunes",
   "horario": "10:00-11:00",
-  "cupo_maximo": 20,
   "cupo_base": 15,
   "estado": "alta",
   "id_actividad": "uuid-actividad",
@@ -599,6 +624,7 @@ Ejemplo de lista de errores de validación:
 }
 ```
 - Respuesta: objeto Actividad.
+- Status: `201 Created`
 
 ### GET /api/actividades/get-actividad/{id}
 
@@ -618,6 +644,20 @@ Ejemplo de lista de errores de validación:
 ### DELETE /api/actividades/delete/{id}
 
 - Path param: `id` es ID de la actividad
+- Respuesta: `200 OK`
+
+## Notificaciones
+
+### POST /api/notificaciones/
+
+- Body:
+```json
+{
+  "mail": "usuario@ejemplo.com",
+  "motivo": "Recordatorio",
+  "cuerpo": "Este es el cuerpo del correo"
+}
+```
 - Respuesta: `200 OK`
 
 ## Notas importantes

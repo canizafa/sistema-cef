@@ -1,6 +1,6 @@
+use super::domain::Empleado;
 use crate::app::errors::DbError;
-use crate::app::rol::Estado;
-use crate::empleado::domain::Empleado;
+use crate::usuarios::{estado::EstadoUsuario, rol::RolUsuario};
 use sqlx::SqlitePool;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -10,8 +10,8 @@ struct EmpleadoRow {
     password: String,
     mail: String,
     genero: String,
-    estado: Estado,
-    rol: String,
+    estado: EstadoUsuario,
+    rol: RolUsuario,
     motivo_eliminacion: Option<String>,
 }
 impl From<EmpleadoRow> for Empleado {
@@ -210,7 +210,7 @@ impl EmpleadoRepository {
     pub async fn delete(
         pool: &SqlitePool,
         dni: i64,
-        estado: Estado,
+        estado: EstadoUsuario,
         motivo_eliminacion: String,
     ) -> Result<(), DbError> {
         sqlx::query!(

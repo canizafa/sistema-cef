@@ -1,10 +1,8 @@
-use crate::{
-    app::rol::{Estado, Rol},
-    empleado::{
-        dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
-        errors::EmpleadoDomainError,
-    },
+use super::{
+    dto::{CreateEmpleadoRequest, UpdateEmpleadoRequest},
+    errors::EmpleadoDomainError,
 };
+use crate::usuarios::{estado::EstadoUsuario, rol::RolUsuario};
 
 #[derive(Debug)]
 pub struct Empleado {
@@ -13,8 +11,8 @@ pub struct Empleado {
     password_hash: String,
     mail: String,
     genero: String,
-    estado: Estado,
-    rol: Rol,
+    estado: EstadoUsuario,
+    rol: RolUsuario,
     motivo_eliminacion: Option<String>,
 }
 
@@ -25,8 +23,8 @@ impl Empleado {
         password_hash: String,
         mail: String,
         genero: String,
-        estado: Estado,
-        rol: Rol,
+        estado: EstadoUsuario,
+        rol: RolUsuario,
         motivo_eliminacion: Option<String>,
     ) -> Self {
         Self {
@@ -52,10 +50,10 @@ impl Empleado {
     pub fn get_genero(&self) -> String {
         self.genero.clone()
     }
-    pub fn get_estado(&self) -> Estado {
+    pub fn get_estado(&self) -> EstadoUsuario {
         self.estado.clone()
     }
-    pub fn get_rol(&self) -> Rol {
+    pub fn get_rol(&self) -> RolUsuario {
         self.rol.clone()
     }
     pub fn get_password_hash(&self) -> String {

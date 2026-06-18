@@ -1,5 +1,5 @@
 use super::domain::Clase;
-use crate::app::rol::Estado;
+use crate::clase::estado::EstadoClase;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +8,7 @@ pub struct CreateClaseRequest {
     pub dia: NaiveDate,
     pub horario: String,
     pub cupo_base: i64,
-    pub estado: Estado,
+    pub estado: EstadoClase,
     pub id_actividad: String,
     pub id_sala: String,
     pub dni_profesor: i64,
@@ -19,7 +19,7 @@ pub struct CreateClaseRequest {
 pub struct UpdateClaseRequest {
     pub id_clase: String,
     pub dni_profesor: i64,
-    pub estado: Estado,
+    pub estado: EstadoClase,
 }
 
 #[derive(Debug, Serialize)]
@@ -30,7 +30,7 @@ pub struct ClaseResponse {
     pub horario: String,
     pub cupo_base: i64,
     pub inscripciones: i64,
-    pub estado: Estado,
+    pub estado: EstadoClase,
     pub lleno: bool,
     pub dni_profesor: i64,
     pub descripcion: String,

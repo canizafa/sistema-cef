@@ -1,5 +1,5 @@
 use crate::{
-    app::rol::Estado,
+    membresia::estado::EstadoMembresia,
     membresia::{dto::CreateMembresiaRequest, errors::MembresiaDomainError},
 };
 use chrono::NaiveDate;
@@ -10,7 +10,7 @@ pub struct Membresia {
     id_membresia: String,
     tipo_actividad: String,
     dni_cliente: i64,
-    estado: Estado,
+    estado: EstadoMembresia,
     id_actividad: String,
     fecha_inicio: NaiveDate,
     fecha_fin: NaiveDate,
@@ -21,7 +21,7 @@ impl Membresia {
         id_membresia: String,
         tipo_actividad: String,
         dni_cliente: i64,
-        estado: Estado,
+        estado: EstadoMembresia,
         id_actividad: String,
         fecha_inicio: NaiveDate,
         fecha_fin: NaiveDate,
@@ -45,7 +45,7 @@ impl Membresia {
     pub fn get_dni_cliente(&self) -> i64 {
         self.dni_cliente
     }
-    pub fn get_estado(&self) -> Estado {
+    pub fn get_estado(&self) -> EstadoMembresia {
         self.estado.clone()
     }
     pub fn get_id_actividad(&self) -> String {

@@ -1,6 +1,6 @@
 use crate::{
     app::errors::AppError,
-    profesor::{
+    usuarios::profesor::{
         domain::Profesor,
         dto::{CreateProfesorRequest, EliminarProfesorRequest},
         repository::ProfesorRepository,

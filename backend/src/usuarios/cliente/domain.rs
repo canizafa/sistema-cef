@@ -1,8 +1,5 @@
 use super::{dto::CreateClienteRequest, errors::ClienteDomainError};
-use crate::{
-    app::rol::{Estado, Rol},
-    cliente::dto::ClienteRequest,
-};
+use crate::usuarios::{cliente::dto::ClienteRequest, estado::EstadoUsuario, rol::RolUsuario};
 
 use chrono::{Datelike, Local, NaiveDate};
 
@@ -14,10 +11,10 @@ pub struct Cliente {
     email: String,
     telefono: String,
     fecha_nacimiento: NaiveDate,
-    estado: Estado,
+    estado: EstadoUsuario,
     motivo_eliminacion: Option<String>,
     id_ficha: String,
-    rol: Rol,
+    rol: RolUsuario,
 }
 
 impl Cliente {
@@ -28,10 +25,10 @@ impl Cliente {
         email: String,
         telefono: String,
         fecha_nacimiento: NaiveDate,
-        estado: Estado,
+        estado: EstadoUsuario,
         motivo_eliminacion: Option<String>,
         id_ficha: String,
-        rol: Rol,
+        rol: RolUsuario,
     ) -> Self {
         Self {
             dni,
@@ -61,7 +58,7 @@ impl Cliente {
     pub fn get_fecha_nacimiento(&self) -> NaiveDate {
         self.fecha_nacimiento.clone()
     }
-    pub fn get_estado(&self) -> Estado {
+    pub fn get_estado(&self) -> EstadoUsuario {
         self.estado.clone()
     }
     pub fn get_motivo_eliminacion(&self) -> Option<String> {
@@ -70,7 +67,7 @@ impl Cliente {
     pub fn get_id_ficha(&self) -> &str {
         &self.id_ficha
     }
-    pub fn get_rol(&self) -> Rol {
+    pub fn get_rol(&self) -> RolUsuario {
         self.rol.clone()
     }
     pub fn get_password_hash(&self) -> &str {
@@ -159,7 +156,7 @@ impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
             fecha_nacimiento: request.fecha_nacimiento,
             estado: request.estado,
             id_ficha,
-            rol: Rol::Cliente,
+            rol: RolUsuario::Cliente,
         };
         let errors = cliente.validate_cliente();
         if !errors.is_empty() {
@@ -182,7 +179,7 @@ impl TryFrom<ClienteRequest> for Cliente {
             fecha_nacimiento: request.fecha_nacimiento,
             estado: request.estado,
             id_ficha: request.id_ficha,
-            rol: Rol::Cliente,
+            rol: RolUsuario::Cliente,
         };
         let errors = cliente.validate_cliente();
         if !errors.is_empty() {

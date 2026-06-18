@@ -1,7 +1,7 @@
 use super::domain::Cliente;
 use crate::{
-    app::rol::{Estado, Rol},
     ficha_medica::dto::CreateFichaMedicaRequest,
+    usuarios::{estado::EstadoUsuario, rol::RolUsuario},
 };
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
@@ -14,7 +14,7 @@ pub struct CreateClienteRequest {
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
-    pub estado: Estado,
+    pub estado: EstadoUsuario,
     pub ficha_medica: CreateFichaMedicaRequest,
 }
 
@@ -33,14 +33,14 @@ pub struct ClienteRequest {
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
     pub motivo_eliminacion: Option<String>,
-    pub estado: Estado,
+    pub estado: EstadoUsuario,
     pub id_ficha: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct EliminarClienteRequest {
     pub dni: i64,
-    pub estado: Estado,
+    pub estado: EstadoUsuario,
     pub motivo_eliminacion: Option<String>,
 }
 
@@ -51,8 +51,8 @@ pub struct ClienteResponse {
     pub email: String,
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
-    pub estado: Estado,
-    pub rol: Rol,
+    pub estado: EstadoUsuario,
+    pub rol: RolUsuario,
     pub motivo_eliminacion: Option<String>,
     pub id_ficha: String,
 }

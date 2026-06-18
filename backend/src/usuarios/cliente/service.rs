@@ -5,9 +5,11 @@ use crate::{
         mailer::{self, Mailer},
     },
     auth,
-    cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
-    empleado,
     ficha_medica::{self, domain::FichaMedica},
+    usuarios::{
+        cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
+        empleado,
+    },
 };
 use axum::http::request;
 use sqlx::SqlitePool;

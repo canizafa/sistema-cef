@@ -2,8 +2,8 @@ use sqlx::SqlitePool;
 
 use crate::{
     app::errors::{AppError, FieldError},
-    cliente,
     membresia::{domain::Membresia, dto::CreateMembresiaRequest, repository::MembresiaRepository},
+    usuarios::cliente_service,
 };
 
 pub async fn create(
@@ -21,7 +21,7 @@ pub async fn create(
         return Err(AppError::Validation(errors));
     }
     //Verificar si el cliente existe
-    let _ = cliente::service::get_by_dni(db, membresia.get_dni_cliente())
+    let _ = cliente_service::get_by_dni(db, membresia.get_dni_cliente())
         .await
         .map_err(AppError::from)?;
     //Verificar si ya tiene una membresia de esa actividad/tipo

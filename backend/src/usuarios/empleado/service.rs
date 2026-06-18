@@ -3,8 +3,9 @@ use crate::{
         errors::AppError,
         mailer::{self, Mailer},
     },
-    auth, cliente,
-    empleado::{
+    auth,
+    usuarios::cliente,
+    usuarios::empleado::{
         domain::Empleado,
         dto::{CreateEmpleadoRequest, EliminarEmpleadoRequest, UpdateEmpleadoRequest},
         repository::EmpleadoRepository,

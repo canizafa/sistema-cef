@@ -1,9 +1,7 @@
 use crate::{
-    app::{
-        errors::DbError,
-        rol::{Estado, Genero},
-    },
-    profesor::domain::Profesor,
+    app::errors::DbError,
+    usuarios::profesor::domain::Profesor,
+    usuarios::{estado::EstadoUsuario, genero::GeneroUsuario},
 };
 use sqlx::SqlitePool;
 
@@ -11,8 +9,8 @@ use sqlx::SqlitePool;
 struct ProfesorRow {
     dni_profesor: i64,
     nombre: String,
-    genero: Genero,
-    estado: Estado,
+    genero: GeneroUsuario,
+    estado: EstadoUsuario,
     motivo_eliminacion: Option<String>,
 }
 impl From<ProfesorRow> for Profesor {
@@ -119,7 +117,7 @@ impl ProfesorRepository {
     pub async fn delete(
         pool: &SqlitePool,
         dni: i64,
-        estado: Estado,
+        estado: EstadoUsuario,
         motivo_eliminacion: &str,
     ) -> Result<(), DbError> {
         sqlx::query!(

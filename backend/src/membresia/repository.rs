@@ -1,6 +1,5 @@
 use crate::{
-    app::{errors::DbError, rol::Estado},
-    membresia::domain::Membresia,
+    app::errors::DbError, membresia::domain::Membresia, membresia::estado::EstadoMembresia,
 };
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
@@ -11,7 +10,7 @@ struct MembresiaRow {
     pub id_actividad: String,
     pub tipo: String,
     pub dni_cliente: i64,
-    pub estado: Estado,
+    pub estado: EstadoMembresia,
     pub fecha_inicio: String,
     pub fecha_fin: String,
 }
@@ -115,7 +114,7 @@ impl MembresiaRepository {
                     row.id_membresia,
                     row.tipo,
                     row.dni_cliente,
-                    Estado::from(row.estado),
+                    EstadoMembresia::from(row.estado),
                     row.id_actividad,
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                     NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
@@ -147,7 +146,7 @@ impl MembresiaRepository {
             row.id_membresia,
             row.tipo,
             row.dni_cliente,
-            Estado::from(row.estado),
+            EstadoMembresia::from(row.estado),
             row.id_actividad,
             NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
             NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
