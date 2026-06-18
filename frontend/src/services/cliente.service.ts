@@ -12,6 +12,18 @@ export interface ClienteResponse {
     motivo_eliminacion: string | null;
 }
 
+export interface FichaMedicaResponse {
+    id_ficha: string;
+    enfermedades: boolean;
+    operaciones_quirurgicas: boolean;
+    detalle: string;
+}
+
+export interface PerfilResponse {
+    cliente: ClienteResponse;
+    ficha_medica: FichaMedicaResponse;
+}
+
 export interface UpdateClienteRequest {
     dni: number;
     nombre_apellido: string;
@@ -29,9 +41,12 @@ export const clienteService = {
         return response.data;
     },
 
-    async getPerfil(dni: number): Promise<ClienteResponse> {
-        const response = await api.get<ClienteResponse>(`/clientes/get-cliente/${dni}`);
-        return response.data;
+    async getPerfil(dni: number): Promise<PerfilResponse> {
+        const response = await api.get<[ClienteResponse, FichaMedicaResponse]>(`/clientes/get-cliente/${dni}`);
+        return {
+            cliente: response.data[0],
+            ficha_medica: response.data[1],
+        };
     },
 
     async updatePerfil(data: UpdateClienteRequest): Promise<ClienteResponse> {
