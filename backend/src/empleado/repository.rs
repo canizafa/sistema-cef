@@ -10,7 +10,7 @@ struct EmpleadoRow {
     password: String,
     mail: String,
     genero: String,
-    estado: String,
+    estado: Estado,
     rol: String,
     motivo_eliminacion: Option<String>,
 }
@@ -42,9 +42,10 @@ impl EmpleadoRepository {
                    genero,
                    estado,
                    rol,
+                   motivo_eliminacion
                )
-               VALUES (?, ?, ?, ?, ?, ?, ?)
-               RETURNING dni_empleado, nombre_apellido, mail, password, genero, estado, rol
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+               RETURNING dni_empleado, nombre_apellido, mail, password, genero, estado, rol, motivo_eliminacion
                "#,
         )
         .bind(empleado.get_dni())
@@ -54,6 +55,7 @@ impl EmpleadoRepository {
         .bind(empleado.get_genero())
         .bind(empleado.get_estado())
         .bind(empleado.get_rol())
+        .bind(empleado.get_motivo_eliminacion())
         .fetch_one(pool)
         .await
         .map_err(DbError::from)?;
@@ -71,7 +73,8 @@ impl EmpleadoRepository {
                   password,
                   genero,
                   estado,
-                  rol
+                  rol,
+                  motivo_eliminacion
               FROM empleado
               "#,
         )
@@ -92,7 +95,8 @@ impl EmpleadoRepository {
                     password,
                     genero,
                     estado,
-                    rol
+                    rol,
+                    motivo_eliminacion
                 FROM empleado
                 WHERE mail = ?
                 "#,
@@ -115,7 +119,8 @@ impl EmpleadoRepository {
                     password,
                     genero,
                     estado,
-                    rol
+                    rol,
+                    motivo_eliminacion
                 FROM empleado
                 WHERE dni_empleado = ?
                 "#,
