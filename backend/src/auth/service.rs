@@ -17,7 +17,8 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     {
         let jwt_token = jwt::generar_token(
             cliente.get_dni(),
-            "cliente".to_string(),
+            cliente.get_rol().to_string(),
+            cliente.get_estado().to_string(),
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
         return Ok(AuthResponse {
@@ -25,6 +26,7 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
             email: cliente.get_mail(),
             access_token: jwt_token,
             rol: "cliente".to_string(),
+            estado: cliente.get_estado().to_string(),
         });
     }
     if let Ok(empleado) =
@@ -32,14 +34,16 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     {
         let jwt_token = jwt::generar_token(
             empleado.get_dni(),
-            "empleado".to_string(),
+            empleado.get_rol().to_string(),
+            empleado.get_estado().to_string(),
             &env::var("JWT_SECRET").unwrap_or_default(),
         )?;
         Ok(AuthResponse {
             dni: empleado.get_dni(),
             email: empleado.get_mail(),
             access_token: jwt_token,
-            rol: "empleado".to_string(),
+            rol: empleado.get_rol().to_string(),
+            estado: empleado.get_estado().to_string(),
         })
     } else {
         return Err(AppError::InvalidCredentials);
