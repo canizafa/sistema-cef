@@ -38,4 +38,5 @@ pub struct AuthResponse {
     pub email: String,
     pub access_token: String,
     pub rol: String,
+    pub estado: String,
 }
