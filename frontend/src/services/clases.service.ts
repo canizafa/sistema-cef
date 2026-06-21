@@ -29,12 +29,14 @@ export type NuevaClaseData = {
 
 export type NuevaReservaData = {
     fecha: string;
+    tipo: string;
     estado: string;
     dni_cliente: number;
     id_clase: string;
 };
 
 export type ReservaResponse = {
+    id_reserva: string;
     fecha: string;
     tipo: string;
     estado: string;

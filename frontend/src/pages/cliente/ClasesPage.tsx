@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext'
 import { ClaseCardCliente, type EstadoReserva } from '@/components/clases/ClaseCardCliente'
 import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
-import { clasesService, type ClaseDTO } from '@/services/clases.service'
+import { clasesService, reservasService, type ClaseDTO } from '@/services/clases.service'
 import { actividadService, type Actividad } from '@/services/actividad.service'
 import { profesorService, type Profesor } from '@/services/profesor.service'
 import { pagosService } from '@/services/pagos.service'
@@ -14,6 +14,7 @@ export function ClasesPage() {
   const [actividades, setActividades] = useState<Actividad[]>([])
   const [profesores, setProfesores] = useState<Profesor[]>([])
   const [reservadas, setReservadas] = useState<Set<string>>(new Set())
+  const [reservaIdPorClase, setReservaIdPorClase] = useState<Map<string, string>>(new Map())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [claseSeleccionada, setClaseSeleccionada] = useState<ClaseDTO | null>(null)
@@ -23,14 +24,23 @@ export function ClasesPage() {
   useEffect(() => {
     async function cargar() {
       try {
-        const [dataClases, dataActividades, dataProfesores] = await Promise.all([
+        const [dataClases, dataActividades, dataProfesores, dataReservas] = await Promise.all([
           clasesService.getClases(),
           actividadService.getActividades(),
           profesorService.getProfesores(),
+          reservasService.getReservas(),
         ])
         setClases(dataClases)
         setActividades(dataActividades)
         setProfesores(dataProfesores)
+
+        if (user) {
+          const reservasConfirmadas = dataReservas.filter(
+            (r) => String(r.dni_cliente) === String(user.dni) && r.estado === 'confirmada'
+          )
+          setReservadas(new Set(reservasConfirmadas.map((r) => r.id_clase)))
+          setReservaIdPorClase(new Map(reservasConfirmadas.map((r) => [r.id_clase, r.id_reserva])))
+        }
       } catch {
         setError('No se pudieron cargar las clases.')
       } finally {
@@ -38,7 +48,7 @@ export function ClasesPage() {
       }
     }
     cargar()
-  }, [])
+  }, [user])
 
   function getNombreActividad(idActividad: string): string {
     return actividades.find((a) => String(a.id) === String(idActividad))?.nombre ?? idActividad
@@ -60,7 +70,7 @@ export function ClasesPage() {
   }
 
   async function handleConfirmar() {
-    if (!claseSeleccionada) return
+    if (!claseSeleccionada || !user) return
     setLoadingPago(true)
     try {
       const data = await pagosService.crearPago({
@@ -72,6 +82,11 @@ export function ClasesPage() {
         id_membresia: '',
         reserva_paga: '',
       })
+      localStorage.setItem('pending_reserva', JSON.stringify({
+        dni: user.dni,
+        idClase: claseSeleccionada.id_clase,
+        fecha: claseSeleccionada.dia,
+      }))
       window.location.href = data.sandbox_init_point
     } catch {
       // TODO: mostrar error en el modal
@@ -86,11 +101,23 @@ export function ClasesPage() {
   }
 
   async function handleCancelar(idClase: string) {
-    setReservadas((prev) => {
-      const next = new Set(prev)
-      next.delete(idClase)
-      return next
-    })
+    const idReserva = reservaIdPorClase.get(idClase)
+    if (!idReserva) return
+    try {
+      await reservasService.cancelarReserva(idReserva)
+      setReservadas((prev) => {
+        const next = new Set(prev)
+        next.delete(idClase)
+        return next
+      })
+      setReservaIdPorClase((prev) => {
+        const next = new Map(prev)
+        next.delete(idClase)
+        return next
+      })
+    } catch {
+      setError('No se pudo cancelar la reserva.')
+    }
   }
 
   async function handleListaEspera(_clase: ClaseDTO) {
