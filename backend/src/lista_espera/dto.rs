@@ -1,42 +1,25 @@
-use super::*;
-use crate::cliente::*;
-use chrono::NaiveDate;
+use super::domain::ListaEspera;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 pub struct CreateListaEsperaRequest {
-    pub dni_cliente: String,
     pub id_clase: String,
     pub tipo: String,
-    pub fecha: NaiveDate,
 }
 
 #[derive(Debug, Serialize)]
 pub struct ListaEsperaResponse {
     pub id_espera: String,
-    pub clientes_en_espera: Vec<ClienteResponse>,
-    pub id_clase: String,
     pub tipo: String,
-    pub fecha: NaiveDate,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ListaEsperaListResponse {
-    pub lista_espera: Vec<ListaEsperaResponse>,
+    pub id_clase: String,
 }
 
 impl From<ListaEspera> for ListaEsperaResponse {
     fn from(lista_espera: ListaEspera) -> Self {
         Self {
             id_espera: lista_espera.get_id_lista().to_string(),
-            clientes_en_espera: lista_espera
-                .get_clientes_en_espera()
-                .into_iter()
-                .map(|c| c.into())
-                .collect(),
-            id_clase: lista_espera.get_id_clase().to_string(),
             tipo: lista_espera.get_tipo().to_string(),
-            fecha: lista_espera.get_fecha_ingreso(),
+            id_clase: lista_espera.get_id_clase().to_string(),
         }
     }
 }

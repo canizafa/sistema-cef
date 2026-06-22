@@ -1,4 +1,4 @@
-use super::*;
+use super::dto::CreateClienteListaEsperaRequest;
 use crate::cliente::*;
 use chrono::NaiveDate;
 
@@ -28,5 +28,14 @@ impl ClienteListaEspera {
 
     pub fn get_fecha_ingreso(&self) -> NaiveDate {
         self.fecha_ingreso
+    }
+}
+impl From<CreateClienteListaEsperaRequest> for ClienteListaEspera {
+    fn from(request: CreateClienteListaEsperaRequest) -> Self {
+        Self::new(
+            request.id_espera,
+            request.dni_cliente,
+            request.fecha_ingreso,
+        )
     }
 }
