@@ -1,5 +1,7 @@
-use super::*;
-use crate::cliente::*;
+use crate::lista_espera::cliente_espera::{
+    dto::CreateClienteListaEsperaRequest, errors::ClienteListaEsperaDomainError,
+};
+
 use chrono::NaiveDate;
 
 #[derive(Debug, Clone)]
@@ -28,5 +30,24 @@ impl ClienteListaEspera {
 
     pub fn get_fecha_ingreso(&self) -> NaiveDate {
         self.fecha_ingreso
+    }
+    pub fn validate(&self) -> Vec<ClienteListaEsperaDomainError> {
+        let mut errors = Vec::new();
+        if self.dni_cliente <= 0 {
+            errors.push(ClienteListaEsperaDomainError::ClienteNotFound);
+        }
+        if self.id_espera.is_empty() {
+            errors.push(ClienteListaEsperaDomainError::IdEsperaEmpty);
+        }
+        errors
+    }
+}
+impl From<CreateClienteListaEsperaRequest> for ClienteListaEspera {
+    fn from(request: CreateClienteListaEsperaRequest) -> Self {
+        Self::new(
+            request.id_espera,
+            request.dni_cliente,
+            request.fecha_ingreso,
+        )
     }
 }

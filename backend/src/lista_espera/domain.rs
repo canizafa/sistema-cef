@@ -1,45 +1,40 @@
-use super::*;
-use crate::cliente::*;
-use chrono::NaiveDate;
+use super::dto::CreateListaEsperaRequest;
+use crate::lista_espera::errors::ListaEsperaDomainError;
 
 #[derive(Debug, Clone)]
 pub struct ListaEspera {
     id_espera: String,
     tipo: String,
     id_clase: String,
-    clientes_en_espera: Vec<ClienteListaEspera>,
 }
-
 impl ListaEspera {
-    pub fn new(
-        id_espera: String,
-        tipo: String,
-        fecha_ingreso: NaiveDate,
-        id_clase: String,
-        clientes_en_espera: Vec<Cliente>,
-    ) -> Self {
+    pub fn new(id_espera: String, tipo: String, id_clase: String) -> Self {
         Self {
             id_espera,
             tipo,
-            fecha_ingreso,
             id_clase,
-            clientes_en_espera,
         }
     }
     pub fn get_id_lista(&self) -> &str {
         &self.id_espera
     }
-    pub fn get_tipo(&self) -> String {
-        self.tipo.clone()
-    }
-    pub fn get_fecha_ingreso(&self) -> NaiveDate {
-        self.fecha_ingreso.clone()
+    pub fn get_tipo(&self) -> &str {
+        &self.tipo
     }
     pub fn get_id_clase(&self) -> &str {
         &self.id_clase
     }
-    pub fn get_clientes_en_espera(&self) -> Vec<Cliente> {
-        self.clientes_en_espera.clone()
+    pub fn validate(&self) -> Vec<ListaEsperaDomainError> {
+        let mut errors = vec![];
+
+        if self.tipo.trim().is_empty() {
+            errors.push(ListaEsperaDomainError::TipoInvalido);
+        }
+
+        if self.id_clase.trim().is_empty() {
+            errors.push(ListaEsperaDomainError::IdClaseInvalido);
+        }
+        errors
     }
 }
 
@@ -48,9 +43,7 @@ impl From<CreateListaEsperaRequest> for ListaEspera {
         Self {
             id_espera: uuid::Uuid::new_v4().to_string(),
             tipo: request.tipo,
-            fecha_ingreso: request.fecha,
             id_clase: request.id_clase,
-            clientes_en_espera: Vec::new(),
         }
     }
 }

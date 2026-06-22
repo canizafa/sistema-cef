@@ -1,117 +1,117 @@
-use super::*;
-use crate::app::*;
-use chrono::NaiveDate;
+use super::domain::ListaEspera;
+use crate::app::errors::DbError;
 use sqlx::SqlitePool;
 
+#[derive(Debug, sqlx::FromRow)]
+struct ListaEsperaRow {
+    id_espera: String,
+    tipo: String,
+    id_clase: String,
+}
+
+impl From<ListaEsperaRow> for ListaEspera {
+    fn from(row: ListaEsperaRow) -> Self {
+        ListaEspera::new(row.id_espera, row.tipo, row.id_clase)
+    }
+}
 pub struct ListaDeEsperaRepository;
 
 impl ListaDeEsperaRepository {
-    pub async fn delete_lista_espera(
-        pool: &SqlitePool,
-        id_espera: &str,
-    ) -> Result<ListaEspera, ApiError> {
-        let lista = Self::get_lista_espera_by_id(pool, id_espera).await?;
-
-        sqlx::query!(
+    pub async fn create(pool: &SqlitePool, lista: &ListaEspera) -> Result<ListaEspera, DbError> {
+        let row = sqlx::query_as::<_, ListaEsperaRow>(
             r#"
-                    DELETE FROM lista_de_espera
-                    WHERE id_espera = ?
-                    "#,
-            id_espera
+                   INSERT INTO lista_de_espera(
+                       id_espera,
+                       tipo,
+                       id_clase
+                   )
+                   VALUES (?, ?, ?)
+                   RETURNING
+                       id_espera,
+                       tipo,
+                       id_clase
+                   "#,
         )
-        .execute(pool)
+        .bind(lista.get_id_lista())
+        .bind(lista.get_tipo())
+        .bind(lista.get_id_clase())
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(lista)
+        Ok(row.into())
     }
-    pub async fn add_lista_espera(
-        pool: &SqlitePool,
-        id_espera: &str,
-        dni_cliente: &str,
-        id_clase: &str,
-        fecha: NaiveDate,
-    ) -> Result<ListaEspera, ApiError> {
-        let tipo = "general";
-
-        sqlx::query!(
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<ListaEspera, DbError> {
+        let row = sqlx::query_as::<_, ListaEsperaRow>(
             r#"
-                    INSERT INTO lista_de_espera (
-                        id_espera,
-                        tipo,
-                        fecha_ingreso,
-                        id_clase
-                    )
-                    VALUES (?, ?, ?, ?)
-                    "#,
-            id_espera,
-            tipo,
-            fecha,
-            id_clase
+               SELECT
+                   id_espera,
+                   tipo,
+                   id_clase
+               FROM lista_de_espera
+               WHERE id_espera = ?
+               "#,
         )
-        .execute(pool)
+        .bind(id)
+        .fetch_one(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Self::get_lista_espera_by_id(pool, id_espera).await
+        Ok(row.into())
     }
-    pub async fn get_lista_espera(pool: &SqlitePool) -> Result<Vec<ListaEspera>, ApiError> {
-        let rows = sqlx::query!(
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<ListaEspera>, DbError> {
+        let rows = sqlx::query_as::<_, ListaEsperaRow>(
             r#"
                     SELECT
-                    id_espera,
-                            tipo,
-                            fecha_ingreso,
-                            id_clase
+                        id_espera,
+                        tipo,
+                        id_clase
                     FROM lista_de_espera
-                    "#
+                    "#,
         )
         .fetch_all(pool)
         .await
-        .map_err(ApiError::DatabaseError)?;
+        .map_err(DbError::from)?;
 
-        Ok(rows
-            .into_iter()
-            .map(|row| {
-                ListaEspera::new(
-                    row.id_espera,
-                    row.tipo,
-                    row.fecha_ingreso.parse::<NaiveDate>().unwrap(),
-                    row.id_clase,
-                    Vec::new(),
-                )
-            })
-            .collect())
+        Ok(rows.into_iter().map(Into::into).collect())
     }
-    pub async fn get_lista_espera_by_id(
-        pool: &SqlitePool,
-        id_espera: &str,
-    ) -> Result<ListaEspera, ApiError> {
-        let row = sqlx::query!(
-            r#"
-             SELECT
-             id_espera,
-                     tipo,
-                     fecha_ingreso,
-                     id_clase
-             FROM lista_de_espera
-             WHERE id_espera = ?
-             "#,
-            id_espera
-        )
-        .fetch_optional(pool)
-        .await
-        .map_err(ApiError::DatabaseError)?;
 
-        match row {
-            Some(row) => Ok(ListaEspera::new(
-                row.id_espera,
-                row.tipo,
-                row.fecha_ingreso.parse::<NaiveDate>().unwrap(),
-                row.id_clase,
-                Vec::new(),
-            )),
-            None => Err(ApiError::NotFound),
-        }
+    pub async fn get_by_clase_y_tipo(
+        pool: &SqlitePool,
+        id_clase: &str,
+        tipo: &str,
+    ) -> Result<ListaEspera, DbError> {
+        let row = sqlx::query_as::<_, ListaEsperaRow>(
+            r#"
+                SELECT
+                    id_espera,
+                    tipo,
+                    id_clase
+                FROM lista_de_espera
+                WHERE id_clase = ?
+                  AND tipo = ?
+                "#,
+        )
+        .bind(id_clase)
+        .bind(tipo)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(row.into())
+    }
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
+        sqlx::query!(
+            r#"
+            DELETE FROM lista_de_espera
+            WHERE id_espera = ?
+            "#,
+            id
+        )
+        .execute(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(())
     }
 }

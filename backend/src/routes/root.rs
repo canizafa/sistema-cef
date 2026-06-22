@@ -6,6 +6,7 @@ use crate::{
     asistencia::route::asistencia_router,
     auth::route::auth_router,
     clase::route::clase_router,
+    lista_espera::route::lista_espera_router,
     membresia::route::membresia_router,
     notificaciones::route::notificaciones_route,
     pago::route::pago_router,
@@ -33,4 +34,5 @@ pub fn router() -> Router<AppState> {
         .nest("/api/notificaciones", notificaciones_route())
         .nest("/api/salas", sala_router())
         .nest("/api/actividades", actividad_router())
+        .nest("/api/lista-espera", lista_espera_router())
 }
