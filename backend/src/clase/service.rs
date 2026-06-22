@@ -83,3 +83,10 @@ pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), App
     ClaseRepository::update(db, id, &clase).await?;
     Ok(())
 }
+
+pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let mut clase = ClaseRepository::get_by_id(db, id).await?;
+    clase.decrementar_inscripciones();
+    ClaseRepository::update(db, id, &clase).await?;
+    Ok(())
+}

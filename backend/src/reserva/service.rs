@@ -68,5 +68,7 @@ pub async fn update(
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ReservaRepository::delete(db, id)
         .await
-        .map_err(AppError::from)
+        .map_err(AppError::from)?;
+    clase::service::decrementar_inscripciones(db, id).await?;
+    Ok(())
 }

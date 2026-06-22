@@ -1,10 +1,11 @@
 use super::dto::{CreateListaEsperaRequest, ListaEsperaResponse};
-use axum::Json;
-use axum::extract::{Path, State};
-use tracing::instrument;
-
 use crate::app::errors::AppError;
 use crate::app::state::AppState;
+use crate::lista_espera;
+use axum::Json;
+use axum::extract::{Path, State};
+use reqwest::StatusCode;
+use tracing::instrument;
 
 #[instrument(name = "lista_espera.create", skip(state, request), err)]
 pub async fn create_lista_espera_handler(
@@ -26,7 +27,7 @@ pub async fn get_lista_espera_handler(
 }
 
 #[instrument(name = "lista_espera.list", skip(state), err)]
-pub async fn get_listas_handler(
+pub async fn get_all_lista_espera_handler(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<ListaEsperaResponse>>, AppError> {
     let listas = lista_espera::service::get_all(&state.db).await?;
@@ -42,6 +43,5 @@ pub async fn delete_lista_espera_handler(
     Path(id): Path<String>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     lista_espera::service::delete(&state.db, &id).await?;
-
     Ok(StatusCode::OK)
 }

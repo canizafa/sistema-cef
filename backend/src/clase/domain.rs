@@ -159,6 +159,13 @@ impl Clase {
             }
         };
     }
+
+    pub fn decrementar_inscripciones(&mut self) {
+        if self.inscripciones > 0 {
+            self.inscripciones -= 1;
+        }
+    }
+
     pub fn extender_cupo(&mut self) {
         self.estado = EstadoClase::Extendido;
     }

@@ -1,6 +1,5 @@
-use crate::app::ApiError;
 use crate::app::errors::DbError;
-use crate::lista_espera::cliente_lista_espera::domain::ClienteListaEspera;
+use crate::lista_espera::cliente_espera::domain::ClienteListaEspera;
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
 #[derive(Debug, sqlx::FromRow)]
@@ -20,7 +19,7 @@ impl ClienteListaEsperaRepository {
     pub async fn create(
         pool: &SqlitePool,
         cliente: &ClienteListaEspera,
-    ) -> Result<ClienteListaEspera, ApiError> {
+    ) -> Result<ClienteListaEspera, DbError> {
         let row = sqlx::query_as::<_, ClienteListaEsperaRow>(
             r#"
                 INSERT INTO cliente_lista_espera (
@@ -48,7 +47,7 @@ impl ClienteListaEsperaRepository {
     pub async fn get_all(
         pool: &SqlitePool,
         id_espera: &str,
-    ) -> Result<Vec<ClienteListaEspera>, ApiError> {
+    ) -> Result<Vec<ClienteListaEspera>, DbError> {
         let rows = sqlx::query_as::<_, ClienteListaEsperaRow>(
             r#"
                SELECT
@@ -70,7 +69,7 @@ impl ClienteListaEsperaRepository {
     pub async fn get_next(
         pool: &SqlitePool,
         id_espera: &str,
-    ) -> Result<Option<ClienteListaEspera>, ApiError> {
+    ) -> Result<Option<ClienteListaEspera>, DbError> {
         let row = sqlx::query_as::<_, ClienteListaEsperaRow>(
             r#"
                 SELECT
@@ -94,7 +93,7 @@ impl ClienteListaEsperaRepository {
         pool: &SqlitePool,
         id_espera: &str,
         dni_cliente: i64,
-    ) -> Result<ClienteListaEspera, ApiError> {
+    ) -> Result<ClienteListaEspera, DbError> {
         let row = sqlx::query_as::<_, ClienteListaEsperaRow>(
             r#"
                 SELECT

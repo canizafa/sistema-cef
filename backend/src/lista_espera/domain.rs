@@ -1,6 +1,5 @@
 use super::dto::CreateListaEsperaRequest;
-use crate::app::errors::FieldError;
-use uuid::Uuid;
+use crate::lista_espera::errors::ListaEsperaDomainError;
 
 #[derive(Debug, Clone)]
 pub struct ListaEspera {
@@ -25,15 +24,15 @@ impl ListaEspera {
     pub fn get_id_clase(&self) -> &str {
         &self.id_clase
     }
-    pub fn validate(&self) -> Vec<FieldError> {
+    pub fn validate(&self) -> Vec<ListaEsperaDomainError> {
         let mut errors = vec![];
 
         if self.tipo.trim().is_empty() {
-            errors.push(FieldError::new("tipo", "Tipo invalido"));
+            errors.push(ListaEsperaDomainError::TipoInvalido);
         }
 
         if self.id_clase.trim().is_empty() {
-            errors.push(FieldError::new("id_clase", "Clase invalida"));
+            errors.push(ListaEsperaDomainError::IdClaseInvalido);
         }
         errors
     }
