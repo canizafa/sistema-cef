@@ -140,8 +140,8 @@ impl Cliente {
     }
     pub fn is_authorized(&self) -> bool {
         match self.estado {
-            EstadoUsuario::Activo => true,
-            EstadoUsuario::Inactivo | EstadoUsuario::Eliminado => false,
+            EstadoUsuario::Alta => true,
+            EstadoUsuario::Baja | EstadoUsuario::Eliminado => false,
         }
     }
 }
