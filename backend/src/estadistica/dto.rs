@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::domain::*;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct EstadisticaRequest {
     pub fecha_desde: NaiveDate,
     pub fecha_hasta: NaiveDate,

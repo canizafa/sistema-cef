@@ -15,6 +15,9 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     if let Ok(cliente) =
         cliente::service::login_cliente(db, &request.email, &request.password).await
     {
+        if !cliente.is_authorized() {
+            return Err(AppError::Unauthorized("Cliente no autorizado".to_string()));
+        }
         let jwt_token = jwt::generar_token(
             cliente.get_dni(),
             cliente.get_rol().to_string(),
@@ -32,6 +35,9 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     if let Ok(empleado) =
         empleado::service::login_empleado(db, &request.email, &request.password).await
     {
+        if !empleado.is_authorized() {
+            return Err(AppError::Unauthorized("Empleado no autorizado".to_string()));
+        }
         let jwt_token = jwt::generar_token(
             empleado.get_dni(),
             empleado.get_rol().to_string(),
