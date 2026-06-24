@@ -72,3 +72,13 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     clase::service::decrementar_inscripciones(db, id).await?;
     Ok(())
 }
+pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppError> {
+    let mut reservas = get_all(db).await.map_err(AppError::from)?;
+
+    let reservas_cliente = reservas.iter_mut().filter(|r| r.get_dni_cliente() == id);
+
+    for reserva in reservas_cliente {
+        delete(db, reserva.get_id()).await?;
+    }
+    Ok(())
+}
