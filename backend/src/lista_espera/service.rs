@@ -4,7 +4,7 @@ use crate::{
     app::errors::{AppError, FieldError},
     clase,
     lista_espera::{
-        cliente_espera::{self, dto::CreateClienteListaEsperaRequest},
+        cliente_espera::{self, domain::ClienteListaEspera, dto::CreateClienteListaEsperaRequest},
         domain::ListaEspera,
         dto::CreateListaEsperaRequest,
         repository::ListaDeEsperaRepository,
@@ -45,7 +45,7 @@ pub async fn insert_user(
 ) -> Result<(), AppError> {
     //verifica que exista la clase
     clase::service::get_by_id(db, id_clase).await?;
-    let errors: Vec<FieldError> = cliente_espera::domain::ClienteListaEspera::from(request.clone())
+    let errors: Vec<FieldError> = ClienteListaEspera::from(request.clone())
         .validate()
         .into_iter()
         .map(|e| e.into())
