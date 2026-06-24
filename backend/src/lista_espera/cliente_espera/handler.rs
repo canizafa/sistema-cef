@@ -5,7 +5,6 @@ use crate::{
         dto::{ClienteListaEsperaResponse, CreateClienteListaEsperaRequest},
     },
 };
-
 use axum::{
     Json,
     extract::{Path, State},

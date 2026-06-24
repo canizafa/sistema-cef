@@ -81,6 +81,7 @@ impl ClaseRepository {
 
         Ok(row.into())
     }
+
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Clase>, DbError> {
         let rows = sqlx::query_as::<_, ClaseRow>(
             "SELECT
@@ -126,7 +127,36 @@ impl ClaseRepository {
 
         Ok(row.into())
     }
+    pub async fn update_inscripciones(
+        pool: &SqlitePool,
+        id: &str,
+        inscripciones: i64,
+    ) -> Result<Clase, DbError> {
+        let row = sqlx::query_as::<_, ClaseRow>(
+            "UPDATE clase
+            SET
+                inscripciones = ?
+            WHERE id_clase = ?
+            RETURNING
+                id_clase,
+                dia,
+                horario,
+                cupo_base,
+                inscripciones,
+                estado,
+                descripcion,
+                id_actividad,
+                id_sala,
+                dni_profesor",
+        )
+        .bind(inscripciones)
+        .bind(id)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
 
+        Ok(row.into())
+    }
     pub async fn update(pool: &SqlitePool, id: &str, clase: &Clase) -> Result<Clase, DbError> {
         let row = sqlx::query_as::<_, ClaseRow>(
             "UPDATE clase
