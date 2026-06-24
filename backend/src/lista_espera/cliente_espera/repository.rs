@@ -84,7 +84,7 @@ impl ClienteListaEsperaRepository {
             LEFT JOIN membresias m
                 ON m.dni_cliente = cle.dni_cliente
                 AND m.id_actividad = c.id_actividad
-                AND m.estado = 'ACTIVA'
+                AND m.estado = 'activo'
             WHERE cle.id_espera = ?
             ORDER BY
                 CASE
