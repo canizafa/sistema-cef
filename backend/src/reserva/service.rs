@@ -73,9 +73,18 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     Ok(())
 }
 pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppError> {
-    let mut reservas = get_all(db).await.map_err(AppError::from)?;
+    let reservas = get_all(db).await.map_err(AppError::from)?;
+    let mut clases = clase::service::get_all(db).await.map_err(AppError::from)?;
 
-    let reservas_cliente = reservas.iter_mut().filter(|r| r.get_dni_cliente() == id);
+    let reservas_cliente = reservas.iter().filter(|r| r.get_dni_cliente() == id);
+    clases.iter_mut().for_each(|c| {
+        reservas.iter().for_each(|r| {
+            if c.get_id() == r.get_id_clase() {
+                c.decrementar_inscripciones();
+                //clase::service::update(db, c.get_id()).await?
+            }
+        });
+    });
 
     for reserva in reservas_cliente {
         delete(db, reserva.get_id()).await?;

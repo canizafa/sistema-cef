@@ -2,6 +2,7 @@ use super::dto::{CreateListaEsperaRequest, ListaEsperaResponse};
 use crate::app::errors::AppError;
 use crate::app::state::AppState;
 use crate::lista_espera;
+use crate::lista_espera::cliente_espera::dto::CreateClienteListaEsperaRequest;
 use axum::Json;
 use axum::extract::{Path, State};
 use reqwest::StatusCode;
@@ -43,5 +44,16 @@ pub async fn delete_lista_espera_handler(
     Path(id): Path<String>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     lista_espera::service::delete(&state.db, &id).await?;
+    Ok(StatusCode::OK)
+}
+
+#[instrument(name = "lista_espera.insert_user", skip(state), fields(id_clase = %id_clase), err)]
+#[axum::debug_handler]
+pub async fn insert_user(
+    State(state): State<AppState>,
+    Path(id_clase): Path<String>,
+    Json(request): Json<CreateClienteListaEsperaRequest>,
+) -> Result<impl axum::response::IntoResponse, AppError> {
+    lista_espera::service::insert_user(&state.db, request, &id_clase).await?;
     Ok(StatusCode::OK)
 }

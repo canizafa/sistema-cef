@@ -7,6 +7,7 @@ pub fn lista_espera_router() -> Router<AppState> {
     Router::new()
         .route("/create", post(create_lista_espera_handler))
         .route("/delete/{id}", delete(delete_lista_espera_handler))
+        .route("/insert-user/{id_clase}", post(insert_user))
         .route("/get-by-id/{id}", get(get_lista_espera_handler))
         .route("/get-all", get(get_all_lista_espera_handler))
 }
