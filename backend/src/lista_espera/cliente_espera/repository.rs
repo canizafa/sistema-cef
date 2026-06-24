@@ -72,14 +72,27 @@ impl ClienteListaEsperaRepository {
     ) -> Result<Option<ClienteListaEspera>, DbError> {
         let row = sqlx::query_as::<_, ClienteListaEsperaRow>(
             r#"
-                SELECT
-                    id_espera,
-                    dni_cliente,
-                    fecha_ingreso
-                FROM cliente_lista_espera
-                WHERE id_espera = ?
-                ORDER BY fecha_ingreso ASC
-                LIMIT 1
+            SELECT
+                cle.id_espera,
+                cle.dni_cliente,
+                cle.fecha_ingreso
+            FROM cliente_lista_espera cle
+            JOIN lista_de_espera le
+                ON le.id_espera = cle.id_espera
+            JOIN clase c
+                ON c.id_clase = le.id_clase
+            LEFT JOIN membresias m
+                ON m.dni_cliente = cle.dni_cliente
+                AND m.id_actividad = c.id_actividad
+                AND m.estado = 'ACTIVA'
+            WHERE cle.id_espera = ?
+            ORDER BY
+                CASE
+                    WHEN m.id_membresia IS NOT NULL THEN 1
+                    ELSE 0
+                END DESC,
+                cle.fecha_ingreso ASC
+            LIMIT 1;
                 "#,
         )
         .bind(id_espera)
