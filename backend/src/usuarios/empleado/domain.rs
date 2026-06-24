@@ -78,6 +78,12 @@ impl Empleado {
         }
         errors
     }
+    pub fn is_authorized(&self) -> bool {
+        match self.estado {
+            EstadoUsuario::Activo => true,
+            EstadoUsuario::Inactivo | EstadoUsuario::Eliminado => false,
+        }
+    }
 }
 
 impl From<(CreateEmpleadoRequest, String)> for Empleado {

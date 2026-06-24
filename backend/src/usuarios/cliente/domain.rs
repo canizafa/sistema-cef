@@ -138,6 +138,12 @@ impl Cliente {
         }
         vec_err
     }
+    pub fn is_authorized(&self) -> bool {
+        match self.estado {
+            EstadoUsuario::Alta => true,
+            EstadoUsuario::Baja | EstadoUsuario::Eliminado => false,
+        }
+    }
 }
 
 impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
