@@ -6,12 +6,12 @@ use crate::{
     },
     auth,
     ficha_medica::{self, domain::FichaMedica},
+    reserva,
     usuarios::{
         cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
         empleado,
     },
 };
-use axum::http::request;
 use sqlx::SqlitePool;
 
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
@@ -168,6 +168,7 @@ pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<C
 }
 
 pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<(), AppError> {
+    reserva::service::delete_all_by_client(db, request.dni).await?;
     ClienteRepository::delete(db, request.dni, request.estado, request.motivo_eliminacion)
         .await
         .map_err(AppError::from)

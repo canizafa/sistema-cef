@@ -72,6 +72,9 @@ impl Reserva {
         }
         vec_errors
     }
+    pub fn cancelar_reserva(&mut self) {
+        self.estado = EstadoReserva::Cancelada;
+    }
 }
 
 impl From<CreateReservaRequest> for Reserva {
