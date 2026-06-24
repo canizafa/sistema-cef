@@ -14,7 +14,6 @@ export function ClasesPage() {
   const [actividades, setActividades] = useState<Actividad[]>([])
   const [profesores, setProfesores] = useState<Profesor[]>([])
   const [reservadas, setReservadas] = useState<Set<string>>(new Set())
-  const [reservaIdPorClase, setReservaIdPorClase] = useState<Map<string, string>>(new Map())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [claseSeleccionada, setClaseSeleccionada] = useState<ClaseDTO | null>(null)
@@ -39,7 +38,6 @@ export function ClasesPage() {
             (r) => String(r.dni_cliente) === String(user.dni) && r.estado === 'confirmada'
           )
           setReservadas(new Set(reservasConfirmadas.map((r) => r.id_clase)))
-          setReservaIdPorClase(new Map(reservasConfirmadas.map((r) => [r.id_clase, r.id_reserva])))
         }
       } catch {
         setError('No se pudieron cargar las clases.')
@@ -100,26 +98,6 @@ export function ClasesPage() {
     setClaseSeleccionada(null)
   }
 
-  async function handleCancelar(idClase: string) {
-    const idReserva = reservaIdPorClase.get(idClase)
-    if (!idReserva) return
-    try {
-      await reservasService.cancelarReserva(idReserva)
-      setReservadas((prev) => {
-        const next = new Set(prev)
-        next.delete(idClase)
-        return next
-      })
-      setReservaIdPorClase((prev) => {
-        const next = new Map(prev)
-        next.delete(idClase)
-        return next
-      })
-    } catch {
-      setError('No se pudo cancelar la reserva.')
-    }
-  }
-
   async function handleListaEspera(_clase: ClaseDTO) {
     // TODO: implementar cuando el back tenga el endpoint de lista de espera
   }
@@ -169,7 +147,6 @@ export function ClasesPage() {
                       dniProfesor={clase.dni_profesor}
                       nombreProfesor={getNombreProfesor(clase.dni_profesor)}
                       onReservar={() => handleReservar(clase)}
-                      onCancelar={() => handleCancelar(clase.id_clase)}
                       onListaEspera={() => handleListaEspera(clase)}
                     />
                   ))}

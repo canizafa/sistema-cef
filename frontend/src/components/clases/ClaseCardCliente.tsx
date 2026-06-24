@@ -18,7 +18,6 @@ interface ClaseCardClienteProps {
   dniProfesor: number
   nombreProfesor: string
   onReservar?: () => void
-  onCancelar?: () => void
   onListaEspera?: () => void
 }
 
@@ -45,7 +44,6 @@ export function ClaseCardCliente({
   dniProfesor,
   nombreProfesor,
   onReservar,
-  onCancelar,
   onListaEspera,
 }: ClaseCardClienteProps) {
   return (
@@ -115,9 +113,9 @@ export function ClaseCardCliente({
           </>
         )}
         {estadoReserva === 'reservada' && (
-          <Button variant="destructive" size="sm" className="flex-1" onClick={onCancelar}>
-            Cancelar reserva
-          </Button>
+          <p className="text-xs text-gray-500 text-center w-full">
+            Podés cancelarla desde "Mis Reservas"
+          </p>
         )}
       </CardFooter>
     </Card>
