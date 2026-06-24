@@ -9,6 +9,12 @@ pub struct CreateClienteListaEsperaRequest {
     pub fecha_ingreso: NaiveDate,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ClienteListaEsperaRequest {
+    pub id_espera: String,
+    pub dni_cliente: i64,
+}
+
 #[derive(Debug, Serialize)]
 pub struct ClienteListaEsperaResponse {
     pub id_espera: String,
