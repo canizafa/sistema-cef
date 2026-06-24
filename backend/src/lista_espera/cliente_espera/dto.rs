@@ -2,7 +2,7 @@ use super::domain::ClienteListaEspera;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateClienteListaEsperaRequest {
     pub id_espera: String,
     pub dni_cliente: i64,
