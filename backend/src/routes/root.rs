@@ -6,6 +6,7 @@ use crate::{
     asistencia::route::asistencia_router,
     auth::route::auth_router,
     clase::route::clase_router,
+    estadistica::route::estadistica_router,
     lista_espera::route::lista_espera_router,
     membresia::route::membresia_router,
     notificaciones::route::notificaciones_route,
@@ -35,4 +36,5 @@ pub fn router() -> Router<AppState> {
         .nest("/api/salas", sala_router())
         .nest("/api/actividades", actividad_router())
         .nest("/api/lista-espera", lista_espera_router())
+        .nest("/api/estadisticas", estadistica_router())
 }
