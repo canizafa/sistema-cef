@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { ClienteCard } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
-import { clienteService } from '@/services/cliente.service'
+import { clienteService, type ClienteResponse } from '@/services/cliente.service'
+import { toast } from 'sonner'
 
 type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 type FiltroCliente = 'todos' | 'alta' | 'baja' | 'eliminado'
@@ -11,6 +12,9 @@ interface Cliente {
   dni: number
   nombreApellido: string
   email: string
+  telefono: string
+  fechaNacimiento: string
+  idFicha: string
   estadoCuenta: EstadoCuenta
   motivoEliminacion: string | null
 }
@@ -26,6 +30,7 @@ export function ClientesPage() {
   const [busquedaNombre, setBusquedaNombre] = useState('')
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
+  const [, setLoadingToggle] = useState<number | null>(null)
 
   useEffect(() => {
     clienteService.getClientes()
@@ -34,6 +39,9 @@ export function ClientesPage() {
           dni: c.dni,
           nombreApellido: c.nombre_apellido,
           email: c.email,
+          telefono: c.telefono,
+          fechaNacimiento: c.fecha_nacimiento,
+          idFicha: c.id_ficha,
           estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
           motivoEliminacion: c.motivo_eliminacion,
         })))
@@ -41,6 +49,42 @@ export function ClientesPage() {
       .catch(() => setError('No se pudieron cargar los clientes'))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleToggleEstado = async (dni: number) => {
+    const cliente = clientes.find((c) => c.dni === dni)
+    if (!cliente) return
+    setLoadingToggle(dni)
+    try {
+      const clienteRaw: ClienteResponse = {
+        dni: cliente.dni,
+        nombre_apellido: cliente.nombreApellido,
+        email: cliente.email,
+        telefono: cliente.telefono,
+        fecha_nacimiento: cliente.fechaNacimiento,
+        estado: cliente.estadoCuenta,
+        rol: 'cliente',
+        id_ficha: cliente.idFicha,
+        motivo_eliminacion: cliente.motivoEliminacion,
+      }
+      await clienteService.toggleEstado(clienteRaw)
+      setClientes((prev) =>
+        prev.map((c) =>
+          c.dni === dni
+            ? { ...c, estadoCuenta: c.estadoCuenta === 'alta' ? 'baja' : 'alta' }
+            : c
+        )
+      )
+      toast.success(
+        cliente.estadoCuenta === 'alta'
+          ? 'Cliente desactivado correctamente'
+          : 'Cliente activado correctamente'
+      )
+    } catch {
+      toast.error('No se pudo actualizar el estado del cliente')
+    } finally {
+      setLoadingToggle(null)
+    }
+  }
 
   const handleEliminar = (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
@@ -66,7 +110,6 @@ export function ClientesPage() {
       return normalizar(c.nombreApellido)
         .startsWith(normalizar(busquedaNombre.trim()))
     }
-
     if (filtro === 'alta') return c.estadoCuenta === 'alta'
     if (filtro === 'baja') return c.estadoCuenta === 'baja'
     if (filtro === 'eliminado') return c.estadoCuenta === 'eliminado'
@@ -74,9 +117,7 @@ export function ClientesPage() {
   })
 
   const mensajeVacio = () => {
-    if (busquedaNombre.trim() !== '') {
-      return 'No existe un cliente con ese nombre y apellido.'
-    }
+    if (busquedaNombre.trim() !== '') return 'No existe un cliente con ese nombre y apellido.'
     if (filtro === 'todos') return 'No hay clientes registrados en el sistema.'
     return 'No existen clientes con el filtro solicitado.'
   }
@@ -143,7 +184,7 @@ export function ClientesPage() {
             email={c.email}
             estadoCuenta={c.estadoCuenta}
             motivoEliminacion={c.motivoEliminacion}
-            onToggleEstado={() => console.log('toggle estado', c.dni)}
+            onToggleEstado={() => handleToggleEstado(c.dni)}
             onEliminar={() => handleEliminar(c.dni)}
           />
         ))}
