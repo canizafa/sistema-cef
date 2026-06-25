@@ -1,4 +1,4 @@
-mod cliente_espera;
+pub mod cliente_espera;
 mod dto;
 mod errors;
 mod handler;
