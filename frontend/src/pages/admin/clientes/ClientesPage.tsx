@@ -30,7 +30,7 @@ export function ClientesPage() {
   const [busquedaNombre, setBusquedaNombre] = useState('')
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
-  const [loadingToggle, setLoadingToggle] = useState<number | null>(null)
+  const [, setLoadingToggle] = useState<number | null>(null)
 
   useEffect(() => {
     clienteService.getClientes()
