@@ -99,6 +99,174 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     .await
     .map_err(DbError::from)?;
 
+    // CLASE YOGA (cupo 1)
+    sqlx::query(
+        "INSERT OR IGNORE INTO clase (
+            id_clase,
+            dia,
+            horario,
+            cupo_base,
+            inscripciones,
+            estado,
+            descripcion,
+            id_actividad,
+            id_sala,
+            dni_profesor
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind("CLASE001")
+    .bind("2026-07-01")
+    .bind("09:00")
+    .bind(1_i64)
+    .bind(0_i64)
+    .bind("alta")
+    .bind("Clase de yoga para principiantes")
+    .bind("ACT001")
+    .bind("SALA02")
+    .bind(40123456_i64)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // CLASE CROSSFIT (cupo 10)
+    sqlx::query(
+        "INSERT OR IGNORE INTO clase (
+            id_clase,
+            dia,
+            horario,
+            cupo_base,
+            inscripciones,
+            estado,
+            descripcion,
+            id_actividad,
+            id_sala,
+            dni_profesor
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind("CLASE002")
+    .bind("2026-07-01")
+    .bind("18:00")
+    .bind(10_i64)
+    .bind(0_i64)
+    .bind("alta")
+    .bind("Entrenamiento funcional de alta intensidad")
+    .bind("ACT002")
+    .bind("SALA01")
+    .bind(38999888_i64)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // CLIENTE
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento
+        ) VALUES (?, ?, ?, ?, ?)",
+    )
+    .bind(40111222_i64)
+    .bind("Ana Martinez")
+    .bind("ana@gmail.com")
+    .bind("2215551234")
+    .bind("1995-05-10")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // FICHA MÉDICA 1
+    sqlx::query(
+        "INSERT OR IGNORE INTO ficha_medica (
+            id_ficha,
+            enfermedades,
+            operaciones_quirurgicas,
+            detalles
+        ) VALUES (?, ?, ?, ?)",
+    )
+    .bind("FICHA001")
+    .bind(false)
+    .bind(false)
+    .bind(None::<String>)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // FICHA MÉDICA 2
+    sqlx::query(
+        "INSERT OR IGNORE INTO ficha_medica (
+            id_ficha,
+            enfermedades,
+            operaciones_quirurgicas,
+            detalles
+        ) VALUES (?, ?, ?, ?)",
+    )
+    .bind("FICHA002")
+    .bind(true)
+    .bind(false)
+    .bind(Some("Asma leve"))
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    let cliente1_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+    let cliente2_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+
+    // CLIENTE 1
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            motivo_eliminacion,
+            id_ficha
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(40111222_i64)
+    .bind("Ana Martinez")
+    .bind("ana@gmail.com")
+    .bind("2215551234")
+    .bind("1995-05-10")
+    .bind("alta")
+    .bind(cliente1_password)
+    .bind(None::<String>)
+    .bind("FICHA001")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // CLIENTE 2
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            motivo_eliminacion,
+            id_ficha
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(40222333_i64)
+    .bind("Pedro Lopez")
+    .bind("pedro@gmail.com")
+    .bind("2215555678")
+    .bind("1990-08-15")
+    .bind("alta")
+    .bind(cliente2_password)
+    .bind(None::<String>)
+    .bind("FICHA002")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
     tracing::info!("Base de datos cargada exitosamente");
 
     Ok(())
