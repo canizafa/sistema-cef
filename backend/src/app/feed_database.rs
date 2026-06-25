@@ -99,6 +99,64 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     .await
     .map_err(DbError::from)?;
 
+    // CLASE YOGA (cupo 1)
+    sqlx::query(
+        "INSERT OR IGNORE INTO clase (
+            id_clase,
+            dia,
+            horario,
+            cupo_base,
+            inscripciones,
+            estado,
+            descripcion,
+            id_actividad,
+            id_sala,
+            dni_profesor
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind("CLASE001")
+    .bind("2026-07-01")
+    .bind("09:00")
+    .bind(1_i64)
+    .bind(0_i64)
+    .bind("alta")
+    .bind("Clase de yoga para principiantes")
+    .bind("ACT001")
+    .bind("SALA02")
+    .bind(40123456_i64)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // CLASE CROSSFIT (cupo 10)
+    sqlx::query(
+        "INSERT OR IGNORE INTO clase (
+            id_clase,
+            dia,
+            horario,
+            cupo_base,
+            inscripciones,
+            estado,
+            descripcion,
+            id_actividad,
+            id_sala,
+            dni_profesor
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind("CLASE002")
+    .bind("2026-07-01")
+    .bind("18:00")
+    .bind(10_i64)
+    .bind(0_i64)
+    .bind("alta")
+    .bind("Entrenamiento funcional de alta intensidad")
+    .bind("ACT002")
+    .bind("SALA01")
+    .bind(38999888_i64)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
     tracing::info!("Base de datos cargada exitosamente");
 
     Ok(())
