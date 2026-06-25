@@ -44,10 +44,10 @@ export type ReservaResponse = {
     id_clase: string;
 };
 
-export type NuevaListaEsperaData = {
-    dni_cliente: number;
+export type ListaEsperaResponse = {
+    id_espera: string;
+    tipo: string;
     id_clase: string;
-    fecha: string;
 };
 
 export const clasesService = {
@@ -95,8 +95,21 @@ export const reservasService = {
 };
 
 export const listaEsperaService = {
-    async anotarse(data: NuevaListaEsperaData) {
-        const response = await api.post('/lista-espera', data);
+    async getAll(): Promise<ListaEsperaResponse[]> {
+        const response = await api.get('/lista-espera/get-all');
         return response.data;
+    },
+
+    async crearLista(idClase: string, tipo: string): Promise<ListaEsperaResponse> {
+        const response = await api.post('/lista-espera/create', { id_clase: idClase, tipo });
+        return response.data;
+    },
+
+    async anotarse(idClase: string, idEspera: string, dniCliente: number): Promise<void> {
+        await api.post(`/lista-espera/insert-user/${idClase}`, {
+            id_espera: idEspera,
+            dni_cliente: dniCliente,
+            fecha_ingreso: new Date().toLocaleDateString('en-CA'),
+        });
     },
 };

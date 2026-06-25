@@ -16,6 +16,7 @@ export function ReservasPage() {
 
     const [reservaParaQr, setReservaParaQr] = useState<ReservaResponse | null>(null);
     const [segundosRestantes, setSegundosRestantes] = useState(DURACION_QR_SEGUNDOS);
+    const [cancelandoId, setCancelandoId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!user) return;
@@ -48,6 +49,18 @@ export function ReservasPage() {
 
     function cerrarQr() {
         setReservaParaQr(null);
+    }
+
+    async function handleCancelar(idReserva: string) {
+        setCancelandoId(idReserva);
+        try {
+            await reservasService.cancelarReserva(idReserva);
+            setReservas((prev) => prev.filter((r) => r.id_reserva !== idReserva));
+        } catch {
+            setError('No se pudo cancelar la reserva.');
+        } finally {
+            setCancelandoId(null);
+        }
     }
 
     function formatTiempo(segundos: number): string {
@@ -103,6 +116,16 @@ export function ReservasPage() {
                                     Ver QR
                                 </button>
                             </div>
+                            {reserva.estado === 'confirmada' && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleCancelar(reserva.id_reserva)}
+                                    disabled={cancelandoId === reserva.id_reserva}
+                                    className="w-full border border-red-300 text-red-600 rounded-md h-8 text-xs font-medium hover:bg-red-50 disabled:opacity-50"
+                                >
+                                    {cancelandoId === reserva.id_reserva ? 'Cancelando...' : 'Cancelar reserva'}
+                                </button>
+                            )}
                         </div>
                     );
                 })}
