@@ -44,8 +44,13 @@ export function LoginPage() {
       } else {
         navigate('/admin/clases');
       }
-    } catch {
-      setError('Email o contraseña incorrectos');
+    } catch (error: any) {
+      const mensaje = error.response?.data?.error
+      if (mensaje === 'Cuenta desactivada o eliminada') {
+        setError('Tu cuenta fue eliminada o desactivada. Contactá al administrador.')
+      } else {
+        setError('Email o contraseña incorrectos.')
+      }
     } finally {
       setLoading(false);
     }

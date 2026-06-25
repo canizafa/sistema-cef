@@ -22,6 +22,7 @@ import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
 
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
+
 // Admin - Clases
 import AdminClasesPage from '@/pages/admin/clases/ClasesPage';
 import { NuevaClasePage } from '@/pages/admin/clases/NuevaClasePage';
@@ -31,14 +32,14 @@ import { EditarClasePage } from '@/pages/admin/clases/EditarClasePage';
 import { EmpleadosPage } from '@/pages/admin/empleados/EmpleadosPage';
 import { NuevoEmpleadoPage } from '@/pages/admin/empleados/NuevoEmpleadoPage';
 import { EditarEmpleadoPage } from '@/pages/admin/empleados/EditarEmpleadoPage';
-import { NuevoProfesorPage } from '@/pages/admin/profesores/NuevoProfesorPage';
 
-//Admin - Profesores
+// Admin - Profesores
 import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
+import { NuevoProfesorPage } from '@/pages/admin/profesores/NuevoProfesorPage';
+import { EditarProfesoresPage } from '@/pages/admin/profesores/EditarProfesoresPage';
+
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
-
-
 
 // Admin - Asistencias y Reportes
 import { AsistenciasPage } from '@/pages/admin/asistencias/AsistenciasPage';
@@ -66,10 +67,10 @@ export const AppRouter = () => {
 
             {/* Rutas de administración: requieren rol admin o dueño */}
             <Route path="/admin" element={
-            <ProtectedRoute>
-               <AdminLayout />
-            </ProtectedRoute>
-                                          }>
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            }>
                 {/* Clases */}
                 <Route path="clases" element={<AdminClasesPage />} />
                 <Route path="clases/nueva" element={<NuevaClasePage />} />
@@ -79,15 +80,14 @@ export const AppRouter = () => {
                 <Route path="empleados" element={<EmpleadosPage />} />
                 <Route path="empleados/nuevo" element={<NuevoEmpleadoPage />} />
                 <Route path="empleados/:id/editar" element={<EditarEmpleadoPage />} />
-              
+
                 {/* Profesores - solo dueño */}
-                 <Route path="profesores" element={<ProfesoresPage />} /> 
-                 <Route path="profesores/nuevo" element={<NuevoProfesorPage />} />         
-                                
+                <Route path="profesores" element={<ProfesoresPage />} />
+                <Route path="profesores/nuevo" element={<NuevoProfesorPage />} />
+                <Route path="profesores/:id/editar" element={<EditarProfesoresPage />} />
+
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
-            
-              
 
                 {/* Asistencias */}
                 <Route path="asistencias" element={<AsistenciasPage />} />

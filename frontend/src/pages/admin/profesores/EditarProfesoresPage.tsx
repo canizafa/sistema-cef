@@ -1,45 +1,34 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { empleadoService } from '@/services/empleados.service'
+import { profesorService } from '@/services/profesor.service'
 
-export function EditarEmpleadoPage() {
+export function EditarProfesoresPage() {
   const { id } = useParams()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
-    dni: '',
-    mail: '',
   })
   const [genero, setGenero] = useState('')
   const [estado, setEstado] = useState('')
-  const [rol, setRol] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingDatos, setLoadingDatos] = useState(true)
 
   useEffect(() => {
-    empleadoService.getEmpleados()
-      .then((data: any[]) => {
-        const empleado = data.find((e) => String(e.dni) === String(id))
-        if (!empleado) {
-          setError('No se encontró el empleado')
-          return
-        }
-        const [nombre, ...resto] = empleado.nombre_apellido.split(' ')
+    profesorService.getProfesor(Number(id))
+      .then((profesor) => {
+        const [nombre, ...resto] = profesor.nombre_completo.split(' ')
         setForm({
           nombre,
           apellido: resto.join(' '),
-          dni: String(empleado.dni),
-          mail: empleado.mail,
         })
-        setGenero(empleado.genero)
-        setEstado(empleado.estado)
-        setRol(empleado.rol)
+        setGenero('otro')
+        setEstado(profesor.estado)
       })
-      .catch(() => setError('No se pudieron cargar los datos del empleado'))
+      .catch(() => setError('No se pudieron cargar los datos del profesor'))
       .finally(() => setLoadingDatos(false))
   }, [id])
 
@@ -53,18 +42,15 @@ export function EditarEmpleadoPage() {
     setSuccess(null)
     setLoading(true)
     try {
-      await empleadoService.actualizarEmpleado(Number(id), {
-        dni: Number(form.dni),
-        nombre_apellido: `${form.nombre} ${form.apellido}`,
-        mail: form.mail,
+      await profesorService.actualizarProfesor(Number(id), {
+        nombre_completo: `${form.nombre} ${form.apellido}`,
         genero,
         estado,
-        rol,
       })
-      setSuccess('Empleado actualizado correctamente')
-      setTimeout(() => navigate('/admin/empleados', { state: { editadoDni: Number(id) } }), 3000)
+      setSuccess('Profesor actualizado correctamente')
+      setTimeout(() => navigate('/admin/profesores'), 3000)
     } catch {
-      setError('Error al actualizar el empleado. Revisá los datos.')
+      setError('Error al actualizar el profesor. Revisá los datos.')
     } finally {
       setLoading(false)
     }
@@ -73,7 +59,7 @@ export function EditarEmpleadoPage() {
   if (loadingDatos) {
     return (
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <p className="text-sm text-muted">Cargando datos del empleado...</p>
+        <p className="text-sm text-muted">Cargando datos del profesor...</p>
       </main>
     )
   }
@@ -81,7 +67,7 @@ export function EditarEmpleadoPage() {
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center">Editar empleado</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Editar profesor</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label htmlFor="nombre" className="text-sm font-medium">Nombre</label>
@@ -110,22 +96,9 @@ export function EditarEmpleadoPage() {
             <input
               id="dni"
               name="dni"
-              value={form.dni}
+              value={id}
               disabled
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm opacity-50 cursor-not-allowed"
-            />
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="mail" className="text-sm font-medium">Email</label>
-            <input
-              id="mail"
-              name="mail"
-              type="email"
-              placeholder="empleado@cef.com"
-              value={form.mail}
-              onChange={handleChange}
-              required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
           </div>
 
@@ -135,7 +108,7 @@ export function EditarEmpleadoPage() {
           <div className="flex gap-2 pt-2">
             <button
               type="button"
-              onClick={() => navigate('/admin/empleados')}
+              onClick={() => navigate('/admin/profesores')}
               className="flex-1 border border-input bg-background text-sm font-medium rounded-md h-10 hover:bg-surface"
             >
               Cancelar
