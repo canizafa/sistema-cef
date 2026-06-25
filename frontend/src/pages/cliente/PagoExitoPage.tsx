@@ -14,7 +14,7 @@ function formatFechaCorta(fecha: string): string {
 export function PagoExitoPage() {
     const { user } = useAuth();
     const [esMembresía, setEsMembresia] = useState(false);
-    const [clasesLlenas, setClasesLlenas] = useState<string[]>([]);
+    const [avisosClases, setAvisosClases] = useState<string[]>([]);
     const [errorMembresia, setErrorMembresia] = useState(false);
     const [errorReserva, setErrorReserva] = useState(false);
     const yaProcesado = useRef(false);
@@ -71,6 +71,7 @@ export function PagoExitoPage() {
                     lleno: boolean;
                     diaSemana: string;
                     nombreActividad: string;
+                    yaReservada: boolean;
                 }[];
             };
             const dniEfectivo = dni ?? user?.dni;
@@ -81,11 +82,21 @@ export function PagoExitoPage() {
             promesa
                 .then(async () => {
                     if (!clases || clases.length === 0) return;
-                    const disponibles = clases.filter((c) => !c.lleno);
-                    const llenas = clases.filter((c) => c.lleno);
-                    setClasesLlenas(
-                        llenas.map((c) => `${c.nombreActividad} ${c.diaSemana} ${formatFechaCorta(c.fecha)}`)
-                    );
+                    const yaReservadas = clases.filter((c) => c.yaReservada);
+                    const llenas = clases.filter((c) => !c.yaReservada && c.lleno);
+                    const disponibles = clases.filter((c) => !c.yaReservada && !c.lleno);
+
+                    const descripcion = (c: (typeof clases)[number]) =>
+                        `${c.nombreActividad} ${c.diaSemana} ${formatFechaCorta(c.fecha)}`;
+                    setAvisosClases([
+                        ...yaReservadas.map(
+                            (c) => `Clase ${descripcion(c)} ya tenías una reserva individual, no se duplicó.`
+                        ),
+                        ...llenas.map(
+                            (c) => `Clase ${descripcion(c)} se encuentra llena, te anotamos en la lista de espera.`
+                        ),
+                    ]);
+
                     await Promise.allSettled(
                         disponibles.map((c) =>
                             reservasService.crearReserva({
@@ -147,12 +158,10 @@ export function PagoExitoPage() {
                             Hubo un problema al registrar tu reserva. Contactá a soporte.
                         </p>
                     )}
-                    {clasesLlenas.length > 0 && (
+                    {avisosClases.length > 0 && (
                         <ul className='text-xs text-amber-600 text-left list-disc list-inside space-y-1'>
-                            {clasesLlenas.map((descripcion) => (
-                                <li key={descripcion}>
-                                    Clase {descripcion} se encuentra llena, te anotamos en la lista de espera.
-                                </li>
+                            {avisosClases.map((aviso) => (
+                                <li key={aviso}>{aviso}</li>
                             ))}
                         </ul>
                     )}
