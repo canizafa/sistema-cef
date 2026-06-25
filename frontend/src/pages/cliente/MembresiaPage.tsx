@@ -15,6 +15,7 @@ export function MembresiaPage() {
     const [error, setError] = useState<string | null>(null);
     const [procesandoId, setProcesandoId] = useState<string | null>(null);
     const [seleccion, setSeleccion] = useState<Record<string, string>>({});
+    const [clasesYaReservadas, setClasesYaReservadas] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (!user) return;
@@ -22,11 +23,16 @@ export function MembresiaPage() {
             membresiaService.getMembresiasPorDni(user.dni),
             actividadService.getActividades(),
             clasesService.getClases(),
+            reservasService.getReservas(),
         ])
-            .then(([mems, acts, cls]) => {
+            .then(([mems, acts, cls, reservas]) => {
                 setMembresias(mems);
                 setActividades(acts);
                 setClases(cls);
+                const reservasConfirmadas = reservas.filter(
+                    (r) => String(r.dni_cliente) === String(user.dni) && r.estado === 'confirmada'
+                );
+                setClasesYaReservadas(new Set(reservasConfirmadas.map((r) => r.id_clase)));
             })
             .catch(() => setError('No se pudo cargar la información.'))
             .finally(() => setLoading(false));
@@ -81,6 +87,7 @@ export function MembresiaPage() {
                         lleno: c.lleno,
                         diaSemana: c.dia_semana,
                         nombreActividad: actividad.nombre,
+                        yaReservada: clasesYaReservadas.has(c.id_clase),
                     })),
                 }));
                 window.location.href = pago.sandbox_init_point;
