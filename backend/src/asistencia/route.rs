@@ -11,4 +11,8 @@ pub fn asistencia_router() -> Router<AppState> {
         .route("/get-asistencia/{id}", get(get_asistencia_by_id_handler))
         .route("/update-asistencia/{id}", put(update_asistencia_handler))
         .route("/delete-asistencia/{id}", delete(delete_asistencia_handler))
+        .route(
+            "/get-asistencia-by-reserva/{id_reserva}",
+            get(get_asistencia_by_reserva_handler),
+        )
 }
