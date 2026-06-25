@@ -40,3 +40,17 @@ pub async fn delete_asistencia_handler(
 ) -> Result<(), AppError> {
     asistencia::service::delete(&state.db, &id).await
 }
+#[instrument(
+    name = "asistencia.get_by_reserva",
+    skip(state),
+    fields(id_reserva = %id_reserva),
+    err
+)]
+pub async fn get_asistencia_by_reserva_handler(
+    State(state): State<AppState>,
+    Path(id_reserva): Path<String>,
+) -> Result<Json<Option<AsistenciaResponse>>, AppError> {
+    let asistencia = asistencia::service::get_by_reserva_id(&state.db, &id_reserva).await?;
+
+    Ok(Json(asistencia.map(AsistenciaResponse::from)))
+}

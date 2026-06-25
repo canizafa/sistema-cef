@@ -1,9 +1,11 @@
+use crate::reserva::estado::EstadoReserva;
 use crate::{
     app::errors::{AppError, FieldError},
-    clase,
+    clase, lista_espera,
     reserva::{domain::Reserva, dto::CreateReservaRequest, repository::ReservaRepository},
 };
 use sqlx::SqlitePool;
+use sqlx::types::chrono::Local;
 
 pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Reserva, AppError> {
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
@@ -64,12 +66,61 @@ pub async fn update(
         .await
         .map_err(AppError::from)
 }
+async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<(), AppError> {
+    // buscar lista asociada a la clase
+    let lista = match lista_espera::service::get_by_clase(db, id_clase).await {
+        Ok(lista) => lista,
 
+        // si no existe lista libero el cupo
+        Err(_) => {
+            clase::service::decrementar_inscripciones(db, &id_clase).await?;
+            return Ok(());
+        }
+    };
+    //tomo el proximo cliente
+    let cliente = lista_espera::cliente_espera::service::get_next(db, lista.get_id_lista()).await?;
+    //si no hay
+    match cliente {
+        None => {
+            clase::service::decrementar_inscripciones(db, &id_clase).await?;
+        }
+        //si hay le creouna reserva y lo borro de lista espera
+        Some(cliente) => {
+            let request = CreateReservaRequest {
+                fecha: Local::now().date_naive(),
+                tipo: "ListaEspera".to_string(),
+                estado: EstadoReserva::Pendiente,
+                dni_cliente: cliente.get_dni_cliente(),
+                id_clase: id_clase.to_string(),
+            };
+
+            create(db, request).await?;
+
+            lista_espera::cliente_espera::service::delete(
+                db,
+                cliente.get_id_espera(),
+                cliente.get_dni_cliente(),
+            )
+            .await?;
+        }
+    }
+    Ok(())
+}
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let reserva = ReservaRepository::get_by_id(db, id)
+        .await
+        .map_err(AppError::from)?;
+    let id_clase = reserva.get_id_clase();
     ReservaRepository::delete(db, id)
         .await
         .map_err(AppError::from)?;
-    clase::service::decrementar_inscripciones(db, id).await?;
+    if let Err(error) = liberar_cupo_y_lista_espera(db, &id_clase).await {
+        tracing::error!(
+            "Error al procesar lista de espera para clase {}: {:?}",
+            id_clase,
+            error
+        );
+    }
     Ok(())
 }
 pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppError> {

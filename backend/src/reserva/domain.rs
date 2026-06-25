@@ -75,6 +75,9 @@ impl Reserva {
     pub fn cancelar_reserva(&mut self) {
         self.estado = EstadoReserva::Cancelada;
     }
+    pub fn confirmar_reserva(&mut self) {
+        self.estado = EstadoReserva::Confirmada;
+    }
 }
 
 impl From<CreateReservaRequest> for Reserva {

@@ -119,4 +119,26 @@ impl AsistenciaRepository {
 
         Ok(())
     }
+    pub async fn get_by_reserva_id(
+        pool: &SqlitePool,
+        id_reserva: &str,
+    ) -> Result<Option<Asistencia>, DbError> {
+        let row = sqlx::query_as::<_, AsistenciaRow>(
+            r#"
+            SELECT
+                id_asistencia,
+                fecha,
+                metodo,
+                id_reserva
+            FROM asistencia
+            WHERE id_reserva = ?
+            "#,
+        )
+        .bind(id_reserva)
+        .fetch_optional(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(row.map(Asistencia::from))
+    }
 }
