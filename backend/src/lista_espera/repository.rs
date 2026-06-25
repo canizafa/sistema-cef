@@ -41,6 +41,25 @@ impl ListaDeEsperaRepository {
 
         Ok(row.into())
     }
+    pub async fn get_by_clase(pool: &SqlitePool, id_clase: &str) -> Result<ListaEspera, DbError> {
+        let row = sqlx::query_as::<_, ListaEsperaRow>(
+            r#"
+            SELECT
+                id_espera,
+                tipo,
+                id_clase
+            FROM lista_de_espera
+            WHERE id_clase = ?
+            LIMIT 1
+            "#,
+        )
+        .bind(id_clase)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(row.into())
+    }
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<ListaEspera, DbError> {
         let row = sqlx::query_as::<_, ListaEsperaRow>(
             r#"

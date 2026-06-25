@@ -5,6 +5,7 @@ use crate::{
     asistencia::{
         domain::Asistencia, dto::CreateAsistenciaRequest, repository::AsistenciaRepository,
     },
+    reserva,
 };
 
 pub async fn create(
@@ -12,6 +13,8 @@ pub async fn create(
     request: CreateAsistenciaRequest,
 ) -> Result<Asistencia, AppError> {
     let asistencia = Asistencia::from(request);
+    let mut reserva =
+        reserva::repository::ReservaRepository::get_by_id(db, asistencia.get_id_reserva()).await?;
     //Verificar si ya existe una asistencia con el mismo id
     let existing_asistencia = AsistenciaRepository::get_by_id(db, &asistencia.id_asistencia)
         .await
@@ -20,6 +23,8 @@ pub async fn create(
         return Err(AppError::Conflict("Asistencia ya existe".to_string()));
     }
     AsistenciaRepository::create(db, &asistencia).await?;
+    reserva.confirmar_reserva(); //marca como reserva confirmada
+    reserva::repository::ReservaRepository::update(db, reserva.get_id(), &reserva).await?; //persistir el cambio
     Ok(asistencia)
 }
 

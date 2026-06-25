@@ -31,7 +31,11 @@ pub async fn get_all(db: &SqlitePool) -> Result<Vec<ListaEspera>, AppError> {
         .await
         .map_err(|e| AppError::from(e))
 }
-
+pub async fn get_by_clase(db: &SqlitePool, id_clase: &str) -> Result<ListaEspera, AppError> {
+    ListaDeEsperaRepository::get_by_clase(db, id_clase)
+        .await
+        .map_err(AppError::from)
+}
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<ListaEspera, AppError> {
     ListaDeEsperaRepository::get_by_id(db, id)
         .await
