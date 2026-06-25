@@ -157,6 +157,116 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     .await
     .map_err(DbError::from)?;
 
+    // CLIENTE
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento
+        ) VALUES (?, ?, ?, ?, ?)",
+    )
+    .bind(40111222_i64)
+    .bind("Ana Martinez")
+    .bind("ana@gmail.com")
+    .bind("2215551234")
+    .bind("1995-05-10")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // FICHA MÉDICA 1
+    sqlx::query(
+        "INSERT OR IGNORE INTO ficha_medica (
+            id_ficha,
+            enfermedades,
+            operaciones_quirurgicas,
+            detalles
+        ) VALUES (?, ?, ?, ?)",
+    )
+    .bind("FICHA001")
+    .bind(false)
+    .bind(false)
+    .bind(None::<String>)
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // FICHA MÉDICA 2
+    sqlx::query(
+        "INSERT OR IGNORE INTO ficha_medica (
+            id_ficha,
+            enfermedades,
+            operaciones_quirurgicas,
+            detalles
+        ) VALUES (?, ?, ?, ?)",
+    )
+    .bind("FICHA002")
+    .bind(true)
+    .bind(false)
+    .bind(Some("Asma leve"))
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    let cliente1_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+    let cliente2_password = hash_password("123456").map_err(|_| DbError::ConnectionError)?;
+
+    // CLIENTE 1
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            motivo_eliminacion,
+            id_ficha
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(40111222_i64)
+    .bind("Ana Martinez")
+    .bind("ana@gmail.com")
+    .bind("2215551234")
+    .bind("1995-05-10")
+    .bind("alta")
+    .bind(cliente1_password)
+    .bind(None::<String>)
+    .bind("FICHA001")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
+    // CLIENTE 2
+    sqlx::query(
+        "INSERT OR IGNORE INTO cliente (
+            dni_cliente,
+            nombre_completo,
+            email,
+            telefono,
+            fecha_nacimiento,
+            estado,
+            password,
+            motivo_eliminacion,
+            id_ficha
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(40222333_i64)
+    .bind("Pedro Lopez")
+    .bind("pedro@gmail.com")
+    .bind("2215555678")
+    .bind("1990-08-15")
+    .bind("alta")
+    .bind(cliente2_password)
+    .bind(None::<String>)
+    .bind("FICHA002")
+    .execute(pool)
+    .await
+    .map_err(DbError::from)?;
+
     tracing::info!("Base de datos cargada exitosamente");
 
     Ok(())
