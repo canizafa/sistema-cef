@@ -44,7 +44,7 @@ export function ProfesoresPage() {
   }, [])
 
   const handleEditar = (dni: number) => {
-    console.log('Editar profesor dni:', dni)
+    navigate(`/admin/profesores/${dni}/editar`)
   }
 
   const handleDesactivar = async (dni: number) => {
