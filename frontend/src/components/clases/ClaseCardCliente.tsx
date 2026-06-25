@@ -17,6 +17,7 @@ interface ClaseCardClienteProps {
   idSala: string
   dniProfesor: number
   nombreProfesor: string
+  enListaEspera?: boolean
   onReservar?: () => void
   onListaEspera?: () => void
 }
@@ -43,6 +44,7 @@ export function ClaseCardCliente({
   idSala,
   dniProfesor,
   nombreProfesor,
+  enListaEspera,
   onReservar,
   onListaEspera,
 }: ClaseCardClienteProps) {
@@ -103,14 +105,9 @@ export function ClaseCardCliente({
           </Button>
         )}
         {estadoReserva === 'sin-cupo' && (
-          <>
-            <Button variant="outline" size="sm" className="flex-1" disabled>
-              Sin cupo
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1" onClick={onListaEspera}>
-              Lista de espera
-            </Button>
-          </>
+          <Button variant="outline" size="sm" className="flex-1" onClick={onListaEspera} disabled={enListaEspera}>
+            {enListaEspera ? 'Ya estás en la lista de espera' : 'Anotarse en lista de espera'}
+          </Button>
         )}
         {estadoReserva === 'reservada' && (
           <p className="text-xs text-gray-500 text-center w-full">

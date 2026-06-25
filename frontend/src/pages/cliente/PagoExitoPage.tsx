@@ -3,13 +3,18 @@ import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { membresiaService, PRECIO_MEMBRESIA } from '@/services/membresia.service';
 import { pagosService } from '@/services/pagos.service';
-import { reservasService } from '@/services/clases.service';
+import { reservasService, listaEsperaService } from '@/services/clases.service';
 import { useAuth } from '@/context/AuthContext';
+
+function formatFechaCorta(fecha: string): string {
+    const [anio, mes, dia] = fecha.slice(0, 10).split('-');
+    return `${dia}-${mes}-${anio.slice(2)}`;
+}
 
 export function PagoExitoPage() {
     const { user } = useAuth();
     const [esMembresía, setEsMembresia] = useState(false);
-    const [clasesLlenas, setClasesLlenas] = useState(0);
+    const [clasesLlenas, setClasesLlenas] = useState<string[]>([]);
     const [errorMembresia, setErrorMembresia] = useState(false);
     const [errorReserva, setErrorReserva] = useState(false);
     const yaProcesado = useRef(false);
@@ -60,7 +65,13 @@ export function PagoExitoPage() {
                 dni: number;
                 idActividad: string;
                 idMembresia?: string;
-                clases?: { id_clase: string; fecha: string; lleno: boolean }[];
+                clases?: {
+                    id_clase: string;
+                    fecha: string;
+                    lleno: boolean;
+                    diaSemana: string;
+                    nombreActividad: string;
+                }[];
             };
             const dniEfectivo = dni ?? user?.dni;
             if (!dniEfectivo) return;
@@ -68,12 +79,14 @@ export function PagoExitoPage() {
                 ? membresiaService.renovarMembresia(idMembresia, tipo, dniEfectivo, idActividad)
                 : membresiaService.crearMembresia(tipo, dniEfectivo, idActividad);
             promesa
-                .then(() => {
+                .then(async () => {
                     if (!clases || clases.length === 0) return;
                     const disponibles = clases.filter((c) => !c.lleno);
                     const llenas = clases.filter((c) => c.lleno);
-                    setClasesLlenas(llenas.length);
-                    return Promise.allSettled(
+                    setClasesLlenas(
+                        llenas.map((c) => `${c.nombreActividad} ${c.diaSemana} ${formatFechaCorta(c.fecha)}`)
+                    );
+                    await Promise.allSettled(
                         disponibles.map((c) =>
                             reservasService.crearReserva({
                                 fecha: c.fecha,
@@ -83,6 +96,15 @@ export function PagoExitoPage() {
                                 id_clase: c.id_clase,
                             })
                         )
+                    );
+                    await Promise.allSettled(
+                        llenas.map(async (c) => {
+                            const listas = await listaEsperaService.getAll();
+                            const lista =
+                                listas.find((l) => l.id_clase === c.id_clase) ??
+                                (await listaEsperaService.crearLista(c.id_clase, c.nombreActividad));
+                            await listaEsperaService.anotarse(c.id_clase, lista.id_espera, dniEfectivo);
+                        })
                     );
                 })
                 .catch(() => {
@@ -125,11 +147,14 @@ export function PagoExitoPage() {
                             Hubo un problema al registrar tu reserva. Contactá a soporte.
                         </p>
                     )}
-                    {clasesLlenas > 0 && (
-                        <p className='text-xs text-amber-600'>
-                            {clasesLlenas} clase{clasesLlenas > 1 ? 's' : ''} ya estaba
-                            {clasesLlenas > 1 ? 'n' : ''} llena{clasesLlenas > 1 ? 's' : ''} y no se reservó (lista de espera próximamente).
-                        </p>
+                    {clasesLlenas.length > 0 && (
+                        <ul className='text-xs text-amber-600 text-left list-disc list-inside space-y-1'>
+                            {clasesLlenas.map((descripcion) => (
+                                <li key={descripcion}>
+                                    Clase {descripcion} se encuentra llena, te anotamos en la lista de espera.
+                                </li>
+                            ))}
+                        </ul>
                     )}
                     <Link
                         to={esMembresía ? '/membresia' : '/clases'}

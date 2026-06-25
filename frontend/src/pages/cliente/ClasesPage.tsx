@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { ClaseCardCliente, type EstadoReserva } from '@/components/clases/ClaseCardCliente'
 import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
-import { clasesService, reservasService, type ClaseDTO } from '@/services/clases.service'
+import { clasesService, reservasService, listaEsperaService, type ClaseDTO } from '@/services/clases.service'
 import { actividadService, type Actividad } from '@/services/actividad.service'
 import { profesorService, type Profesor } from '@/services/profesor.service'
 import { pagosService } from '@/services/pagos.service'
@@ -14,6 +15,7 @@ export function ClasesPage() {
   const [actividades, setActividades] = useState<Actividad[]>([])
   const [profesores, setProfesores] = useState<Profesor[]>([])
   const [reservadas, setReservadas] = useState<Set<string>>(new Set())
+  const [enListaEspera, setEnListaEspera] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [claseSeleccionada, setClaseSeleccionada] = useState<ClaseDTO | null>(null)
@@ -98,8 +100,19 @@ export function ClasesPage() {
     setClaseSeleccionada(null)
   }
 
-  async function handleListaEspera(_clase: ClaseDTO) {
-    // TODO: implementar cuando el back tenga el endpoint de lista de espera
+  async function handleListaEspera(clase: ClaseDTO) {
+    if (!user) return
+    try {
+      const listas = await listaEsperaService.getAll()
+      let lista = listas.find((l) => l.id_clase === clase.id_clase)
+      if (!lista) {
+        lista = await listaEsperaService.crearLista(clase.id_clase, getNombreActividad(clase.id_actividad))
+      }
+      await listaEsperaService.anotarse(clase.id_clase, lista.id_espera, user.dni)
+      setEnListaEspera((prev) => new Set(prev).add(clase.id_clase))
+    } catch {
+      toast.error('No se pudo anotar en la lista de espera. Intentá de nuevo.')
+    }
   }
 
   // Agrupar clases por actividad
@@ -146,6 +159,7 @@ export function ClasesPage() {
                       idSala={clase.id_sala}
                       dniProfesor={clase.dni_profesor}
                       nombreProfesor={getNombreProfesor(clase.dni_profesor)}
+                      enListaEspera={enListaEspera.has(clase.id_clase)}
                       onReservar={() => handleReservar(clase)}
                       onListaEspera={() => handleListaEspera(clase)}
                     />

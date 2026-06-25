@@ -79,6 +79,8 @@ export function MembresiaPage() {
                         id_clase: c.id_clase,
                         fecha: c.dia,
                         lleno: c.lleno,
+                        diaSemana: c.dia_semana,
+                        nombreActividad: actividad.nombre,
                     })),
                 }));
                 window.location.href = pago.sandbox_init_point;
