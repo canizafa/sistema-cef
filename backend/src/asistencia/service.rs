@@ -5,6 +5,7 @@ use crate::{
     asistencia::{
         domain::Asistencia, dto::CreateAsistenciaRequest, repository::AsistenciaRepository,
     },
+    reserva,
 };
 
 pub async fn create(
@@ -12,17 +13,29 @@ pub async fn create(
     request: CreateAsistenciaRequest,
 ) -> Result<Asistencia, AppError> {
     let asistencia = Asistencia::from(request);
+    let mut reserva =
+        reserva::repository::ReservaRepository::get_by_id(db, asistencia.get_id_reserva()).await?;
     //Verificar si ya existe una asistencia con el mismo id
-    let existing_asistencia = AsistenciaRepository::get_by_id(db, &asistencia.id_asistencia)
-        .await
-        .ok();
+    let existing_asistencia =
+        AsistenciaRepository::get_by_reserva_id(db, &asistencia.get_id_reserva())
+            .await
+            .ok();
     if existing_asistencia.is_some() {
         return Err(AppError::Conflict("Asistencia ya existe".to_string()));
     }
-    AsistenciaRepository::create(db, &asistencia).await?;
-    Ok(asistencia)
+    let asistencia_creada = AsistenciaRepository::create(db, &asistencia).await?;
+    reserva.confirmar_reserva(); //marca como reserva confirmada
+    reserva::repository::ReservaRepository::update(db, reserva.get_id(), &reserva).await?; //persistir el cambio
+    Ok(asistencia_creada)
 }
-
+pub async fn get_by_reserva_id(
+    db: &SqlitePool,
+    id_reserva: &str,
+) -> Result<Option<Asistencia>, AppError> {
+    AsistenciaRepository::get_by_reserva_id(db, id_reserva)
+        .await
+        .map_err(AppError::from)
+}
 pub async fn get_by_id(db: &SqlitePool, id_asistencia: &str) -> Result<Asistencia, AppError> {
     let asistencia = AsistenciaRepository::get_by_id(db, id_asistencia).await?;
     Ok(asistencia)
