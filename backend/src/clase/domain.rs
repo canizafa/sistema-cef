@@ -141,7 +141,10 @@ impl Clase {
     }
 
     pub fn is_lleno(&self) -> bool {
-        self.inscripciones >= self.cupo_base
+        match self.estado {
+            EstadoClase::SinCupo => true,
+            _ => false,
+        }
     }
 
     pub fn aumentar_inscripciones(&mut self, sala_capacidad: i64) {
