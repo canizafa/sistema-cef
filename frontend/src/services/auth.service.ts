@@ -33,8 +33,8 @@ export interface AuthResponse {
     email: string;
     access_token: string;
     rol: string;
+    estado: string;  
 }
-
 export const authService = {
     async login(data: LoginData): Promise<AuthResponse> {
         const response = await api.post('/auth/login', data);
