@@ -2,7 +2,9 @@ use crate::{
     app::{errors::AppError, state::AppState},
     lista_espera::cliente_espera::{
         self,
-        dto::{ClienteListaEsperaResponse, CreateClienteListaEsperaRequest},
+        dto::{
+            ClienteListaEsperaRequest, ClienteListaEsperaResponse, CreateClienteListaEsperaRequest,
+        },
     },
 };
 use axum::{
@@ -48,9 +50,9 @@ pub async fn get_next_cliente_handler(
 
 pub async fn delete_cliente_lista_espera_handler(
     State(state): State<AppState>,
-    Path((id_espera, dni_cliente)): Path<(String, i64)>,
+    Json(request): Json<ClienteListaEsperaRequest>,
 ) -> Result<StatusCode, AppError> {
-    cliente_espera::service::delete(&state.db, &id_espera, dni_cliente).await?;
+    cliente_espera::service::delete(&state.db, &request.id_espera, request.dni_cliente).await?;
 
     Ok(StatusCode::OK)
 }

@@ -16,6 +16,8 @@ pub struct ClienteRow {
     motivo_eliminacion: Option<String>,
     id_ficha: String,
     rol: RolUsuario,
+    creditos: i64,
+    contador_cancelaciones: i64,
 }
 impl From<ClienteRow> for Cliente {
     fn from(row: ClienteRow) -> Self {
@@ -30,6 +32,8 @@ impl From<ClienteRow> for Cliente {
             row.motivo_eliminacion,
             row.id_ficha,
             row.rol,
+            row.creditos,
+            row.contador_cancelaciones,
         )
     }
 }
@@ -65,6 +69,8 @@ impl ClienteRepository {
                 motivo_eliminacion,
                 password,
                 id_ficha,
+                creditos,
+                contador_cancelaciones,
                 'cliente' AS rol
             "#,
         )
@@ -97,6 +103,8 @@ impl ClienteRepository {
                 c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
+                c.creditos,
+                c.contador_cancelaciones,
                 'cliente' AS rol
             FROM cliente c
             "#,
@@ -121,6 +129,8 @@ impl ClienteRepository {
                 c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
+                c.creditos,
+                c.contador_cancelaciones,
                 'cliente' AS rol
             FROM cliente c
             WHERE c.dni_cliente = ?
@@ -147,6 +157,8 @@ impl ClienteRepository {
                 c.motivo_eliminacion,
                 c.password,
                 c.id_ficha,
+                c.creditos,
+                c.contador_cancelaciones,
                 'cliente' AS rol
             FROM cliente c
             WHERE c.email = ?
@@ -219,6 +231,8 @@ impl ClienteRepository {
                     motivo_eliminacion,
                     password,
                     id_ficha,
+                    creditos,
+                    contador_cancelaciones,
                     'cliente' AS rol
                 "#,
         )
@@ -252,6 +266,8 @@ impl ClienteRepository {
                     motivo_eliminacion,
                     password,
                     id_ficha,
+                    creditos,
+                    contador_cancelaciones,
                     'cliente' AS rol
                 "#,
         )
@@ -279,5 +295,42 @@ impl ClienteRepository {
             .map_err(DbError::from)?;
 
         Ok(())
+    }
+    pub async fn update_creditos_y_cancelaciones(
+        pool: &SqlitePool,
+        dni: i64,
+        creditos: i64,
+        contador_cancelaciones: i64,
+    ) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
+            r#"
+            UPDATE cliente
+            SET
+                creditos = ?,
+                contador_cancelaciones = ?
+            WHERE dni_cliente = ?
+            RETURNING
+                dni_cliente AS dni,
+                nombre_completo AS nombre,
+                email,
+                telefono,
+                fecha_nacimiento,
+                estado,
+                motivo_eliminacion,
+                password,
+                id_ficha,
+                creditos,
+                contador_cancelaciones,
+                'cliente' AS rol
+            "#,
+        )
+        .bind(creditos)
+        .bind(contador_cancelaciones)
+        .bind(dni)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(row.into())
     }
 }
