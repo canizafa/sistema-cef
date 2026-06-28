@@ -80,7 +80,7 @@ pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), App
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     let sala = sala::service::get_by_id(db, clase.get_id_sala()).await?;
     clase.aumentar_inscripciones(sala.get_capacidad_maxima());
-    ClaseRepository::update(db, id, &clase).await?;
+    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
     Ok(())
 }
 
