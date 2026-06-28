@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS cliente (
     creditos INTEGER not null default 0,
     contador_cancelaciones INTEGER not null default 0,
     motivo_eliminacion VARCHAR(255),
+    fecha_notificacion VARCHAR(20),
     id_ficha TEXT not null,
     FOREIGN KEY (id_ficha) REFERENCES ficha_medica(id_ficha)
 )

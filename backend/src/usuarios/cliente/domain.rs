@@ -165,16 +165,8 @@ impl Cliente {
         self.creditos -= monto;
     }
 
-    // devuelve true si el cliente fue penalizado
-    pub fn registrar_cancelacion(&mut self) -> bool {
+    pub fn incrementar_cancelaciones(&mut self) {
         self.contador_cancelaciones += 1;
-
-        if self.contador_cancelaciones == 3 {
-            self.creditos = 0;
-            self.contador_cancelaciones = 0;
-            return true;
-        }
-        false
     }
 }
 
