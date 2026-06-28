@@ -1,4 +1,5 @@
 use crate::reserva::estado::EstadoReserva;
+use crate::usuarios::cliente::repository::ClienteRepository;
 use crate::{
     app::errors::{AppError, FieldError},
     clase, lista_espera,
@@ -136,5 +137,57 @@ pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppErr
     for clase in clases_cliente {
         clase::service::decrementar_inscripciones(db, clase.get_id()).await?;
     }
+    Ok(())
+}
+pub async fn registrar_cancelacion(
+    db: &SqlitePool,
+    dni: i64,
+    monto: i64,
+    tiene_24hs: bool,
+) -> Result<(), AppError> {
+    let mut cliente = ClienteRepository::get_by_dni(db, dni)
+        .await
+        .map_err(AppError::from)?;
+
+    cliente.incrementar_cancelaciones();
+
+    // regla 3ra cancelacion
+    if cliente.get_contador_cancelaciones() == 3 {
+        cliente.anular_creditos();
+        cliente.reset_cancelaciones();
+
+        ClienteRepository::update_creditos_y_cancelaciones(
+            db,
+            cliente.get_dni(),
+            cliente.get_creditos(),
+            cliente.get_contador_cancelaciones(),
+        )
+        .await
+        .map_err(AppError::from)?;
+
+        return Ok(());
+    }
+
+    // calcular credito si tiene 24hs de anticipacion
+    let credito = if !tiene_24hs {
+        0
+    } else {
+        match cliente.get_contador_cancelaciones() {
+            1 => monto,
+            2 => (monto as f64 * 0.25) as i64,
+            _ => 0,
+        }
+    };
+    cliente.acreditar_creditos(credito);
+
+    ClienteRepository::update_creditos_y_cancelaciones(
+        db,
+        cliente.get_dni(),
+        cliente.get_creditos(),
+        cliente.get_contador_cancelaciones(),
+    )
+    .await
+    .map_err(AppError::from)?;
+
     Ok(())
 }
