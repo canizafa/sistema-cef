@@ -10,6 +10,7 @@ pub struct CreateMembresiaRequest {
     pub estado: EstadoMembresia,
     pub fecha_inicio: NaiveDate,
     pub fecha_fin: NaiveDate,
+    pub aceptar_espera: bool,
 }
 
 #[derive(Debug, Serialize)]
