@@ -7,8 +7,10 @@ use crate::{
 };
 use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use sqlx::SqlitePool;
+use tracing::instrument;
 use uuid::Uuid;
 
+#[instrument(skip_all, err)]
 pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Reserva, AppError> {
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
     let reserva = Reserva::from(request);
@@ -40,16 +42,19 @@ pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Re
     Ok(reserva)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Reserva, AppError> {
     ReservaRepository::get_by_id(db, id)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Reserva>, AppError> {
     ReservaRepository::get_all(db).await.map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     db: &SqlitePool,
     id: &str,
@@ -68,6 +73,8 @@ pub async fn update(
         .await
         .map_err(AppError::from)
 }
+
+#[instrument(skip_all, err)]
 async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<(), AppError> {
     // buscar lista asociada a la clase
     let lista = match lista_espera::service::get_by_clase(db, id_clase).await {
@@ -108,6 +115,8 @@ async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<
     }
     Ok(())
 }
+
+#[instrument(skip_all, err)]
 pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let reserva = ReservaRepository::get_by_id(db, id)
         .await
@@ -135,6 +144,7 @@ pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     Ok(())
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let reserva = ReservaRepository::get_by_id(db, id)
         .await
@@ -152,6 +162,8 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     }
     Ok(())
 }
+
+#[instrument(skip_all, err)]
 pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppError> {
     let mut reservas = get_all(db).await.map_err(AppError::from)?;
     let mut clases = clase::service::get_all(db).await.map_err(AppError::from)?;
@@ -167,6 +179,8 @@ pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppErr
     }
     Ok(())
 }
+
+#[instrument(skip_all, err)]
 async fn registrar_cancelacion(
     db: &SqlitePool,
     dni: i64,
@@ -222,6 +236,7 @@ async fn registrar_cancelacion(
     Ok(())
 }
 
+#[instrument(skip_all, err)]
 pub async fn generar_reserva(
     db: &SqlitePool,
     tipo: String,

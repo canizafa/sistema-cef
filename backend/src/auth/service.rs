@@ -1,6 +1,7 @@
 use std::env;
 
 use sqlx::SqlitePool;
+use tracing::instrument;
 
 use crate::{
     app::{errors::AppError, mailer::Mailer},
@@ -11,6 +12,7 @@ use crate::{
     usuarios::{cliente, empleado},
 };
 
+#[instrument(skip_all, err)]
 pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthResponse, AppError> {
     if let Ok(cliente) =
         cliente::service::login_cliente(db, &request.email, &request.password).await
@@ -60,6 +62,7 @@ pub async fn login(db: &SqlitePool, request: LoginRequest) -> Result<AuthRespons
     }
 }
 
+#[instrument(skip_all, err)]
 pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Result<(), AppError> {
     //Nos fijamos si es un cliente o empleado
     let cliente = cliente::service::get_by_email(db, email).await;
@@ -75,6 +78,7 @@ pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Re
     }
 }
 
+#[instrument(skip_all, err)]
 pub async fn change_password(
     db: &SqlitePool,
     dni: i64,
