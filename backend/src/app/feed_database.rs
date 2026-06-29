@@ -1,5 +1,8 @@
 use crate::app::errors::DbError;
 use crate::auth::password::hash_password;
+use crate::clase::dto::CreateClaseRequest;
+use crate::clase::estado::EstadoClase;
+use chrono::NaiveDate;
 use sqlx::SqlitePool;
 
 pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
@@ -100,63 +103,32 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     .map_err(DbError::from)?;
 
     // CLASE YOGA (cupo 1)
-    sqlx::query(
-        "INSERT OR IGNORE INTO clase (
-            id_clase,
-            dia,
-            horario,
-            cupo_base,
-            inscripciones,
-            estado,
-            descripcion,
-            id_actividad,
-            id_sala,
-            dni_profesor
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    )
-    .bind("CLASE001")
-    .bind("2026-07-01")
-    .bind("09:00")
-    .bind(1_i64)
-    .bind(0_i64)
-    .bind("alta")
-    .bind("Clase de yoga para principiantes")
-    .bind("ACT001")
-    .bind("SALA02")
-    .bind(40123456_i64)
-    .execute(pool)
-    .await
-    .map_err(DbError::from)?;
+    let request = CreateClaseRequest {
+        dia: NaiveDate::from_ymd_opt(2026, 7, 1).unwrap(),
+        horario: "09:00".to_string(),
+        cupo_base: 1,
+        estado: EstadoClase::Alta,
+        id_actividad: "ACT001".to_string(),
+        id_sala: "SALA02".to_string(),
+        dni_profesor: 40123456,
+        descripcion: "Clase de yoga para principiantes".to_string(),
+    };
+
+    let _ = crate::clase::service::create(pool, request, "CLASE001").await;
 
     // CLASE CROSSFIT (cupo 10)
-    sqlx::query(
-        "INSERT OR IGNORE INTO clase (
-            id_clase,
-            dia,
-            horario,
-            cupo_base,
-            inscripciones,
-            estado,
-            descripcion,
-            id_actividad,
-            id_sala,
-            dni_profesor
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    )
-    .bind("CLASE002")
-    .bind("2026-07-01")
-    .bind("18:00")
-    .bind(10_i64)
-    .bind(0_i64)
-    .bind("alta")
-    .bind("Entrenamiento funcional de alta intensidad")
-    .bind("ACT002")
-    .bind("SALA01")
-    .bind(38999888_i64)
-    .execute(pool)
-    .await
-    .map_err(DbError::from)?;
+    let request = CreateClaseRequest {
+        dia: NaiveDate::from_ymd_opt(2026, 7, 1).unwrap(),
+        horario: "18:00".to_string(),
+        cupo_base: 10,
+        estado: EstadoClase::Alta,
+        id_actividad: "ACT002".to_string(),
+        id_sala: "SALA01".to_string(),
+        dni_profesor: 38999888,
+        descripcion: "Entrenamiento funcional de alta intensidad".to_string(),
+    };
 
+    let _ = crate::clase::service::create(pool, request, "CLASE002").await;
     // CLIENTE
     sqlx::query(
         "INSERT OR IGNORE INTO cliente (
