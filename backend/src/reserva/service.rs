@@ -167,7 +167,7 @@ pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppErr
     }
     Ok(())
 }
-async fn cancelar_reserva(
+async fn registrar_cancelacion(
     db: &SqlitePool,
     dni: i64,
     monto: i64,
