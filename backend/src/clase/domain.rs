@@ -4,7 +4,7 @@ use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
-use chrono::{NaiveDate, NaiveTime};
+use chrono::{Datelike, NaiveDate, NaiveTime, Utc, Weekday};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -114,13 +114,21 @@ impl Clase {
 
     pub fn validate_clase(&self, sala_capacidad: i64) -> Vec<ClaseDomainError> {
         let mut errors = Vec::new();
+        let hora =
+            NaiveTime::parse_from_str(&self.horario, "%H:%M").expect("Fallo al formatear hora");
+        let apertura =
+            NaiveTime::parse_from_str("06:00", "%H:%M").expect("Fallo al formatear hora");
+        let cierre = NaiveTime::parse_from_str("22:00", "%H:%M").expect("Fallo al formatear hora");
+        if self.dia <= Utc::now().date_naive() || self.dia.weekday() == Weekday::Sun {
+            errors.push(ClaseDomainError::DiaInvalido);
+        }
         if self.cupo_base > sala_capacidad {
             errors.push(ClaseDomainError::SalaSobrepasada);
         }
         if self.cupo_base < 0 {
             errors.push(ClaseDomainError::CupoNegativo);
         }
-        if self.horario.trim().is_empty() {
+        if self.horario.trim().is_empty() && hora > apertura && hora < cierre {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
         if self.descripcion.trim().is_empty() {
@@ -176,6 +184,17 @@ impl Clase {
 
     pub fn extender_cupo(&mut self) {
         self.estado = EstadoClase::Extendido;
+    }
+
+    pub fn cambiar_fecha(&mut self, fecha: NaiveDate) -> Vec<ClaseDomainError> {
+        let mut vec_errors = Vec::new();
+        if fecha <= Utc::now().date_naive() || fecha.weekday() == Weekday::Sun {
+            vec_errors.push(ClaseDomainError::DiaInvalido);
+        }
+        if vec_errors.is_empty() {
+            self.dia = fecha;
+        }
+        vec_errors
     }
 }
 

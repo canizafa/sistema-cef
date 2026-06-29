@@ -1,3 +1,4 @@
+use chrono::Duration;
 use sqlx::SqlitePool;
 
 use crate::{
@@ -25,7 +26,7 @@ pub async fn create(
     }
 
     //Verificar si existe la sala
-    let clase = Clase::from(request);
+    let mut clase = Clase::from(request);
     let errors: Vec<FieldError> = clase
         .validate_clase(sala.get_capacidad_maxima())
         .into_iter()
@@ -47,6 +48,12 @@ pub async fn create(
     }
 
     ClaseRepository::create(db, &clase).await?;
+
+    for _ in 0..3 {
+        clase.cambiar_fecha(clase.get_dia() + Duration::days(7));
+        ClaseRepository::create(db, &clase).await?;
+    }
+
     Ok(clase)
 }
 
