@@ -15,6 +15,8 @@ pub struct Cliente {
     motivo_eliminacion: Option<String>,
     id_ficha: String,
     rol: RolUsuario,
+    creditos: i64,
+    contador_cancelaciones: i64,
 }
 
 impl Cliente {
@@ -29,6 +31,8 @@ impl Cliente {
         motivo_eliminacion: Option<String>,
         id_ficha: String,
         rol: RolUsuario,
+        creditos: i64,
+        contador_cancelaciones: i64,
     ) -> Self {
         Self {
             dni,
@@ -41,6 +45,8 @@ impl Cliente {
             motivo_eliminacion,
             id_ficha,
             rol,
+            creditos,
+            contador_cancelaciones,
         }
     }
     pub fn get_dni(&self) -> i64 {
@@ -73,6 +79,13 @@ impl Cliente {
     pub fn get_password_hash(&self) -> &str {
         &self.password_hash
     }
+    pub fn get_creditos(&self) -> i64 {
+        self.creditos
+    }
+    pub fn get_contador_cancelaciones(&self) -> i64 {
+        self.contador_cancelaciones
+    }
+
     pub fn update_password(
         &mut self,
         password_verificada: bool,
@@ -144,6 +157,23 @@ impl Cliente {
             EstadoUsuario::Baja | EstadoUsuario::Eliminado => false,
         }
     }
+    pub fn acreditar_creditos(&mut self, monto: i64) {
+        self.creditos += monto;
+    }
+
+    pub fn consumir_creditos(&mut self, monto: i64) -> i64 {
+        let creditos_utilizados = self.creditos.min(monto);
+        self.creditos -= creditos_utilizados;
+        creditos_utilizados
+    }
+
+    pub fn incrementar_cancelaciones(&mut self) {
+        self.contador_cancelaciones += 1;
+    }
+    pub fn anular_cancelaciones_y_creditos(&mut self) {
+        self.contador_cancelaciones = 0;
+        self.creditos = 0;
+    }
 }
 
 impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
@@ -163,6 +193,8 @@ impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
             estado: request.estado,
             id_ficha,
             rol: RolUsuario::Cliente,
+            creditos: 0,
+            contador_cancelaciones: 0,
         };
         let errors = cliente.validate_cliente();
         if !errors.is_empty() {
@@ -186,6 +218,8 @@ impl TryFrom<ClienteRequest> for Cliente {
             estado: request.estado,
             id_ficha: request.id_ficha,
             rol: RolUsuario::Cliente,
+            creditos: 0,
+            contador_cancelaciones: 0,
         };
         let errors = cliente.validate_cliente();
         if !errors.is_empty() {

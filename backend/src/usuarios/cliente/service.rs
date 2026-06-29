@@ -166,6 +166,19 @@ pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<C
     .await
     .map_err(AppError::from)
 }
+pub async fn update_creditos_y_cancelaciones(
+    db: &SqlitePool,
+    cliente: &Cliente,
+) -> Result<Cliente, AppError> {
+    ClienteRepository::update_creditos_y_cancelaciones(
+        db,
+        cliente.get_dni(),
+        cliente.get_creditos(),
+        cliente.get_contador_cancelaciones(),
+    )
+    .await
+    .map_err(AppError::from)
+}
 
 pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<(), AppError> {
     reserva::service::delete_all_by_client(db, request.dni).await?;
