@@ -333,4 +333,23 @@ impl ClienteRepository {
 
         Ok(row.into())
     }
+    pub async fn update_notify_date(
+        db: &SqlitePool,
+        email: &str,
+        date: NaiveDate,
+    ) -> Result<(), DbError> {
+        let _ = sqlx::query!(
+            "
+            UPDATE cliente
+            SET fecha_notificacion = ?
+            WHERE email = ?
+            ",
+            date,
+            email
+        )
+        .fetch_one(db)
+        .await
+        .map_err(DbError::from)?;
+        Ok(())
+    }
 }
