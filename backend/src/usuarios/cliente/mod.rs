@@ -1,6 +1,6 @@
 mod dto;
 mod errors;
-mod repository;
+pub mod repository;
 
 pub mod domain;
 pub mod handler;

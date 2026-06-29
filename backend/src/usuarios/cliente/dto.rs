@@ -55,6 +55,7 @@ pub struct ClienteResponse {
     pub rol: RolUsuario,
     pub motivo_eliminacion: Option<String>,
     pub id_ficha: String,
+    pub creditos: i64,
 }
 impl From<Cliente> for ClienteResponse {
     fn from(cliente: Cliente) -> Self {
@@ -68,6 +69,7 @@ impl From<Cliente> for ClienteResponse {
             rol: cliente.get_rol(),
             motivo_eliminacion: cliente.get_motivo_eliminacion(),
             id_ficha: cliente.get_id_ficha().to_string(),
+            creditos: cliente.get_creditos(),
         }
     }
 }
