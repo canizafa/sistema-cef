@@ -252,6 +252,26 @@ pub async fn generar_reserva(
         dni_cliente,
         id_clase.to_owned(),
     );
+    //Validar si no existe una reserva para la misma actividad para ese mismo cliente
+    let errors: Vec<FieldError> = reserva
+        .validate_reserva()
+        .into_iter()
+        .map(FieldError::from)
+        .collect();
+    if !errors.is_empty() {
+        return Err(AppError::Validation(errors));
+    }
+    let reservas_existentes = ReservaRepository::get_all(db)
+        .await
+        .map_err(AppError::from)?;
+    if reservas_existentes.iter().any(|r| {
+        r.get_id_clase() == reserva.get_id_clase()
+            && r.get_dni_cliente() == reserva.get_dni_cliente()
+    }) {
+        return Err(AppError::Conflict(
+            "Ya existe una reserva para esta actividad y cliente".to_string(),
+        ));
+    }
     ReservaRepository::create(db, &reserva).await?;
     Ok(())
 }
