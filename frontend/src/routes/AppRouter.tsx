@@ -14,13 +14,15 @@ import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage';
 // Cliente
 import { ClasesPage } from '@/pages/cliente/ClasesPage';
 import { PerfilPage } from '@/pages/cliente/PerfilPage';
+import { ReservasPage } from '@/pages/cliente/ReservasPage';
+import { MembresiaPage } from '@/pages/cliente/MembresiaPage';
 import { PagoExitoPage } from '@/pages/cliente/PagoExitoPage';
 import { PagoFalloPage } from '@/pages/cliente/PagoFalloPage';
 import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
 
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import AdminPage from '@/pages/admin/AdminPage'
+
 // Admin - Clases
 import AdminClasesPage from '@/pages/admin/clases/ClasesPage';
 import { NuevaClasePage } from '@/pages/admin/clases/NuevaClasePage';
@@ -31,10 +33,13 @@ import { EmpleadosPage } from '@/pages/admin/empleados/EmpleadosPage';
 import { NuevoEmpleadoPage } from '@/pages/admin/empleados/NuevoEmpleadoPage';
 import { EditarEmpleadoPage } from '@/pages/admin/empleados/EditarEmpleadoPage';
 
+// Admin - Profesores
+import { ProfesoresPage } from '@/pages/admin/profesores/ProfesoresPage';
+import { NuevoProfesorPage } from '@/pages/admin/profesores/NuevoProfesorPage';
+import { EditarProfesoresPage } from '@/pages/admin/profesores/EditarProfesoresPage';
+
 // Admin - Clientes
 import { ClientesPage } from '@/pages/admin/clientes/ClientesPage';
-import { NuevoClientePage } from '@/pages/admin/clientes/NuevoClientePage';
-import { EditarClientePage } from '@/pages/admin/clientes/EditarClientePage';
 
 // Admin - Asistencias y Reportes
 import { AsistenciasPage } from '@/pages/admin/asistencias/AsistenciasPage';
@@ -51,6 +56,8 @@ export const AppRouter = () => {
 
             {/* Rutas del cliente: requieren sesión activa */}
             <Route path="/clases" element={<ProtectedRoute><ClasesPage /></ProtectedRoute>} />
+            <Route path="/mis-reservas" element={<ProtectedRoute><ReservasPage /></ProtectedRoute>} />
+            <Route path="/membresia" element={<ProtectedRoute><MembresiaPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
 
             {/* Resultado de pago — públicas porque MP redirige sin token */}
@@ -59,9 +66,11 @@ export const AppRouter = () => {
             <Route path="/pago/pendiente" element={<PagoPendientePage />} />
 
             {/* Rutas de administración: requieren rol admin o dueño */}
-            <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminPage />} />
-
+            <Route path="/admin" element={
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            }>
                 {/* Clases */}
                 <Route path="clases" element={<AdminClasesPage />} />
                 <Route path="clases/nueva" element={<NuevaClasePage />} />
@@ -72,10 +81,13 @@ export const AppRouter = () => {
                 <Route path="empleados/nuevo" element={<NuevoEmpleadoPage />} />
                 <Route path="empleados/:id/editar" element={<EditarEmpleadoPage />} />
 
+                {/* Profesores - solo dueño */}
+                <Route path="profesores" element={<ProfesoresPage />} />
+                <Route path="profesores/nuevo" element={<NuevoProfesorPage />} />
+                <Route path="profesores/:id/editar" element={<EditarProfesoresPage />} />
+
                 {/* Clientes */}
                 <Route path="clientes" element={<ClientesPage />} />
-                <Route path="clientes/nuevo" element={<NuevoClientePage />} />
-                <Route path="clientes/:id/editar" element={<EditarClientePage />} />
 
                 {/* Asistencias */}
                 <Route path="asistencias" element={<AsistenciasPage />} />

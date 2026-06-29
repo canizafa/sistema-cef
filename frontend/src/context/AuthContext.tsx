@@ -5,7 +5,7 @@ import { createContext, useContext, useReducer, type ReactNode } from 'react';
 
 // --- Tipos ---
 
-export type Rol = 'dueno' | 'recepcionista' | 'cliente';
+export type Rol = 'duenio' | 'empleado'  | 'cliente' | 'profesor';
 
 export type User = {
     id: number;
@@ -27,10 +27,20 @@ type AuthAction =
 
 // --- Reducer ---
 
-const initialState: AuthState = {
-    user: null,
-    token: null,
+function loadInitialState(): AuthState {
+    const token = localStorage.getItem('token');
+    const userJson = localStorage.getItem('user');
+    if (token && userJson) {
+        try {
+            return { token, user: JSON.parse(userJson) };
+        } catch {
+            // JSON corrupto — sesión inválida
+        }
+    }
+    return { user: null, token: null };
 }
+
+const initialState: AuthState = loadInitialState();
 
 export function authReducer(state: AuthState, action: AuthAction): AuthState {
     switch (action.type){

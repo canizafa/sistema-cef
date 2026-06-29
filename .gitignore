@@ -13,9 +13,14 @@ frontend/yarn-error.log*
 frontend/pnpm-debug.log*
 frontend/lerna-debug.log*
 
+
 # General
 .env
 .DS_Store
+
+# Ignorar database
+backend/database.db*
+database.*
 
 # Archivos personales (facu-l)
 .superpowers/

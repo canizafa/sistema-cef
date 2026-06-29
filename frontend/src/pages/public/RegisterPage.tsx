@@ -1,34 +1,78 @@
-// Formulario de registro para nuevos clientes. Solo clientes se auto-registran; los empleados los crea el dueño.
-// Llama a authService.register() y redirige al login al completarse.
 import { useState } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { authService } from '@/services/auth.service';
 
 export function RegisterPage() {
     const [form, setForm] = useState({
-        nombre: '', email: '', dni: '',
-        telefono: '', fecha_nacimiento: '',
-        estado: 'activo',
-        ficha: '',
+        nombre_apellido: '',
+        email: '',
+        dni: '',
+        telefono: '',
+        fecha_nacimiento: '',
+        password: '',
+        estado: 'alta',
+        enfermedades: false,
+        operaciones_quirurgicas: false,
+        detalle: '',
     });
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value, type } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+        }));
     }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
+
+        const hoy = new Date();
+        const fechaMinima = new Date(hoy.getFullYear() - 14, hoy.getMonth(), hoy.getDate());
+        if (new Date(form.fecha_nacimiento) > fechaMinima) {
+            setError('Edad insuficiente.');
+            return;
+        }
+
         setLoading(true);
         try {
-            await authService.register({ ...form, dni: Number(form.dni) });
-            navigate('/login');
-        } catch {
-            setError('Error al crear la cuenta. Revisá los datos.');
+            await authService.register({
+                nombre_apellido: form.nombre_apellido,
+                email: form.email,
+                dni: Number(form.dni),
+                telefono: form.telefono,
+                fecha_nacimiento: form.fecha_nacimiento,
+                password: form.password,
+                estado: form.estado,
+                ficha_medica: {
+                    enfermedades: form.enfermedades,
+                    operaciones_quirurgicas: form.operaciones_quirurgicas,
+                    detalle: form.detalle,
+                },
+            });
+            setSuccess('Usuario registrado con éxito.');
+            setTimeout(() => navigate('/login'), 3000);
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                const msg: string = err.response?.data?.error ?? '';
+                if (msg.includes('dni_cliente')) {
+                    setError('El DNI ya está registrado.');
+                } else if (msg.includes('email')) {
+                    setError('El email ya está registrado.');
+                } else {
+                    setError('Error al crear la cuenta. Revisá los datos.');
+                }
+            } else {
+                setError('Usuario ya registrado en el sistema.');
+            }
         } finally {
             setLoading(false);
         }
@@ -42,12 +86,16 @@ export function RegisterPage() {
                     <h1 className="text-2xl font-bold mb-6 text-center">Crear cuenta</h1>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-1">
-                            <label htmlFor="nombre" className="text-sm font-medium">Nombre</label>
-                            <input id="nombre" name="nombre" placeholder="Juan" value={form.nombre} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                            <label htmlFor="nombre_apellido" className="text-sm font-medium">Nombre y apellido</label>
+                            <input id="nombre_apellido" name="nombre_apellido" placeholder="Juan Pérez" value={form.nombre_apellido} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                         </div>
                         <div className="space-y-1">
                             <label htmlFor="email" className="text-sm font-medium">Email</label>
                             <input id="email" name="email" type="email" placeholder="tu@email.com" value={form.email} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label htmlFor="password" className="text-sm font-medium">Contraseña</label>
+                            <input id="password" name="password" type="password" value={form.password} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                         </div>
                         <div className="space-y-1">
                             <label htmlFor="dni" className="text-sm font-medium">DNI</label>
@@ -61,11 +109,26 @@ export function RegisterPage() {
                             <label htmlFor="fecha_nacimiento" className="text-sm font-medium">Fecha de nacimiento</label>
                             <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" value={form.fecha_nacimiento} onChange={handleChange} required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                         </div>
-                        <div className="space-y-1">
-                            <label htmlFor="ficha" className="text-sm font-medium">Ficha médica</label>
-                            <textarea id="ficha" name="ficha" value={form.ficha} onChange={handleChange} placeholder="Describí antecedentes médicos relevantes" className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-16" />
-                        </div>
+
+                        <fieldset className="space-y-3 rounded-md border border-border p-4">
+                            <legend className="text-sm font-medium px-1">Ficha médica</legend>
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                <input type="checkbox" name="enfermedades" checked={form.enfermedades} onChange={handleChange} className="h-4 w-4 rounded border-border" />
+                                ¿Tenés enfermedades preexistentes?
+                            </label>
+                            <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                <input type="checkbox" name="operaciones_quirurgicas" checked={form.operaciones_quirurgicas} onChange={handleChange} className="h-4 w-4 rounded border-border" />
+                                ¿Tuviste operaciones quirúrgicas?
+                            </label>
+                            <div className="space-y-1">
+                                <label htmlFor="detalle" className="text-sm font-medium">Detalle</label>
+                                <textarea id="detalle" name="detalle" value={form.detalle} onChange={handleChange} placeholder="Describí antecedentes médicos relevantes" className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-16" />
+                            </div>
+                        </fieldset>
+
                         {error && <p className="text-sm text-red-600">{error}</p>}
+                        {success && <p className="text-sm text-green-600">{success}</p>}
+
                         <button type="submit" disabled={loading} className="w-full bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50">
                             {loading ? 'Creando cuenta...' : 'Crear cuenta'}
                         </button>

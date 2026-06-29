@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE reserva\n            SET\n                estado = ?,\n                tipo = ?,\n                fecha_reserva = ?,\n                dni_cliente = ?,\n                id_clase = ?\n            WHERE id_reserva = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "589c81022a017bb41948b831b1524ce78ba1072cf040df06bd5823c582770ee7"
+}

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/context/AuthContext';
-import { clienteService, type ClienteResponse } from '@/services/cliente.service';
+import { clienteService, type ClienteResponse, type FichaMedicaResponse } from '@/services/cliente.service';
+import { authService } from '@/services/auth.service';
 
 function CampoInfo({ label, valor }: { label: string; valor: string }) {
     return (
-        <div className='space-y-1'>
+        <div>
             <p className='text-xs text-gray-500 font-medium uppercase tracking-wide'>{label}</p>
             <p className='text-sm text-gray-900'>{valor}</p>
         </div>
@@ -15,24 +17,125 @@ function CampoInfo({ label, valor }: { label: string; valor: string }) {
 export function PerfilPage() {
     const { user } = useAuth();
     const [perfil, setPerfil] = useState<ClienteResponse | null>(null);
+    const [ficha, setFicha] = useState<FichaMedicaResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [cambiarForm, setCambiarForm] = useState({ old_password: '', new_password: '' });
+    const [cambiarLoading, setCambiarLoading] = useState(false);
+    const [cambiarError, setCambiarError] = useState<string | null>(null);
+    const [cambiarExito, setCambiarExito] = useState(false);
+
+    const [editando, setEditando] = useState(false);
+    const [editForm, setEditForm] = useState<{ nombre_apellido: string; telefono: string }>({
+        nombre_apellido: '', telefono: '',
+    });
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
+    const [editExito, setEditExito] = useState(false);
+
+    async function handleCambiarPassword(e: React.FormEvent) {
+        e.preventDefault();
+        if (!user) return;
+        setCambiarError(null);
+        setCambiarExito(false);
+        setCambiarLoading(true);
+        try {
+            await authService.changePassword({
+                dni_cliente: user.dni,
+                old_password: cambiarForm.old_password,
+                new_password: cambiarForm.new_password,
+            });
+            setCambiarExito(true);
+            setCambiarForm({ old_password: '', new_password: '' });
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 401) {
+                setCambiarError('Clave actual incorrecta, intente nuevamente.');
+            } else {
+                setCambiarError('Error al cambiar la contraseña. Intentá de nuevo.');
+            }
+        } finally {
+            setCambiarLoading(false);
+        }
+    }
+
+    async function handleGuardarPerfil() {
+        if (!user || !perfil) return;
+        setEditError(null);
+        setEditExito(false);
+
+        if (!editForm.nombre_apellido.trim()) {
+            setEditError('El nombre y apellido es obligatorio.');
+            return;
+        }
+
+        if (!editForm.telefono.trim()) {
+            setEditError('El teléfono es obligatorio.');
+            return;
+        }
+
+        setEditLoading(true);
+        try {
+            const updated = await clienteService.updatePerfil({
+                dni: perfil.dni,
+                nombre_apellido: editForm.nombre_apellido.trim(),
+                email: perfil.email,
+                telefono: editForm.telefono.trim(),
+                fecha_nacimiento: perfil.fecha_nacimiento,
+                motivo_eliminacion: perfil.motivo_eliminacion,
+                estado: perfil.estado,
+                id_ficha: perfil.id_ficha,
+            });
+            setPerfil(updated);
+            setEditando(false);
+            setEditExito(true);
+        } catch {
+            setEditError('Error al guardar los cambios. Intentá de nuevo.');
+        } finally {
+            setEditLoading(false);
+        }
+    }
+
+    function handleClickEditar() {
+        if (perfil) {
+            setEditForm({
+                nombre_apellido: perfil.nombre_apellido,
+                telefono: perfil.telefono,
+            });
+        }
+        setEditExito(false);
+        setEditError(null);
+        setEditando(true);
+    }
+
+    function handleCancelarEdicion() {
+        setEditError(null);
+        setEditando(false);
+    }
 
     useEffect(() => {
         if (!user) return;
         clienteService
             .getPerfil(user.dni)
-            .then(setPerfil)
+            .then((res) => {
+                setPerfil(res.cliente);
+                setFicha(res.ficha_medica);
+            })
             .catch(() => setError('No se pudo cargar el perfil.'))
             .finally(() => setLoading(false));
     }, [user]);
 
+    const hayCambios = perfil
+        ? editForm.nombre_apellido.trim() !== perfil.nombre_apellido ||
+          editForm.telefono.trim() !== perfil.telefono
+        : false;
+
     return (
         <div className='min-h-screen flex flex-col'>
             <Header />
-            <main className='flex-1 flex items-center justify-center px-4 py-12'>
-                <div className='w-full max-w-md space-y-6'>
-                    <h1 className='text-2xl font-bold text-center'>Mi perfil</h1>
+            <main className='flex-1 flex items-center justify-center px-4 py-8'>
+                <div className='w-full max-w-md space-y-4'>
+                    <h1 className='text-lg font-bold text-center'>Mi perfil</h1>
 
                     {loading && (
                         <p className='text-sm text-gray-500 text-center'>Cargando...</p>
@@ -44,31 +147,149 @@ export function PerfilPage() {
 
                     {perfil && (
                         <>
-                            <div className='border border-gray-200 rounded-lg p-5 space-y-4'>
+                            <div className='border border-gray-200 rounded-lg p-4 space-y-2'>
                                 <h2 className='text-sm font-semibold text-gray-700'>Datos personales</h2>
-                                <CampoInfo label='Nombre y apellido' valor={perfil.nombre_apellido} />
-                                <CampoInfo label='DNI' valor={perfil.dni.toString()} />
-                                <CampoInfo label='Email' valor={perfil.email} />
-                                <CampoInfo label='Teléfono' valor={perfil.telefono} />
-                                <CampoInfo
-                                    label='Fecha de nacimiento'
-                                    valor={new Date(perfil.fecha_nacimiento).toLocaleDateString('es-AR')}
-                                />
+                                {editando ? (
+                                    <form onSubmit={(e) => { e.preventDefault(); handleGuardarPerfil(); }} className='space-y-2'>
+                                        <div>
+                                            <label htmlFor='edit_nombre' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Nombre y apellido</label>
+                                            <input
+                                                id='edit_nombre'
+                                                value={editForm.nombre_apellido}
+                                                onChange={(e) => setEditForm((p) => ({ ...p, nombre_apellido: e.target.value }))}
+                                                required
+                                                className='flex h-9 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm'
+                                            />
+                                        </div>
+                                        <CampoInfo label='DNI' valor={perfil.dni.toString()} />
+                                        <CampoInfo label='Email' valor={perfil.email} />
+                                        <div>
+                                            <label htmlFor='edit_telefono' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Teléfono</label>
+                                            <input
+                                                id='edit_telefono'
+                                                value={editForm.telefono}
+                                                onChange={(e) => setEditForm((p) => ({ ...p, telefono: e.target.value }))}
+                                                required
+                                                className='flex h-9 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm'
+                                            />
+                                        </div>
+                                        <CampoInfo label='Fecha de nacimiento' valor={perfil.fecha_nacimiento.slice(0, 10).split('-').reverse().join('/')} />
+                                        <button type='submit' aria-hidden='true' className='hidden' />
+                                    </form>
+                                ) : (
+                                    <div className='space-y-2'>
+                                        <CampoInfo label='Nombre y apellido' valor={perfil.nombre_apellido} />
+                                        <CampoInfo label='DNI' valor={perfil.dni.toString()} />
+                                        <CampoInfo label='Email' valor={perfil.email} />
+                                        <CampoInfo label='Teléfono' valor={perfil.telefono} />
+                                        <CampoInfo label='Fecha de nacimiento' valor={perfil.fecha_nacimiento.slice(0, 10).split('-').reverse().join('/')} />
+                                    </div>
+                                )}
                             </div>
 
-                            <div className='border border-gray-200 rounded-lg p-5 space-y-4'>
-                                <h2 className='text-sm font-semibold text-gray-700'>Ficha médica</h2>
-                                <CampoInfo
-                                    label='Enfermedades'
-                                    valor={perfil.ficha_medica.enfermedades ? 'Sí' : 'No'}
-                                />
-                                <CampoInfo
-                                    label='Operaciones quirúrgicas'
-                                    valor={perfil.ficha_medica.operaciones_quirurgicas ? 'Sí' : 'No'}
-                                />
-                                {perfil.ficha_medica.detalle && (
-                                    <CampoInfo label='Detalle' valor={perfil.ficha_medica.detalle} />
+                            <div className='space-y-2'>
+                                {editando ? (
+                                    <div className='flex gap-2'>
+                                        <button
+                                            type='button'
+                                            onClick={handleCancelarEdicion}
+                                            disabled={editLoading}
+                                            className='flex-1 border border-gray-300 text-gray-700 rounded-md h-9 text-sm font-medium hover:bg-gray-50 disabled:opacity-50'
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            type='button'
+                                            onClick={handleGuardarPerfil}
+                                            disabled={editLoading || !hayCambios}
+                                            className='flex-1 bg-brand text-white rounded-md h-9 text-sm font-medium hover:opacity-90 disabled:opacity-50'
+                                        >
+                                            {editLoading ? 'Guardando...' : 'Guardar cambios'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type='button'
+                                        onClick={handleClickEditar}
+                                        disabled={editLoading}
+                                        className='w-full border border-[#C8102E] text-[#C8102E] rounded-md h-9 text-sm font-medium hover:bg-red-50 disabled:opacity-50'
+                                    >
+                                        Editar Datos
+                                    </button>
                                 )}
+                                {editError && <p className='text-sm text-red-600'>{editError}</p>}
+                                {editExito && <p className='text-sm text-green-600'>Cambio exitoso.</p>}
+                            </div>
+
+                            <fieldset className='space-y-2 rounded-md border border-gray-200 p-4'>
+                                <legend className='text-sm font-semibold text-gray-700 px-1'>Ficha médica</legend>
+                                <label className='flex items-center gap-2 text-sm'>
+                                    <input
+                                        type='checkbox'
+                                        readOnly
+                                        disabled
+                                        checked={ficha?.enfermedades ?? false}
+                                        className='h-4 w-4 rounded border-border'
+                                    />
+                                    ¿Tenés enfermedades preexistentes?
+                                </label>
+                                <label className='flex items-center gap-2 text-sm'>
+                                    <input
+                                        type='checkbox'
+                                        readOnly
+                                        disabled
+                                        checked={ficha?.operaciones_quirurgicas ?? false}
+                                        className='h-4 w-4 rounded border-border'
+                                    />
+                                    ¿Tuviste operaciones quirúrgicas?
+                                </label>
+                                <div>
+                                    <label className='text-sm font-medium'>Detalle</label>
+                                    <textarea
+                                        readOnly
+                                        disabled
+                                        value={ficha?.detalle ?? ''}
+                                        placeholder='Sin antecedentes médicos cargados'
+                                        className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-14 resize-none opacity-60'
+                                    />
+                                </div>
+                            </fieldset>
+
+                            <div className='border border-gray-200 rounded-lg p-4 space-y-3'>
+                                <h2 className='text-sm font-semibold text-gray-700'>Cambiar contraseña</h2>
+                                <form onSubmit={handleCambiarPassword} className='space-y-2'>
+                                    <div>
+                                        <label htmlFor='old_password' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Contraseña actual</label>
+                                        <input
+                                            id='old_password'
+                                            type='password'
+                                            value={cambiarForm.old_password}
+                                            onChange={(e) => setCambiarForm((p) => ({ ...p, old_password: e.target.value }))}
+                                            required
+                                            className='flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor='new_password' className='text-xs text-gray-500 font-medium uppercase tracking-wide'>Nueva contraseña</label>
+                                        <input
+                                            id='new_password'
+                                            type='password'
+                                            value={cambiarForm.new_password}
+                                            onChange={(e) => setCambiarForm((p) => ({ ...p, new_password: e.target.value }))}
+                                            required
+                                            className='flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                                        />
+                                    </div>
+                                    {cambiarError && <p className='text-sm text-red-600'>{cambiarError}</p>}
+                                    {cambiarExito && <p className='text-sm text-green-600'>Cambio de contraseña exitoso.</p>}
+                                    <button
+                                        type='submit'
+                                        disabled={cambiarLoading}
+                                        className='w-full bg-brand text-white rounded-md h-9 text-sm font-medium hover:opacity-90 disabled:opacity-50'
+                                    >
+                                        {cambiarLoading ? 'Cambiando...' : 'Cambiar contraseña'}
+                                    </button>
+                                </form>
                             </div>
                         </>
                     )}

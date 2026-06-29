@@ -1,26 +1,40 @@
 import api from './api';
-import type { User } from '../context/AuthContext';
 
 export interface LoginData {
-    mail: string;
+    email: string;
     password: string;
 }
 
+export interface ChangePasswordData {
+    dni_cliente: number;
+    old_password: string;
+    new_password: string;
+}
+
+export interface CreateFichaMedicaRequest {
+    enfermedades: boolean;
+    operaciones_quirurgicas: boolean;
+    detalle: string;
+}
+
 export interface RegisterData {
-    nombre: string;
+    nombre_apellido: string;
     email: string;
     dni: number;
     telefono: string;
     fecha_nacimiento: string;
+    password: string;
     estado: string;
-    ficha: string;
+    ficha_medica: CreateFichaMedicaRequest;
 }
 
 export interface AuthResponse {
-    token: string;
-    user: User;
+    dni: string;
+    email: string;
+    access_token: string;
+    rol: string;
+    estado: string;  
 }
-
 export const authService = {
     async login(data: LoginData): Promise<AuthResponse> {
         const response = await api.post('/auth/login', data);
@@ -28,14 +42,23 @@ export const authService = {
     },
 
     async register(data: RegisterData): Promise<void> {
-        await api.post('/auth/register', data);
+        await api.post('/clientes/create', data);
     },
 
     async forgotPassword(data: { email: string }): Promise<void> {
-        await api.post('/auth/forgot-password', data);
+        await api.post('/auth/reset-password', data);
+    },
+
+    async changePassword(data: ChangePasswordData): Promise<void> {
+        await api.put(`/auth/change-password/${data.dni_cliente}`, {
+            dni_cliente: data.dni_cliente,
+            old_password: data.old_password,
+            new_password: data.new_password,
+        });
     },
 
     logout(): void {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
     },
 };

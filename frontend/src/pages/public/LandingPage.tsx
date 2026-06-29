@@ -2,30 +2,36 @@ import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
- 
+import { useAuth } from '@/context/AuthContext';
+import { Navigate } from 'react-router-dom';
+
+// Array con las disciplinas para renderizarlas dinámicamente
+  const clases = ['FUNCIONAL', 'PILATES', 'CROSSFIT', 'YOGA'];
+
 export function LandingPage() {
+  const { user } = useAuth();
+
+      // Si es admin o empleado, redirigir directo al panel
+  if (user?.rol === 'duenio' || user?.rol === 'empleado') {
+   return <Navigate to="/admin/clases" replace />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#FFFFFF] font-['Roboto',sans-serif] text-[#333333]">
-      {/* El Header ya es sticky y está alineado con el mismo px-8 */}
+    <div className="min-h-screen bg-white text-gray-800">
       <Header />
 
-      {/* HERO*/}
       <section
         id="inicio"
         className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
       >
-        
         <div
           className="absolute inset-0 bg-cover bg-center opacity-50 blur-md scale-105"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1400')" }}
         />
-        
-       
-        <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-black/60" />
 
         <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-20 md:py-32 text-white">
-        
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-['Montserrat',sans-serif] leading-tight mb-5">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-5">
             <span className="block">Construir Fuerza.</span>
             <span className="block">Construir Confianza.</span>
           </h1>
@@ -36,38 +42,39 @@ export function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
+            {!user && (
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-md transition-colors text-sm"
+              >
+                Comenzar ahora <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
             <Link
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-[#D01F25] hover:bg-[#B01A1F] text-white font-semibold px-6 py-3 rounded-md transition-colors text-sm shadow-lg shadow-red-900/20"
-            >
-              Comenzar ahora <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href="#clases"
+              to="/clases"
               className="inline-flex items-center justify-center border-2 border-white/80 text-white hover:bg-white hover:text-black font-semibold px-6 py-3 rounded-md transition-colors text-sm"
             >
               Ver clases
-            </a>
+            </Link>
           </div>
         </div>
 
-        {/* Stats strip */}
-        <div className="relative z-10 border-t border-gray-200/10 bg-black/40 backdrop-blur-sm">
+        <div className="relative z-10 border-t border-white/10 bg-black/40 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-white font-['Montserrat',sans-serif]">+500</p>
+              <p className="text-3xl font-bold text-white">+500</p>
               <p className="text-sm text-gray-400 mt-1">Socios activos</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-white font-['Montserrat',sans-serif]">12</p>
+              <p className="text-3xl font-bold text-white">12</p>
               <p className="text-sm text-gray-400 mt-1">Profesores certificados</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-white font-['Montserrat',sans-serif]">3</p>
+              <p className="text-3xl font-bold text-white">3</p>
               <p className="text-sm text-gray-400 mt-1">Salas equipadas</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-white font-['Montserrat',sans-serif]">5★</p>
+              <p className="text-3xl font-bold text-white">5★</p>
               <p className="text-sm text-gray-400 mt-1">Valoración promedio</p>
             </div>
           </div>
@@ -81,20 +88,32 @@ export function LandingPage() {
         </a>
       </section>
 
-      {/*CLASES */}
-      <section id="clases" className="py-20 md:py-28 bg-[#FFFFFF]">
+   {/* SECCIÓN NUESTRAS CLASES MODIFICADA */}
+      <section id="clases" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#333333] font-['Montserrat',sans-serif]">
-              Nuestras <span className="text-[#D01F25]">Clases</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-800">
+              Nuestras <span className="text-red-600">Clases</span>
             </h2>
-            <p className="mt-4 text-[#666666] max-w-2xl mx-auto">
-                Explora nuestra variedad de disciplinas diseñadas para todos los niveles.
+            <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
+              Explora nuestra variedad de disciplinas diseñadas para todos los niveles.
             </p>
+          </div>
+
+          {/* Contenedor Grid Responsivo */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {clases.map((clase, index) => (
+              <div
+                key={index}
+                className="aspect-square flex items-center justify-center bg-gray-600 text-white font-bold text-xl tracking-wider rounded-lg shadow-md hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+              >
+                {clase}
+              </div>
+            ))}
           </div>
         </div>
       </section>
-    <Footer />
+      <Footer />
     </div>
   );
 }
