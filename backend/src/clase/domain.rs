@@ -196,6 +196,9 @@ impl Clase {
         }
         vec_errors
     }
+    pub fn cambiar_id(&mut self, uuid: String) {
+        self.id_clase = uuid;
+    }
 }
 
 impl From<CreateClaseRequest> for Clase {

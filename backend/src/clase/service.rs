@@ -1,5 +1,6 @@
 use chrono::Duration;
 use sqlx::SqlitePool;
+use uuid::Uuid;
 
 use crate::{
     app::errors::{AppError, FieldError},
@@ -51,6 +52,7 @@ pub async fn create(
 
     for _ in 0..3 {
         clase.cambiar_fecha(clase.get_dia() + Duration::days(7));
+        clase.cambiar_id(Uuid::new_v4().to_string());
         ClaseRepository::create(db, &clase).await?;
     }
 
