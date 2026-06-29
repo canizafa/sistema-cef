@@ -8,6 +8,8 @@ pub enum ClaseDomainError {
     SalaSobrepasada,
     #[error("Cupo negativo")]
     CupoNegativo,
+    #[error("Día invalido")]
+    DiaInvalido,
     #[error("Horario inválido")]
     HorarioInvalido,
     #[error("Día invalido")]
@@ -30,7 +32,7 @@ impl From<ClaseDomainError> for FieldError {
     fn from(error: ClaseDomainError) -> Self {
         let (field, message) = match error {
             ClaseDomainError::DiaInvalido => {
-                ("dia", "No se puede crear la clase en ese día".to_string())
+                ("dia", "Día no válido para hacer una clase".to_string())
             }
             ProfesorNoDisponible => (
                 "profesor",

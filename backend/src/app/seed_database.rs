@@ -129,7 +129,6 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     };
 
     let _ = crate::clase::service::create(pool, request, "CLASE002").await;
-
     // CLIENTE
     sqlx::query(
         "INSERT OR IGNORE INTO cliente (
