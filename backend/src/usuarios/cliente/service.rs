@@ -12,6 +12,7 @@ use crate::{
         empleado,
     },
 };
+use chrono::{NaiveDate, TimeDelta, Utc};
 use sqlx::SqlitePool;
 
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
@@ -199,4 +200,21 @@ pub async fn login_cliente(
         return Err(AppError::InvalidCredentials);
     }
     Ok(cliente)
+}
+
+pub async fn update_notify_date(
+    db: &SqlitePool,
+    email: &str,
+    fecha: NaiveDate,
+) -> Result<(), AppError> {
+    let date_now = Utc::now();
+    if date_now.date_naive().signed_duration_since(fecha) <= TimeDelta::zero() {
+        return Err(AppError::Conflict(
+            "No se permite una fecha menor a la actual".to_owned(),
+        ));
+    }
+    ClienteRepository::update_notify_date(db, email, fecha)
+        .await
+        .map_err(AppError::from)?;
+    Ok(())
 }

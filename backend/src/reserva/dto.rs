@@ -38,3 +38,15 @@ impl From<Reserva> for ReservaResponse {
         }
     }
 }
+
+impl From<Reserva> for CreateReservaRequest {
+    fn from(reserva: Reserva) -> Self {
+        Self {
+            fecha: reserva.get_fecha_reserva(),
+            tipo: reserva.get_tipo(),
+            estado: reserva.get_estado(),
+            dni_cliente: reserva.get_dni_cliente(),
+            id_clase: reserva.get_id_clase(),
+        }
+    }
+}

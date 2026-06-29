@@ -13,8 +13,7 @@ pub async fn create(
     request: CreateAsistenciaRequest,
 ) -> Result<Asistencia, AppError> {
     let asistencia = Asistencia::from(request);
-    let mut reserva =
-        reserva::repository::ReservaRepository::get_by_id(db, asistencia.get_id_reserva()).await?;
+    let mut reserva = reserva::service::get_by_id(db, asistencia.get_id_reserva()).await?;
     //Verificar si ya existe una asistencia con el mismo id
     let existing_asistencia =
         AsistenciaRepository::get_by_reserva_id(db, &asistencia.get_id_reserva()).await?;
@@ -23,7 +22,7 @@ pub async fn create(
     }
     let asistencia_creada = AsistenciaRepository::create(db, &asistencia).await?;
     reserva.confirmar_reserva(); //marca como reserva confirmada
-    reserva::repository::ReservaRepository::update(db, reserva.get_id(), &reserva).await?; //persistir el cambio
+    reserva::service::update(db, reserva.clone().get_id(), reserva.into()).await?; //persistir el cambio
     Ok(asistencia_creada)
 }
 pub async fn get_by_reserva_id(

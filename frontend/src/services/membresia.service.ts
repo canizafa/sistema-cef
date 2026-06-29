@@ -8,6 +8,7 @@ export type ActividadResponse = {
 
 export type MembresiaResponse = {
     id_membresia: string;
+    id_actividad: string;
     tipo: string;
     estado: string;
     fecha_inicio: string;
@@ -23,27 +24,55 @@ export const actividadService = {
     },
 };
 
+function fechaFinA30Dias(): { hoy: string; fin: string } {
+    const hoy = new Date().toLocaleDateString('en-CA');
+    const fechaFinDate = new Date();
+    fechaFinDate.setDate(fechaFinDate.getDate() + 30);
+    return { hoy, fin: fechaFinDate.toLocaleDateString('en-CA') };
+}
+
 export const membresiaService = {
-    async getMembresiaPorDni(dni: number): Promise<MembresiaResponse | null> {
+    async getMembresiasPorDni(dni: number): Promise<MembresiaResponse[]> {
         try {
             const response = await api.get(`/membresias/get-membresia-dni/${dni}`);
-            return response.data ?? null;
+            return response.data ?? [];
         } catch {
-            return null;
+            return [];
         }
     },
 
-    async crearMembresia(tipo: string, dni: number): Promise<void> {
-        const hoy = new Date().toLocaleDateString('en-CA');
-        const fechaFinDate = new Date();
-        fechaFinDate.setDate(fechaFinDate.getDate() + 30);
-        const fin = fechaFinDate.toLocaleDateString('en-CA');
+    async crearMembresia(tipo: string, dni: number, idActividad: string): Promise<void> {
+        const { hoy, fin } = fechaFinA30Dias();
         await api.post('/membresias/create', {
             tipo,
-            estado: 'alta',
+            id_actividad: idActividad,
+            estado: 'activo',
             fecha_inicio: hoy,
             fecha_fin: fin,
-            dni_cliente: String(dni),
+            dni_cliente: dni,
+        });
+    },
+
+    async renovarMembresia(idMembresia: string, tipo: string, dni: number, idActividad: string): Promise<void> {
+        const { hoy, fin } = fechaFinA30Dias();
+        await api.put(`/membresias/update-membresia/${idMembresia}`, {
+            tipo,
+            id_actividad: idActividad,
+            estado: 'activo',
+            fecha_inicio: hoy,
+            fecha_fin: fin,
+            dni_cliente: dni,
+        });
+    },
+
+    async darBajaMembresia(membresia: MembresiaResponse, dni: number): Promise<void> {
+        await api.put(`/membresias/update-membresia/${membresia.id_membresia}`, {
+            tipo: membresia.tipo,
+            id_actividad: membresia.id_actividad,
+            estado: 'cancelado',
+            fecha_inicio: membresia.fecha_inicio.slice(0, 10),
+            fecha_fin: membresia.fecha_fin,
+            dni_cliente: dni,
         });
     },
 };
