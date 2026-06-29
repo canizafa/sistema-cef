@@ -105,6 +105,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion
                 'cliente' AS rol
             FROM cliente c
             "#,
@@ -131,6 +132,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion
                 'cliente' AS rol
             FROM cliente c
             WHERE c.dni_cliente = ?
@@ -234,6 +236,7 @@ impl ClienteRepository {
                     id_ficha,
                     creditos,
                     contador_cancelaciones,
+                    fecha_notificacion
                     'cliente' AS rol
                 "#,
         )
@@ -269,6 +272,7 @@ impl ClienteRepository {
                     id_ficha,
                     creditos,
                     contador_cancelaciones,
+                    fecha_notificacion
                     'cliente' AS rol
                 "#,
         )
@@ -322,6 +326,7 @@ impl ClienteRepository {
                 id_ficha,
                 creditos,
                 contador_cancelaciones,
+                fecha_notificacion
                 'cliente' AS rol
             "#,
         )
