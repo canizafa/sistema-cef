@@ -159,6 +159,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion
                 'cliente' AS rol
             FROM cliente c
             WHERE c.email = ?
