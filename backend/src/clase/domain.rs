@@ -114,11 +114,21 @@ impl Clase {
 
     pub fn validate_clase(&self, sala_capacidad: i64) -> Vec<ClaseDomainError> {
         let mut errors = Vec::new();
-        let hora =
-            NaiveTime::parse_from_str(&self.horario, "%H:%M").expect("Fallo al formatear hora");
-        let apertura =
-            NaiveTime::parse_from_str("06:00", "%H:%M").expect("Fallo al formatear hora");
-        let cierre = NaiveTime::parse_from_str("22:00", "%H:%M").expect("Fallo al formatear hora");
+        let hora = NaiveTime::parse_from_str(&self.horario, "%H:%M");
+        if hora.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        let apertura = NaiveTime::parse_from_str("06:00", "%H:%M");
+        if apertura.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        let cierre = NaiveTime::parse_from_str("22:00", "%H:%M");
+        if cierre.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        if !errors.is_empty() {
+            return errors;
+        }
         if self.dia <= Utc::now().date_naive() || self.dia.weekday() == Weekday::Sun {
             errors.push(ClaseDomainError::DiaInvalido);
         }
@@ -128,7 +138,10 @@ impl Clase {
         if self.cupo_base < 0 {
             errors.push(ClaseDomainError::CupoNegativo);
         }
-        if self.horario.trim().is_empty() && hora > apertura && hora < cierre {
+        if self.horario.trim().is_empty()
+            && hora.unwrap() > apertura.unwrap()
+            && hora.unwrap() < cierre.unwrap()
+        {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
         if self.descripcion.trim().is_empty() {
