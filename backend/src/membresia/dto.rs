@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize)]
 pub struct CreateMembresiaRequest {
     pub id_actividad: String,
+    pub horario: String,
     pub tipo: String,
     pub dni_cliente: i64,
     pub estado: EstadoMembresia,

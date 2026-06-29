@@ -1,13 +1,13 @@
 use crate::reserva::estado::EstadoReserva;
-use crate::usuarios::cliente;
 use crate::usuarios::cliente::repository::ClienteRepository;
 use crate::{
     app::errors::{AppError, FieldError},
     clase, lista_espera,
     reserva::{domain::Reserva, dto::CreateReservaRequest, repository::ReservaRepository},
 };
-use chrono::{Local, NaiveDateTime, NaiveTime};
+use chrono::{Local, NaiveDate, NaiveDateTime, NaiveTime};
 use sqlx::SqlitePool;
+use uuid::Uuid;
 
 pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Reserva, AppError> {
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
@@ -219,5 +219,24 @@ async fn registrar_cancelacion(
     )
     .await
     .map_err(AppError::from)?;
+    Ok(())
+}
+
+pub async fn generar_reserva(
+    db: &SqlitePool,
+    tipo: String,
+    fecha_reserva: NaiveDate,
+    dni_cliente: i64,
+    id_clase: &str,
+) -> Result<(), AppError> {
+    let reserva = Reserva::new(
+        Uuid::new_v4().to_string(),
+        EstadoReserva::Pendiente,
+        tipo,
+        fecha_reserva,
+        dni_cliente,
+        id_clase.to_owned(),
+    );
+    ReservaRepository::create(db, &reserva).await?;
     Ok(())
 }

@@ -99,3 +99,13 @@ pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), 
     ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
     Ok(())
 }
+
+pub async fn get_all_by_actividad_horario(
+    db: &SqlitePool,
+    id_actividad: &str,
+    horario: &str,
+) -> Result<Vec<Clase>, AppError> {
+    ClaseRepository::get_by_actividad_horario(db, id_actividad, horario)
+        .await
+        .map_err(AppError::from)
+}

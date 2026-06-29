@@ -2,7 +2,9 @@ use sqlx::SqlitePool;
 
 use crate::{
     app::errors::{AppError, FieldError},
+    clase,
     membresia::{domain::Membresia, dto::CreateMembresiaRequest, repository::MembresiaRepository},
+    reserva,
     usuarios::cliente_service,
 };
 
@@ -42,6 +44,28 @@ pub async fn create(
     MembresiaRepository::create(db, &membresia)
         .await
         .map_err(AppError::from)?;
+
+    // Bajar cupo de las clases
+    let clases = clase::service::get_all_by_actividad_horario(
+        db,
+        &membresia.get_id_actividad(),
+        membresia.get_horario(),
+    )
+    .await?;
+
+    for clase in clases {
+        clase::service::aumentar_inscripciones(db, clase.get_id()).await?;
+        // Crear reservas de las clases
+        reserva::service::generar_reserva(
+            db,
+            "membresia".to_owned(),
+            clase.get_dia(),
+            membresia.get_dni_cliente(),
+            clase.get_id(),
+        )
+        .await?;
+    }
+
     Ok(membresia)
 }
 
