@@ -12,6 +12,7 @@ use crate::{
         empleado,
     },
 };
+use chrono::{NaiveDate, TimeDelta, Utc};
 use sqlx::SqlitePool;
 
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
@@ -166,6 +167,19 @@ pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<C
     .await
     .map_err(AppError::from)
 }
+pub async fn update_creditos_y_cancelaciones(
+    db: &SqlitePool,
+    cliente: &Cliente,
+) -> Result<Cliente, AppError> {
+    ClienteRepository::update_creditos_y_cancelaciones(
+        db,
+        cliente.get_dni(),
+        cliente.get_creditos(),
+        cliente.get_contador_cancelaciones(),
+    )
+    .await
+    .map_err(AppError::from)
+}
 
 pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<(), AppError> {
     reserva::service::delete_all_by_client(db, request.dni).await?;
@@ -186,4 +200,21 @@ pub async fn login_cliente(
         return Err(AppError::InvalidCredentials);
     }
     Ok(cliente)
+}
+
+pub async fn update_notify_date(
+    db: &SqlitePool,
+    email: &str,
+    fecha: NaiveDate,
+) -> Result<(), AppError> {
+    let date_now = Utc::now();
+    if date_now.date_naive().signed_duration_since(fecha) <= TimeDelta::zero() {
+        return Err(AppError::Conflict(
+            "No se permite una fecha menor a la actual".to_owned(),
+        ));
+    }
+    ClienteRepository::update_notify_date(db, email, fecha)
+        .await
+        .map_err(AppError::from)?;
+    Ok(())
 }
