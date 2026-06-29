@@ -1,11 +1,13 @@
 use crate::reserva::estado::EstadoReserva;
+use crate::usuarios::cliente;
+use crate::usuarios::cliente::repository::ClienteRepository;
 use crate::{
     app::errors::{AppError, FieldError},
     clase, lista_espera,
     reserva::{domain::Reserva, dto::CreateReservaRequest, repository::ReservaRepository},
 };
+use chrono::{Local, NaiveDateTime, NaiveTime};
 use sqlx::SqlitePool;
-use sqlx::types::chrono::Local;
 
 pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Reserva, AppError> {
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
@@ -106,6 +108,33 @@ async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<
     }
     Ok(())
 }
+pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let reserva = ReservaRepository::get_by_id(db, id)
+        .await
+        .map_err(AppError::from)?;
+
+    let clase = clase::service::get_by_id(db, &reserva.get_id_clase()).await?;
+
+    // calcular si faltan 24 hs
+    let hora = NaiveTime::parse_from_str(clase.get_horario(), "%H:%M")
+        .map_err(|_| AppError::Conflict("Horario de la clase inválido".to_string()))?;
+
+    let fecha_hora_clase = NaiveDateTime::new(clase.get_dia(), hora);
+    let ahora = Local::now().naive_local();
+
+    let tiene_24hs = fecha_hora_clase.signed_duration_since(ahora).num_hours() >= 24;
+
+    registrar_cancelacion(
+        db,
+        reserva.get_dni_cliente(),
+        clase.get_precio(),
+        tiene_24hs,
+    )
+    .await?;
+    delete(db, id).await?;
+    Ok(())
+}
+
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let reserva = ReservaRepository::get_by_id(db, id)
         .await
@@ -136,5 +165,59 @@ pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppErr
     for clase in clases_cliente {
         clase::service::decrementar_inscripciones(db, clase.get_id()).await?;
     }
+    Ok(())
+}
+async fn registrar_cancelacion(
+    db: &SqlitePool,
+    dni: i64,
+    monto: i64,
+    tiene_24hs: bool,
+) -> Result<(), AppError> {
+    let mut cliente = ClienteRepository::get_by_dni(db, dni)
+        .await
+        .map_err(AppError::from)?;
+    cliente.incrementar_cancelaciones();
+    let cancelaciones = cliente.get_contador_cancelaciones();
+
+    if cancelaciones >= 3 {
+        cliente.anular_cancelaciones_y_creditos();
+        ClienteRepository::update_creditos_y_cancelaciones(
+            db,
+            cliente.get_dni(),
+            cliente.get_creditos(),
+            cliente.get_contador_cancelaciones(),
+        )
+        .await
+        .map_err(AppError::from)?;
+        return Ok(());
+    }
+    if !tiene_24hs {
+        ClienteRepository::update_creditos_y_cancelaciones(
+            db,
+            cliente.get_dni(),
+            cliente.get_creditos(),
+            cliente.get_contador_cancelaciones(),
+        )
+        .await
+        .map_err(AppError::from)?;
+        return Ok(());
+    }
+
+    //calculo creditos
+    let credito = match cancelaciones {
+        1 => monto,
+        2 => monto / 4, //seria como 25%
+        _ => 0,
+    };
+    cliente.acreditar_creditos(credito);
+
+    ClienteRepository::update_creditos_y_cancelaciones(
+        db,
+        cliente.get_dni(),
+        cliente.get_creditos(),
+        cliente.get_contador_cancelaciones(),
+    )
+    .await
+    .map_err(AppError::from)?;
     Ok(())
 }

@@ -8,6 +8,6 @@ use crate::{
 
 pub async fn notify(request: NotificacionRequest) -> Result<(), AppError> {
     let mailer = mailer::Mailer::new()?;
-    Mailer::notify(&mailer, &request.mail, &request.motivo, &request.cuerpo).await?;
+    Mailer::notify(&mailer, &request.email, &request.motivo, &request.cuerpo).await?;
     Ok(())
 }
