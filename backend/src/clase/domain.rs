@@ -59,6 +59,9 @@ impl Clase {
     pub fn get_cupo_base(&self) -> i64 {
         self.cupo_base
     }
+    pub fn get_precio(&self) -> i64 {
+        5000
+    }
     pub fn get_inscripciones(&self) -> i64 {
         self.inscripciones
     }

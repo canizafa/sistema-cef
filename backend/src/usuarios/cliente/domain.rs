@@ -161,12 +161,18 @@ impl Cliente {
         self.creditos += monto;
     }
 
-    pub fn consumir_creditos(&mut self, monto: i64) {
-        self.creditos -= monto;
+    pub fn consumir_creditos(&mut self, monto: i64) -> i64 {
+        let creditos_utilizados = self.creditos.min(monto);
+        self.creditos -= creditos_utilizados;
+        creditos_utilizados
     }
 
     pub fn incrementar_cancelaciones(&mut self) {
         self.contador_cancelaciones += 1;
+    }
+    pub fn anular_cancelaciones_y_creditos(&mut self) {
+        self.contador_cancelaciones = 0;
+        self.creditos = 0;
     }
 }
 

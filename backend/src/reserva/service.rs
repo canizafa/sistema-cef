@@ -1,12 +1,13 @@
 use crate::reserva::estado::EstadoReserva;
+use crate::usuarios::cliente;
 use crate::usuarios::cliente::repository::ClienteRepository;
 use crate::{
     app::errors::{AppError, FieldError},
     clase, lista_espera,
     reserva::{domain::Reserva, dto::CreateReservaRequest, repository::ReservaRepository},
 };
+use chrono::{Local, NaiveDateTime, NaiveTime};
 use sqlx::SqlitePool;
-use sqlx::types::chrono::Local;
 
 pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Reserva, AppError> {
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
@@ -107,6 +108,33 @@ async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<
     }
     Ok(())
 }
+pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let reserva = ReservaRepository::get_by_id(db, id)
+        .await
+        .map_err(AppError::from)?;
+
+    let clase = clase::service::get_by_id(db, &reserva.get_id_clase()).await?;
+
+    // calcular si faltan 24 hs
+    let hora = NaiveTime::parse_from_str(clase.get_horario(), "%H:%M")
+        .map_err(|_| AppError::Conflict("Horario de la clase inválido".to_string()))?;
+
+    let fecha_hora_clase = NaiveDateTime::new(clase.get_dia(), hora);
+    let ahora = Local::now().naive_local();
+
+    let tiene_24hs = fecha_hora_clase.signed_duration_since(ahora).num_hours() >= 24;
+
+    registrar_cancelacion(
+        db,
+        reserva.get_dni_cliente(),
+        clase.get_precio(),
+        tiene_24hs,
+    )
+    .await?;
+    delete(db, id).await?;
+    Ok(())
+}
+
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let reserva = ReservaRepository::get_by_id(db, id)
         .await
@@ -139,7 +167,7 @@ pub async fn delete_all_by_client(db: &SqlitePool, id: i64) -> Result<(), AppErr
     }
     Ok(())
 }
-pub async fn registrar_cancelacion(
+async fn cancelar_reserva(
     db: &SqlitePool,
     dni: i64,
     monto: i64,
@@ -148,14 +176,11 @@ pub async fn registrar_cancelacion(
     let mut cliente = ClienteRepository::get_by_dni(db, dni)
         .await
         .map_err(AppError::from)?;
-
     cliente.incrementar_cancelaciones();
+    let cancelaciones = cliente.get_contador_cancelaciones();
 
-    // regla 3ra cancelacion
-    if cliente.get_contador_cancelaciones() == 3 {
-        cliente.anular_creditos();
-        cliente.reset_cancelaciones();
-
+    if cancelaciones >= 3 {
+        cliente.anular_cancelaciones_y_creditos();
         ClienteRepository::update_creditos_y_cancelaciones(
             db,
             cliente.get_dni(),
@@ -164,19 +189,25 @@ pub async fn registrar_cancelacion(
         )
         .await
         .map_err(AppError::from)?;
-
+        return Ok(());
+    }
+    if !tiene_24hs {
+        ClienteRepository::update_creditos_y_cancelaciones(
+            db,
+            cliente.get_dni(),
+            cliente.get_creditos(),
+            cliente.get_contador_cancelaciones(),
+        )
+        .await
+        .map_err(AppError::from)?;
         return Ok(());
     }
 
-    // calcular credito si tiene 24hs de anticipacion
-    let credito = if !tiene_24hs {
-        0
-    } else {
-        match cliente.get_contador_cancelaciones() {
-            1 => monto,
-            2 => (monto as f64 * 0.25) as i64,
-            _ => 0,
-        }
+    //calculo creditos
+    let credito = match cancelaciones {
+        1 => monto,
+        2 => monto / 4, //seria como 25%
+        _ => 0,
     };
     cliente.acreditar_creditos(credito);
 
@@ -188,6 +219,5 @@ pub async fn registrar_cancelacion(
     )
     .await
     .map_err(AppError::from)?;
-
     Ok(())
 }
