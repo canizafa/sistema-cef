@@ -1,10 +1,9 @@
-use crate::app::errors::{AppError, DbError};
+use crate::app::errors::DbError;
 use crate::auth::password::hash_password;
 use crate::clase::dto::CreateClaseRequest;
 use crate::clase::estado::EstadoClase;
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
-use uuid::Uuid;
 
 pub async fn seed_database(pool: &SqlitePool) -> Result<(), DbError> {
     // Hash de passwords
