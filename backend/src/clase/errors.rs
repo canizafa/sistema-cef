@@ -12,8 +12,6 @@ pub enum ClaseDomainError {
     DiaInvalido,
     #[error("Horario inválido")]
     HorarioInvalido,
-    #[error("Día invalido")]
-    DiaInvalido,
     #[error("Descripción inválida")]
     DescripcionInvalida,
     #[error("ID de sala inválido")]
