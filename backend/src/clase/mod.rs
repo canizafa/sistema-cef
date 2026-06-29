@@ -1,9 +1,9 @@
 mod domain;
-mod dto;
 mod errors;
-mod estado;
 mod handler;
 mod repository;
 
+pub mod dto;
+pub mod estado;
 pub mod route;
 pub mod service;
