@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, CalendarDays } from 'lucide-react' // <--- Traemos un icono lindo para programar
 import { ClienteCard } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 import { clienteService, type ClienteResponse } from '@/services/cliente.service'
@@ -105,6 +105,11 @@ export function ClientesPage() {
     setClienteAEliminar(null)
   }
 
+  // Manejador para el nuevo botón global
+  const handleProgramarNotificaciones = () => {
+    toast.info("Apertura de programación de notificaciones")
+  }
+
   const clientesFiltrados = clientes.filter((c) => {
     if (busquedaNombre.trim() !== '') {
       return normalizar(c.nombreApellido)
@@ -131,9 +136,20 @@ export function ClientesPage() {
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-primary">Gestión de Clientes</h1>
-        <p className="text-sm mt-1">Administrá los clientes del centro</p>
+      {/* SECCIÓN SUPERIOR: Título y Botón alineado a la derecha */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-primary">Gestión de Clientes</h1>
+          <p className="text-sm mt-1">Administrá los clientes del centro</p>
+        </div>
+        
+        <button
+          onClick={handleProgramarNotificaciones}
+          className="flex items-center justify-center gap-2 bg-brand text-white text-sm font-medium h-10 px-4 rounded-lg hover:bg-brand/90 transition-colors self-start sm:self-auto"
+        >
+          <CalendarDays className="w-4 h-4" />
+          Programar envío de notificaciones
+        </button>
       </div>
 
       <div className="relative mb-4">
