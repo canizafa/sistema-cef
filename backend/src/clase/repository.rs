@@ -1,7 +1,7 @@
 use super::domain::Clase;
 use crate::app::errors::DbError;
 use crate::clase::estado::EstadoClase;
-use chrono::{Duration, NaiveDate, Utc};
+use chrono::{Datelike, Duration, NaiveDate, Utc, Weekday};
 use sqlx::SqlitePool;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -127,10 +127,11 @@ impl ClaseRepository {
 
         Ok(row.into())
     }
-    pub async fn get_by_actividad_horario(
+    pub async fn get_by_actividad_horario_dia(
         pool: &SqlitePool,
         id_actividad: &str,
         horario: &str,
+        dia_semana: Weekday,
     ) -> Result<Vec<Clase>, DbError> {
         let tomorrow = (Utc::now().date_naive() + Duration::days(1))
             .format("%Y-%m-%d")
@@ -153,7 +154,7 @@ impl ClaseRepository {
               AND horario = ?
               AND dia >= ?
             ORDER BY dia ASC
-            LIMIT 4",
+            LIMIT 30",
         )
         .bind(id_actividad)
         .bind(horario)
@@ -162,7 +163,18 @@ impl ClaseRepository {
         .await
         .map_err(DbError::from)?;
 
-        Ok(rows.into_iter().map(|r| r.into()).collect())
+        let clases: Vec<Clase> = rows
+            .into_iter()
+            .map(|r| r.into())
+            .filter(|c: &Clase| {
+                NaiveDate::parse_from_str(&c.get_dia().to_string(), "%Y-%m-%d")
+                    .map(|fecha| fecha.weekday() == dia_semana)
+                    .unwrap_or(false)
+            })
+            .take(4)
+            .collect();
+
+        Ok(clases)
     }
 
     pub async fn update_inscripciones(

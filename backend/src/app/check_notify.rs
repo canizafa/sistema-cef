@@ -18,7 +18,7 @@ pub async fn check_notify(pool: Arc<SqlitePool>) {
                 for cliente in clientes {
                     if let Some(fecha) = cliente.get_fecha_notificacion() {
                         if fecha.eq(&today) {
-                            notificaciones::service::notify(
+                            notificaciones::service::notify_date(
                                 &cliente.get_mail(),
                                 "Su membresía ha vencido, renuevela",
                                 "Membresía vencida",

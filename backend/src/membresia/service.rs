@@ -1,3 +1,4 @@
+use chrono::Datelike;
 use sqlx::SqlitePool;
 use tracing::instrument;
 
@@ -52,6 +53,7 @@ pub async fn create(
         db,
         &membresia.get_id_actividad(),
         membresia.get_horario(),
+        membresia.get_fecha_inicio().weekday(),
     )
     .await?;
 

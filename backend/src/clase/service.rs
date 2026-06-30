@@ -1,4 +1,4 @@
-use chrono::Duration;
+use chrono::{Duration, Weekday};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
@@ -104,8 +104,12 @@ pub async fn get_all_by_actividad_horario(
     db: &SqlitePool,
     id_actividad: &str,
     horario: &str,
+    dia: Weekday,
 ) -> Result<Vec<Clase>, AppError> {
-    ClaseRepository::get_by_actividad_horario(db, id_actividad, horario)
+    let clases = ClaseRepository::get_by_actividad_horario_dia(db, id_actividad, horario, dia)
         .await
-        .map_err(AppError::from)
+        .map_err(AppError::from)?;
+
+    let clases: Vec<Clase> = clases.into_iter().take(4).collect();
+    Ok(clases)
 }
