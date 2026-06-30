@@ -9,10 +9,7 @@ use crate::{
     reserva,
     usuarios::{
         self,
-        cliente::{
-            self,
-            dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
-        },
+        cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
         empleado,
     },
 };
