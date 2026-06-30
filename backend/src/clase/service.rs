@@ -1,3 +1,6 @@
+use std::time::Duration;
+
+use chrono::Utc;
 use sqlx::SqlitePool;
 
 use crate::{
@@ -52,6 +55,12 @@ pub async fn create(
 
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Clase>, AppError> {
     let clases = ClaseRepository::get_all(db).await?;
+    let yesterday = Utc::now().date_naive() - Duration::days(1);
+
+    let clases = clases
+        .into_iter()
+        .filter(|c| c.get_dia() >= yesterday)
+        .collect();
     Ok(clases)
 }
 
