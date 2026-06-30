@@ -85,13 +85,15 @@ pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), App
         ));
     }
     clase.aumentar_inscripciones(sala.get_capacidad_maxima());
-    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
+    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones(), clase.get_estado())
+        .await?;
     Ok(())
 }
 
 pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     clase.decrementar_inscripciones();
-    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
+    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones(), clase.get_estado())
+        .await?;
     Ok(())
 }
