@@ -134,7 +134,7 @@ pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     Ok(())
 }
 
-pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let reserva = ReservaRepository::get_by_id(db, id)
         .await
         .map_err(AppError::from)?;
