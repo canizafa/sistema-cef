@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { empleadoService } from '@/services/empleados.service'
+import { clienteService } from '@/services/cliente.service'
 
 export function EditarEmpleadoPage() {
   const { id } = useParams()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
+    nombre: '',
+    apellido: '',
+    dni: '',
+    mail: '',
+  })
+  const [formOriginal, setFormOriginal] = useState({
     nombre: '',
     apellido: '',
     dni: '',
@@ -29,12 +36,14 @@ export function EditarEmpleadoPage() {
           return
         }
         const [nombre, ...resto] = empleado.nombre_apellido.split(' ')
-        setForm({
+        const datosIniciales = {
           nombre,
           apellido: resto.join(' '),
           dni: String(empleado.dni),
           mail: empleado.mail,
-        })
+        }
+        setForm(datosIniciales)
+        setFormOriginal(datosIniciales)
         setGenero(empleado.genero)
         setEstado(empleado.estado)
         setRol(empleado.rol)
@@ -47,12 +56,37 @@ export function EditarEmpleadoPage() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  const hayCambios =
+    form.nombre !== formOriginal.nombre ||
+    form.apellido !== formOriginal.apellido ||
+    form.mail !== formOriginal.mail
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     setSuccess(null)
     setLoading(true)
     try {
+      const [empleados, clientes] = await Promise.all([
+        empleadoService.getEmpleados(),
+        clienteService.getClientes(),
+      ])
+
+      const mailNuevo = form.mail.trim().toLowerCase()
+
+      const mailEnEmpleados = empleados.some(
+        (e: any) => e.mail?.toLowerCase() === mailNuevo && String(e.dni) !== String(id)
+      )
+      const mailEnClientes = clientes.some(
+        (c: any) => c.email?.toLowerCase() === mailNuevo
+      )
+
+      if (mailEnEmpleados || mailEnClientes) {
+        setError('El email ya está en uso por otro usuario.')
+        setLoading(false)
+        return
+      }
+
       await empleadoService.actualizarEmpleado(Number(id), {
         dni: Number(form.dni),
         nombre_apellido: `${form.nombre} ${form.apellido}`,
@@ -62,6 +96,7 @@ export function EditarEmpleadoPage() {
         rol,
       })
       setSuccess('Empleado actualizado correctamente')
+      setFormOriginal(form)
       setTimeout(() => navigate('/admin/empleados', { state: { editadoDni: Number(id) } }), 3000)
     } catch {
       setError('Error al actualizar el empleado. Revisá los datos.')
@@ -72,78 +107,78 @@ export function EditarEmpleadoPage() {
 
   if (loadingDatos) {
     return (
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <p className="text-sm text-muted">Cargando datos del empleado...</p>
+      <main className='flex-1 flex items-center justify-center px-4 py-12'>
+        <p className='text-sm text-muted'>Cargando datos del empleado...</p>
       </main>
     )
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center">Editar empleado</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <label htmlFor="nombre" className="text-sm font-medium">Nombre</label>
+    <main className='flex-1 flex items-center justify-center px-4 py-12'>
+      <div className='w-full max-w-sm'>
+        <h1 className='text-2xl font-bold mb-6 text-center'>Editar empleado</h1>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <div className='space-y-1'>
+            <label htmlFor='nombre' className='text-sm font-medium'>Nombre</label>
             <input
-              id="nombre"
-              name="nombre"
+              id='nombre'
+              name='nombre'
               value={form.nombre}
               onChange={handleChange}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
             />
           </div>
-          <div className="space-y-1">
-            <label htmlFor="apellido" className="text-sm font-medium">Apellido</label>
+          <div className='space-y-1'>
+            <label htmlFor='apellido' className='text-sm font-medium'>Apellido</label>
             <input
-              id="apellido"
-              name="apellido"
+              id='apellido'
+              name='apellido'
               value={form.apellido}
               onChange={handleChange}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
             />
           </div>
-          <div className="space-y-1">
-            <label htmlFor="dni" className="text-sm font-medium">DNI</label>
+          <div className='space-y-1'>
+            <label htmlFor='dni' className='text-sm font-medium'>DNI</label>
             <input
-              id="dni"
-              name="dni"
+              id='dni'
+              name='dni'
               value={form.dni}
               disabled
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm opacity-50 cursor-not-allowed"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm opacity-50 cursor-not-allowed'
             />
           </div>
-          <div className="space-y-1">
-            <label htmlFor="mail" className="text-sm font-medium">Email</label>
+          <div className='space-y-1'>
+            <label htmlFor='mail' className='text-sm font-medium'>Email</label>
             <input
-              id="mail"
-              name="mail"
-              type="email"
-              placeholder="empleado@cef.com"
+              id='mail'
+              name='mail'
+              type='email'
+              placeholder='empleado@cef.com'
               value={form.mail}
               onChange={handleChange}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {success && <p className="text-sm text-green-600">{success}</p>}
+          {error && <p className='text-sm text-red-600'>{error}</p>}
+          {success && <p className='text-sm text-green-600'>{success}</p>}
 
-          <div className="flex gap-2 pt-2">
+          <div className='flex gap-2 pt-2'>
             <button
-              type="button"
+              type='button'
               onClick={() => navigate('/admin/empleados')}
-              className="flex-1 border border-input bg-background text-sm font-medium rounded-md h-10 hover:bg-surface"
+              className='flex-1 border border-input bg-background text-sm font-medium rounded-md h-10 hover:bg-surface'
             >
               Cancelar
             </button>
             <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              type='submit'
+              disabled={loading || !hayCambios}
+              className='flex-1 bg-brand text-white rounded-md h-10 text-sm font-medium hover:opacity-90 disabled:opacity-50'
             >
               {loading ? 'Guardando...' : 'Guardar cambios'}
             </button>
