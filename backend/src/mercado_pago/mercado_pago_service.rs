@@ -1,7 +1,9 @@
 use super::*;
 use reqwest::Client;
 use std::env;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn crear_preferencia(
     titulo: String,
     monto: f64,

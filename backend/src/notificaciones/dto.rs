@@ -11,5 +11,4 @@ pub struct NotificacionRequest {
 #[derive(Debug, Deserialize)]
 pub struct NotificacionUpdateRequest {
     pub fecha: NaiveDate,
-    pub email: String,
 }
