@@ -56,7 +56,7 @@ export function MembresiaPage() {
         }
 
         return Array.from(grupos.entries())
-            .filter(([, clasesGrupo]) => !clasesGrupo.some((c) => c.lleno))
+            .filter(([, clasesGrupo]) => !clasesGrupo.some((c) => c.inscripciones >= c.cupo_base))
             .map(([key, clasesGrupo]) => ({
                 key,
                 label: `${clasesGrupo[0].dia_semana} ${clasesGrupo[0].horario}`,
@@ -86,7 +86,7 @@ export function MembresiaPage() {
                     clases: grupo.clases.map((c) => ({
                         id_clase: c.id_clase,
                         fecha: c.dia,
-                        lleno: c.lleno,
+                        lleno: c.inscripciones >= c.cupo_base,
                         diaSemana: c.dia_semana,
                         nombreActividad: actividad.nombre,
                         yaReservada: clasesYaReservadas.has(c.id_clase),

@@ -3,10 +3,12 @@
 // si el rol es "duenio" o "empleado" también muestra el link al panel admin. Sin sesión muestra Iniciar sesión y Registrarse.
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useCreditos } from '@/context/CreditosContext';
 import logo from '@/assets/Logo.png';
 
 export function Header() {
     const { token, user, dispatch } = useAuth();
+    const { creditos } = useCreditos();
     const navigate = useNavigate();
 
     function handleLogout() {
@@ -39,9 +41,16 @@ export function Header() {
                                     Membresía
                                 </Link>
                             )}
-                            <Link to="/perfil" className="text-sm font-medium hover:text-brand">
-                                Mi perfil
-                            </Link>
+                            <div className="relative">
+                                <Link to="/perfil" className="text-sm font-medium hover:text-brand">
+                                    Mi perfil
+                                </Link>
+                                {user?.rol === 'cliente' && (
+                                    <span className="absolute top-full left-0 pt-0.5 text-xs text-gray-500 whitespace-nowrap">
+                                        Créditos: {creditos}
+                                    </span>
+                                )}
+                            </div>
                             {(user?.rol === 'duenio' || user?.rol === 'empleado') && (
                                 <Link to="/admin" className="text-sm font-medium hover:text-brand">
                                     Panel Admin
