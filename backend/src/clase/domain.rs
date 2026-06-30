@@ -118,11 +118,11 @@ impl Clase {
         if hora.is_err() {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
-        let apertura = NaiveTime::parse_from_str("06:00", "%H:%M");
+        let apertura = NaiveTime::parse_from_str("07:00", "%H:%M");
         if apertura.is_err() {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
-        let cierre = NaiveTime::parse_from_str("22:00", "%H:%M");
+        let cierre = NaiveTime::parse_from_str("21:00", "%H:%M");
         if cierre.is_err() {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
