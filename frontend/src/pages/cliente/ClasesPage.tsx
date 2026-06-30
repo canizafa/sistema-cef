@@ -153,7 +153,8 @@ export function ClasesPage() {
                       diaSemana={clase.dia_semana}
                       horario={clase.horario}
                       descripcion={clase.descripcion}
-                      lleno={clase.lleno}
+                      cupoBase={clase.cupo_base}
+                      inscripciones={clase.inscripciones}
                       estadoReserva={getEstadoReserva(clase)}
                       idActividad={getNombreActividad(clase.id_actividad)}
                       idSala={clase.id_sala}

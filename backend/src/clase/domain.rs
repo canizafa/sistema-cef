@@ -4,7 +4,7 @@ use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
-use chrono::{NaiveDate, NaiveTime};
+use chrono::{Datelike, NaiveDate, NaiveTime, Utc, Weekday};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -114,13 +114,34 @@ impl Clase {
 
     pub fn validate_clase(&self, sala_capacidad: i64) -> Vec<ClaseDomainError> {
         let mut errors = Vec::new();
+        let hora = NaiveTime::parse_from_str(&self.horario, "%H:%M");
+        if hora.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        let apertura = NaiveTime::parse_from_str("07:00", "%H:%M");
+        if apertura.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        let cierre = NaiveTime::parse_from_str("21:00", "%H:%M");
+        if cierre.is_err() {
+            errors.push(ClaseDomainError::HorarioInvalido);
+        }
+        if !errors.is_empty() {
+            return errors;
+        }
+        if self.dia <= Utc::now().date_naive() || self.dia.weekday() == Weekday::Sun {
+            errors.push(ClaseDomainError::DiaInvalido);
+        }
         if self.cupo_base > sala_capacidad {
             errors.push(ClaseDomainError::SalaSobrepasada);
         }
         if self.cupo_base < 0 {
             errors.push(ClaseDomainError::CupoNegativo);
         }
-        if self.horario.trim().is_empty() {
+        if self.horario.trim().is_empty()
+            && hora.unwrap() > apertura.unwrap()
+            && hora.unwrap() < cierre.unwrap()
+        {
             errors.push(ClaseDomainError::HorarioInvalido);
         }
         if self.descripcion.trim().is_empty() {
