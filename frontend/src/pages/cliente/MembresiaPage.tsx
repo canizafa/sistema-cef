@@ -46,7 +46,7 @@ export function MembresiaPage() {
 
     function getGruposHorario(idActividad: string): GrupoHorario[] {
         const clasesActividad = clases
-            .filter((c) => c.id_actividad === idActividad && c.estado === 'alta')
+            .filter((c) => c.id_actividad === idActividad)
             .sort((a, b) => a.dia.localeCompare(b.dia));
 
         const grupos = new Map<string, ClaseDTO[]>();
@@ -55,11 +55,13 @@ export function MembresiaPage() {
             grupos.set(key, [...(grupos.get(key) ?? []), c]);
         }
 
-        return Array.from(grupos.entries()).map(([key, clasesGrupo]) => ({
-            key,
-            label: `${clasesGrupo[0].dia_semana} ${clasesGrupo[0].horario}`,
-            clases: clasesGrupo,
-        }));
+        return Array.from(grupos.entries())
+            .filter(([, clasesGrupo]) => !clasesGrupo.some((c) => c.lleno))
+            .map(([key, clasesGrupo]) => ({
+                key,
+                label: `${clasesGrupo[0].dia_semana} ${clasesGrupo[0].horario}`,
+                clases: clasesGrupo,
+            }));
     }
 
     function iniciarPago(actividad: ActividadResponse, grupo: GrupoHorario, idMembresia?: string) {
