@@ -181,6 +181,7 @@ impl ClaseRepository {
         pool: &SqlitePool,
         id: &str,
         inscripciones: i64,
+        estado: &EstadoClase,
     ) -> Result<Clase, DbError> {
         let row = sqlx::query_as::<_, ClaseRow>(
             "UPDATE clase
@@ -200,6 +201,7 @@ impl ClaseRepository {
                 dni_profesor",
         )
         .bind(inscripciones)
+        .bind(estado)
         .bind(id)
         .fetch_one(pool)
         .await

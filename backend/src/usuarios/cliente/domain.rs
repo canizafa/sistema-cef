@@ -179,6 +179,9 @@ impl Cliente {
         self.contador_cancelaciones = 0;
         self.creditos = 0;
     }
+    pub fn set_fecha_notificacion(&mut self, fecha: NaiveDate) {
+        self.fecha_notificacion = Some(fecha);
+    }
 }
 
 impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
