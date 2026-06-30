@@ -1,4 +1,6 @@
-use chrono::{Duration, Utc};
+use std::time::Duration;
+
+use chrono::Utc;
 use sqlx::SqlitePool;
 
 use crate::{
