@@ -88,6 +88,11 @@ pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
 pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     let sala = sala::service::get_by_id(db, clase.get_id_sala()).await?;
+    if clase.is_lleno() {
+        return Err(AppError::Conflict(
+            "La clase no tiene cupo disponible".to_string(),
+        ));
+    }
     clase.aumentar_inscripciones(sala.get_capacidad_maxima());
     ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
     Ok(())

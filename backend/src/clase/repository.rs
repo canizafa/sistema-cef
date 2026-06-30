@@ -185,7 +185,8 @@ impl ClaseRepository {
         let row = sqlx::query_as::<_, ClaseRow>(
             "UPDATE clase
             SET
-                inscripciones = ?
+                inscripciones = ?,
+                estado = ?
             WHERE id_clase = ?
             RETURNING
                 id_clase,
