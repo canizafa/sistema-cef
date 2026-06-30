@@ -65,6 +65,7 @@ export function ClientesPage() {
         rol: 'cliente',
         id_ficha: cliente.idFicha,
         motivo_eliminacion: cliente.motivoEliminacion,
+        creditos: 0
       }
       await clienteService.toggleEstado(clienteRaw)
       setClientes((prev) =>
