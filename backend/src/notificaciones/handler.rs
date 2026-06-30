@@ -9,11 +9,11 @@ use crate::{
 use axum::{Json, extract::State};
 use tracing::instrument;
 
-#[instrument(name = "notificaciones.notify", skip(request), err)]
-pub async fn notify_handler(Json(request): Json<NotificacionRequest>) -> Result<(), AppError> {
-    notificaciones::service::notify(request).await?;
-    Ok(())
-}
+// #[instrument(name = "notificaciones.notify", skip(request), err)]
+// pub async fn notify_handler(Json(request): Json<NotificacionRequest>) -> Result<(), AppError> {
+//     notificaciones::service::notify(request).await?;
+//     Ok(())
+// }
 
 #[instrument(
     name = "notificaciones.update_notify_date_client",

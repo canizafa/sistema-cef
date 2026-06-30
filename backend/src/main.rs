@@ -1,3 +1,4 @@
+use backend::app::check_notify::check_notify;
 use backend::app::errors::{AppError, DbError};
 use backend::app::mailer::Mailer;
 use backend::app::state::AppState;
@@ -50,6 +51,11 @@ async fn main() -> Result<(), AppError> {
     tracing::info!("Cargando base de datos...");
 
     seed_database::seed_database(&app_state.db).await?;
+
+    let bg_pool = app_state.db.clone();
+    tokio::spawn(async move {
+        check_notify(Arc::new(bg_pool)).await;
+    });
 
     let app = root::router()
         .with_state(app_state)

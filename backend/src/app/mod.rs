@@ -1,3 +1,4 @@
+pub mod check_notify;
 pub mod config;
 pub mod errors;
 pub mod mailer;
