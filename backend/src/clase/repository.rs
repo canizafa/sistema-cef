@@ -186,7 +186,6 @@ impl ClaseRepository {
             "UPDATE clase
             SET
                 inscripciones = ?,
-                estado = ?
             WHERE id_clase = ?
             RETURNING
                 id_clase,
