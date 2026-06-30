@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
@@ -182,6 +180,9 @@ impl Clase {
             EstadoClase::Alta => {
                 if self.cupo_base > 0 && self.cupo_base > self.inscripciones {
                     self.inscripciones += 1;
+                    if self.cupo_base == self.inscripciones {
+                        self.estado = EstadoClase::SinCupo;
+                    }
                 } else {
                     self.estado = EstadoClase::SinCupo;
                 }

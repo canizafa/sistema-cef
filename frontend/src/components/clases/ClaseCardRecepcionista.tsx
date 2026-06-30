@@ -62,7 +62,7 @@ export function ClaseCardRecepcionista({
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Users className="w-4 h-4 text-destructive" />
-          <span className="font-medium text-destructive">Disponibilidad:</span>
+          <span className="font-medium text-destructive">Lugares disponibles:</span>
           <span className="text-gray-700">{inscripciones}/{cupoBase}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
