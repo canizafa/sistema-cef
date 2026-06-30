@@ -10,6 +10,7 @@ export interface ClienteResponse {
     rol: string;
     id_ficha: string;
     motivo_eliminacion: string | null;
+    creditos: number;
 }
 
 export interface FichaMedicaResponse {
@@ -78,5 +79,9 @@ export const clienteService = {
             },
             headers: { 'Content-Type': 'application/json' }
         });
+    },
+
+    async usarCreditos(dni: number, monto: number): Promise<void> {
+        await api.post('/clientes/usar-creditos', { dni, monto });
     },
 };
