@@ -95,30 +95,31 @@ impl ListaDeEsperaRepository {
         Ok(rows.into_iter().map(Into::into).collect())
     }
 
-    pub async fn get_by_clase_y_tipo(
-        pool: &SqlitePool,
-        id_clase: &str,
-        tipo: &str,
-    ) -> Result<ListaEspera, DbError> {
-        let row = sqlx::query_as::<_, ListaEsperaRow>(
-            r#"
-                SELECT
-                    id_espera,
-                    tipo,
-                    id_clase
-                FROM lista_de_espera
-                WHERE id_clase = ?
-                  AND tipo = ?
-                "#,
-        )
-        .bind(id_clase)
-        .bind(tipo)
-        .fetch_one(pool)
-        .await
-        .map_err(DbError::from)?;
+    // pub async fn get_by_clase_y_tipo(
+    //     pool: &SqlitePool,
+    //     id_clase: &str,
+    //     tipo: &str,
+    // ) -> Result<ListaEspera, DbError> {
+    //     let row = sqlx::query_as::<_, ListaEsperaRow>(
+    //         r#"
+    //             SELECT
+    //                 id_espera,
+    //                 tipo,
+    //                 id_clase
+    //             FROM lista_de_espera
+    //             WHERE id_clase = ?
+    //               AND tipo = ?
+    //             "#,
+    //     )
+    //     .bind(id_clase)
+    //     .bind(tipo)
+    //     .fetch_one(pool)
+    //     .await
+    //     .map_err(DbError::from)?;
 
-        Ok(row.into())
-    }
+    //     Ok(row.into())
+    // }
+    //
     pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
