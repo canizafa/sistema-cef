@@ -1,5 +1,3 @@
-use std::{f64::consts::E, str::FromStr};
-
 use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
