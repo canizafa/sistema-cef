@@ -17,15 +17,11 @@ use chrono::{NaiveDate, TimeDelta, Utc};
 use sqlx::SqlitePool;
 
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
-    let cliente = ClienteRepository::get_by_dni(db, request.dni)
-        .await
-        .map_err(AppError::from)?;
-
-    ClienteRepository::update_estado(
+    ClienteRepository::update_nombre(
         db,
-        cliente.get_dni(),
-        request.estado,
-        request.motivo_eliminacion,
+        request.dni,
+        &request.nombre_apellido,
+        &request.telefono,
     )
     .await
     .map_err(AppError::from)
