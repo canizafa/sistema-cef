@@ -1,7 +1,8 @@
+use backend::app::check_notify::check_notify;
 use backend::app::errors::{AppError, DbError};
 use backend::app::mailer::Mailer;
 use backend::app::state::AppState;
-use backend::app::{feed_database, telemetry};
+use backend::app::{seed_database, telemetry};
 use backend::routes::root;
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
@@ -49,7 +50,12 @@ async fn main() -> Result<(), AppError> {
     tracing::info!(port = config.port, "Servidor iniciado");
     tracing::info!("Cargando base de datos...");
 
-    feed_database::seed_database(&app_state.db).await?;
+    seed_database::seed_database(&app_state.db).await?;
+
+    let bg_pool = app_state.db.clone();
+    tokio::spawn(async move {
+        check_notify(Arc::new(bg_pool)).await;
+    });
 
     let app = root::router()
         .with_state(app_state)

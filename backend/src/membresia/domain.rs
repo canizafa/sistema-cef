@@ -14,6 +14,7 @@ pub struct Membresia {
     id_actividad: String,
     fecha_inicio: NaiveDate,
     fecha_fin: NaiveDate,
+    horario: String,
 }
 
 impl Membresia {
@@ -25,6 +26,7 @@ impl Membresia {
         id_actividad: String,
         fecha_inicio: NaiveDate,
         fecha_fin: NaiveDate,
+        horario: String,
     ) -> Self {
         Self {
             id_membresia,
@@ -34,6 +36,7 @@ impl Membresia {
             id_actividad,
             fecha_inicio,
             fecha_fin,
+            horario,
         }
     }
     pub fn get_id_membresia(&self) -> &str {
@@ -44,6 +47,9 @@ impl Membresia {
     }
     pub fn get_dni_cliente(&self) -> i64 {
         self.dni_cliente
+    }
+    pub fn get_horario(&self) -> &str {
+        &self.horario
     }
     pub fn get_estado(&self) -> EstadoMembresia {
         self.estado.clone()
@@ -84,6 +90,7 @@ impl From<CreateMembresiaRequest> for Membresia {
             estado: request.estado,
             fecha_inicio: request.fecha_inicio,
             fecha_fin: request.fecha_fin,
+            horario: request.horario,
         }
     }
 }

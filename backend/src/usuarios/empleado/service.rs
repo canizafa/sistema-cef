@@ -12,7 +12,9 @@ use crate::{
     },
 };
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn create(db: &SqlitePool, request: CreateEmpleadoRequest) -> Result<Empleado, AppError> {
     // Verificar si ya existe
     let existing_empleado = EmpleadoRepository::get_by_email(db, &request.mail)
@@ -42,12 +44,14 @@ pub async fn create(db: &SqlitePool, request: CreateEmpleadoRequest) -> Result<E
     Ok(empleado)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Empleado>, AppError> {
     EmpleadoRepository::get_all(db)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     db: &SqlitePool,
     dni: i64,
@@ -60,6 +64,7 @@ pub async fn update(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(db: &SqlitePool, request: EliminarEmpleadoRequest) -> Result<(), AppError> {
     EmpleadoRepository::delete(
         db,
@@ -71,18 +76,21 @@ pub async fn delete(db: &SqlitePool, request: EliminarEmpleadoRequest) -> Result
     .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<Empleado, AppError> {
     EmpleadoRepository::get_by_dni(db, dni)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_email(db: &SqlitePool, email: &str) -> Result<Empleado, AppError> {
     EmpleadoRepository::get_by_email(db, email)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Result<(), AppError> {
     //Generar contraseña
     let password = auth::password::generate_random_password();
@@ -98,6 +106,7 @@ pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Re
     Ok(())
 }
 
+#[instrument(skip_all, err)]
 pub async fn change_password(
     db: &SqlitePool,
     dni: i64,
@@ -116,6 +125,7 @@ pub async fn change_password(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn login_empleado(
     db: &SqlitePool,
     email: &str,
