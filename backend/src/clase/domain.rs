@@ -3,6 +3,7 @@ use crate::{
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
 use chrono::{NaiveDate, NaiveTime};
+use std::str::FromStr;
 use uuid::Uuid;
 
 #[derive(Debug)]

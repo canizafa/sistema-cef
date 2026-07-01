@@ -1,6 +1,5 @@
 use super::domain::Cliente;
 use crate::app::errors::DbError;
-use crate::app::telemetry;
 use crate::usuarios::{estado::EstadoUsuario, rol::RolUsuario};
 use chrono::NaiveDate;
 use sqlx::SqlitePool;
