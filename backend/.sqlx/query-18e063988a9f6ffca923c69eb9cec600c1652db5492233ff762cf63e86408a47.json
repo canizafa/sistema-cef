@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE cliente\n            SET fecha_notificacion = ?\n            WHERE email = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "18e063988a9f6ffca923c69eb9cec600c1652db5492233ff762cf63e86408a47"
+}
