@@ -3,7 +3,7 @@ use crate::{
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
 
-use chrono::{NaiveDate, NaiveTime};
+
 use std::str::FromStr;
 
 use chrono::{Datelike, NaiveDate, NaiveTime, Utc, Weekday};
