@@ -3,7 +3,9 @@ use crate::{
     sala::{domain::Sala, dto::CreateSalaRequest, repository::SalaRepository},
 };
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn create(pool: &SqlitePool, request: CreateSalaRequest) -> Result<Sala, AppError> {
     // Convertir el request a un modelo Sala
     let sala = Sala::from(request);
@@ -20,12 +22,14 @@ pub async fn create(pool: &SqlitePool, request: CreateSalaRequest) -> Result<Sal
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Sala, AppError> {
     SalaRepository::get_by_id(pool, id)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Sala>, AppError> {
     SalaRepository::get_all(pool).await.map_err(AppError::from)
 }

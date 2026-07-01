@@ -2,7 +2,9 @@ use super::{dto::CreateActividadRequest, repository::ActividadRepository};
 use crate::actividad::Actividad;
 use crate::app::errors::AppError;
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn create(
     db: &SqlitePool,
     request: CreateActividadRequest,
@@ -24,18 +26,21 @@ pub async fn create(
     Ok(actividad)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Actividad, AppError> {
     ActividadRepository::get_by_id(db, id)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Actividad>, AppError> {
     ActividadRepository::get_all(db)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     db: &SqlitePool,
     id: &str,

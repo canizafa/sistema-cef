@@ -1,5 +1,6 @@
 use chrono::{Duration, Utc};
 use sqlx::SqlitePool;
+use uuid::Uuid;
 
 use crate::{
     app::errors::{AppError, FieldError},
@@ -26,7 +27,7 @@ pub async fn create(
     }
 
     //Verificar si existe la sala
-    let clase = Clase::from(request);
+    let mut clase = Clase::from(request);
     let errors: Vec<FieldError> = clase
         .validate_clase(sala.get_capacidad_maxima())
         .into_iter()
@@ -48,6 +49,13 @@ pub async fn create(
     }
 
     ClaseRepository::create(db, &clase).await?;
+
+    for _ in 0..3 {
+        clase.cambiar_fecha(clase.get_dia() + Duration::days(7));
+        clase.cambiar_id(Uuid::new_v4().to_string());
+        ClaseRepository::create(db, &clase).await?;
+    }
+
     Ok(clase)
 }
 
@@ -103,4 +111,18 @@ pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), 
     ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones(), clase.get_estado())
         .await?;
     Ok(())
+}
+
+pub async fn get_all_by_actividad_horario(
+    db: &SqlitePool,
+    id_actividad: &str,
+    horario: &str,
+    dia: Weekday,
+) -> Result<Vec<Clase>, AppError> {
+    let clases = ClaseRepository::get_by_actividad_horario_dia(db, id_actividad, horario, dia)
+        .await
+        .map_err(AppError::from)?;
+
+    let clases: Vec<Clase> = clases.into_iter().take(4).collect();
+    Ok(clases)
 }
