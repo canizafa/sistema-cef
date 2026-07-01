@@ -90,7 +90,7 @@ pub async fn get_all(db: &SqlitePool) -> Result<Vec<Cliente>, AppError> {
 }
 
 pub async fn update_nombre(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
-    ClienteRepository::update_nombre(db, request.dni, &request.nombre_apellido)
+    ClienteRepository::update_nombre(db, request.dni, &request.nombre_apellido, &request.telefono)
         .await
         .map_err(AppError::from)
 }

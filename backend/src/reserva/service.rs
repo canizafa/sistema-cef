@@ -122,14 +122,15 @@ pub async fn delete_reserva(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let ahora = Local::now().naive_local();
 
     let tiene_24hs = fecha_hora_clase.signed_duration_since(ahora).num_hours() >= 24;
-
-    registrar_cancelacion(
-        db,
-        reserva.get_dni_cliente(),
-        clase.get_precio(),
-        tiene_24hs,
-    )
-    .await?;
+    if reserva.get_tipo() == "abono" {
+        registrar_cancelacion(
+            db,
+            reserva.get_dni_cliente(),
+            clase.get_precio(),
+            tiene_24hs,
+        )
+        .await?;
+    }
     delete(db, id).await?;
     Ok(())
 }
