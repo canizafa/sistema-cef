@@ -13,6 +13,7 @@ struct MembresiaRow {
     pub estado: EstadoMembresia,
     pub fecha_inicio: String,
     pub fecha_fin: String,
+    pub horario: String,
 }
 impl From<MembresiaRow> for Membresia {
     fn from(value: MembresiaRow) -> Self {
@@ -24,6 +25,7 @@ impl From<MembresiaRow> for Membresia {
             value.id_actividad,
             value.fecha_inicio.parse::<NaiveDate>().unwrap(),
             value.fecha_fin.parse::<NaiveDate>().unwrap(),
+            value.horario,
         )
     }
 }
@@ -99,7 +101,8 @@ impl MembresiaRepository {
                         estado as "estado!",
                         id_actividad as "id_actividad!",
                         fecha_inicio as "fecha_inicio!",
-                        fecha_fin as "fecha_fin!"
+                        fecha_fin as "fecha_fin!",
+                        horario as "horario!"
                     FROM membresias
                     "#
         )
@@ -118,6 +121,7 @@ impl MembresiaRepository {
                     row.id_actividad,
                     NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
                     NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
+                    row.horario,
                 )
             })
             .collect())
@@ -132,7 +136,8 @@ impl MembresiaRepository {
                         estado as "estado!",
                         id_actividad as "id_actividad!",
                         fecha_inicio as "fecha_inicio!",
-                        fecha_fin as "fecha_fin!"
+                        fecha_fin as "fecha_fin!",
+                        horario as "horario!"
                     FROM membresias
                     WHERE id_membresia = ?
                     "#,
@@ -150,6 +155,7 @@ impl MembresiaRepository {
             row.id_actividad,
             NaiveDate::parse_from_str(&row.fecha_inicio, "%Y-%m-%d").unwrap_or_default(),
             NaiveDate::parse_from_str(&row.fecha_fin, "%Y-%m-%d").unwrap_or_default(),
+            row.horario,
         ))
     }
     pub async fn update(

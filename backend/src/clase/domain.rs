@@ -2,6 +2,10 @@ use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
+
+
+use std::str::FromStr;
+
 use chrono::{Datelike, NaiveDate, NaiveTime, Utc, Weekday};
 use uuid::Uuid;
 
@@ -198,6 +202,20 @@ impl Clase {
 
     pub fn extender_cupo(&mut self) {
         self.estado = EstadoClase::Extendido;
+    }
+
+    pub fn cambiar_fecha(&mut self, fecha: NaiveDate) -> Vec<ClaseDomainError> {
+        let mut vec_errors = Vec::new();
+        if fecha <= Utc::now().date_naive() || fecha.weekday() == Weekday::Sun {
+            vec_errors.push(ClaseDomainError::DiaInvalido);
+        }
+        if vec_errors.is_empty() {
+            self.dia = fecha;
+        }
+        vec_errors
+    }
+    pub fn cambiar_id(&mut self, uuid: String) {
+        self.id_clase = uuid;
     }
 }
 

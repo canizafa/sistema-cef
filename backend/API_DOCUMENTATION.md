@@ -5,7 +5,7 @@ Este archivo describe las rutas disponibles, los métodos HTTP y los datos que e
 ## Base URL
 
 - Base URL: `http://<host>:<port>/api`
-- Ejemplo local: `http://localhost:8000/api` (el puerto se configura en el backend)
+- Ejemplo local: `http://localhost:8000/api`
 - Content-Type: `application/json`
 - Fechas deben enviarse en formato `YYYY-MM-DD`
 
@@ -14,7 +14,7 @@ Este archivo describe las rutas disponibles, los métodos HTTP y los datos que e
 - `Content-Type: application/json`
 - `Accept: application/json`
 
-## Errores comunes
+## Formato de errores
 
 Las rutas pueden devolver errores con distintos códigos HTTP. El formato general es:
 
@@ -52,29 +52,13 @@ Las rutas pueden devolver errores con distintos códigos HTTP. El formato genera
   { "error": "servicio no disponible, intentá más tarde" }
   ```
 
-Los errores de validación usan la estructura `FieldError` con campos:
-- `field`: nombre del campo con el problema.
-- `message`: descripción del error.
-
-Ejemplo de lista de errores de validación:
-
-```json
-{
-  "error": "errores de validación",
-  "details": [
-    { "field": "email", "message": "email es requerido" },
-    { "field": "password", "message": "password es requerido" }
-  ]
-}
-```
-
 ## Rutas generales
 
 ### Health check
 
 - `GET /api/health`
 - Respuesta: `200 OK`
-- Uso: verificar que el backend está vivo.
+- Uso: verificar que el backend está activo.
 
 ## Autenticación
 
@@ -93,18 +77,10 @@ Ejemplo de lista de errores de validación:
   "dni": 12345678,
   "email": "usuario@ejemplo.com",
   "access_token": "<jwt>",
-  "rol": "cliente"
+  "rol": "cliente",
+  "estado": "alta"
 }
 ```
-- Errores posibles:
-  - `401 Unauthorized`
-    ```json
-    { "error": "Email o contraseña incorrectos" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "Error de hash de contraseña" }
-    ```
 
 ### POST /api/auth/reset-password
 
@@ -115,21 +91,12 @@ Ejemplo de lista de errores de validación:
 }
 ```
 - Respuesta: `200 OK`
-- Uso: enviar correo de restablecimiento de contraseña para cliente o empleado.
-- Errores posibles:
-  - `404 Not Found`
-    ```json
-    { "error": "Usuario no encontrado" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "Error de hash de contraseña" }
-    ```
+- Uso: solicitar envío de correo de restablecimiento.
 
 ### PUT /api/auth/change-password/{dni}
 
 - Path param:
-  - `dni`: DNI del usuario (cliente o empleado).
+  - `dni`: DNI del usuario.
 - Body:
 ```json
 {
@@ -139,19 +106,6 @@ Ejemplo de lista de errores de validación:
 }
 ```
 - Respuesta: `200 OK`
-- Errores posibles:
-  - `404 Not Found`
-    ```json
-    { "error": "Usuario no encontrado" }
-    ```
-  - `401 Unauthorized`
-    ```json
-    { "error": "Clave actual incorrecta, intente nuevamente" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "Error de hash de contraseña" }
-    ```
 
 ## Clientes
 
@@ -185,53 +139,40 @@ Ejemplo de lista de errores de validación:
   "estado": "alta",
   "rol": "cliente",
   "motivo_eliminacion": null,
-  "id_ficha": "..."
+  "id_ficha": "<uuid>",
+  "creditos": 0,
+  "fecha_notificacion": null
 }
 ```
-- Errores posibles:
-  - `409 Conflict`
-    ```json
-    { "error": "El email ya está registrado" }
-    ```
-  - `422 Unprocessable Entity`
-    ```json
-    {
-      "error": "errores de validación",
-      "details": [
-        { "field": "dni", "message": "DNI demasiado corto" },
-        { "field": "password", "message": "Contraseña muy corta" },
-        { "field": "nombre_apellido", "message": "Nombre no puede ser vacío" },
-        { "field": "email", "message": "Email no puede ser vacío" },
-        { "field": "telefono", "message": "Teléfono no puede ser vacío" },
-        { "field": "fecha_nacimiento", "message": "Edad insuficiente" }
-      ]
-    }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "Error de hash de contraseña" }
-    ```
 
 ### GET /api/clientes/get-cliente/{id}
 
 - Path param:
-  - `id`: DNI del cliente
-- Respuesta: arreglo JSON con cliente y ficha médica:
+  - `id`: DNI del cliente.
+- Respuesta:
 ```json
 [
-  { "dni": 12345678, "nombre_apellido": "Juan Pérez", ... },
-  { "id_ficha": "...", "enfermedades": false, "operaciones_quirurgicas": false, "detalle": "sin detalles" }
+  {
+    "dni": 12345678,
+    "nombre_apellido": "Juan Pérez",
+    "email": "juan@ejemplo.com",
+    "telefono": "+541234567890",
+    "fecha_nacimiento": "1990-01-01",
+    "estado": "alta",
+    "rol": "cliente",
+    "motivo_eliminacion": null,
+    "id_ficha": "<uuid>",
+    "creditos": 0,
+    "fecha_notificacion": null
+  },
+  {
+    "id_ficha": "<uuid>",
+    "enfermedades": false,
+    "operaciones_quirurgicas": false,
+    "detalle": "sin detalles"
+  }
 ]
 ```
-- Errores posibles:
-  - `404 Not Found`
-    ```json
-    { "error": "El recurso solicitado no existe" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "error interno del servidor" }
-    ```
 
 ### PUT /api/clientes/update-cliente
 
@@ -245,11 +186,10 @@ Ejemplo de lista de errores de validación:
   "fecha_nacimiento": "1990-01-01",
   "motivo_eliminacion": null,
   "estado": "alta",
-  "id_ficha": "uuid-ficha"
+  "id_ficha": "<uuid>"
 }
 ```
-- Respuesta: objeto Cliente actualizado.
-- Nota: la implementación actual solo actualiza `nombre_apellido`.
+- Respuesta: `ClienteResponse` actualizado.
 
 ### PUT /api/clientes/update-password/
 
@@ -258,38 +198,16 @@ Ejemplo de lista de errores de validación:
 {
   "email": "juan@ejemplo.com",
   "old_password": "clave123",
-  "new_password": "nuevo123"
+  "new_password": "nuevaClave123"
 }
 ```
 - Respuesta: `200 OK`
-- Errores posibles:
-  - `404 Not Found`
-    ```json
-    { "error": "El recurso solicitado no existe" }
-    ```
-  - `401 Unauthorized`
-    ```json
-    { "error": "Clave actual incorrecta, intente nuevamente" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "Error de hash de contraseña" }
-    ```
 
 ### PUT /api/clientes/reset-password/{email}
 
 - Path param:
-  - `email`: email del cliente
+  - `email`: email del cliente.
 - Respuesta: `200 OK`
-- Errores posibles:
-  - `404 Not Found`
-    ```json
-    { "error": "Usuario no encontrado" }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "error interno del servidor" }
-    ```
 
 ### DELETE /api/clientes/delete-cliente
 
@@ -297,15 +215,15 @@ Ejemplo de lista de errores de validación:
 ```json
 {
   "dni": 12345678,
-  "estado": "baja",
-  "motivo_eliminacion": "cliente eliminado"
+  "estado": "eliminado",
+  "motivo_eliminacion": "motivo"
 }
 ```
 - Respuesta: `200 OK`
 
 ### GET /api/clientes/get-all
 
-- Respuesta: lista de clientes.
+- Respuesta: arreglo de `ClienteResponse`.
 
 ## Empleados
 
@@ -314,8 +232,8 @@ Ejemplo de lista de errores de validación:
 - Body:
 ```json
 {
-  "dni": 12345678,
-  "nombre_apellido": "María Gómez",
+  "dni": 87654321,
+  "nombre_apellido": "María López",
   "password": "clave123",
   "mail": "maria@ejemplo.com",
   "genero": "femenino",
@@ -323,237 +241,55 @@ Ejemplo de lista de errores de validación:
   "rol": "empleado"
 }
 ```
-- Respuesta: objeto Empleado.
+- Respuesta: `EmpleadoResponse`.
 
 ### GET /api/empleados/get-empleado-by-email/{id}
 
-- Path param: `id` es email del empleado
-- Respuesta: objeto Empleado.
+- Path param:
+  - `id`: email del empleado.
+- Respuesta: `EmpleadoResponse`.
 
 ### GET /api/empleados/get-empleado-by-dni/{id}
 
-- Path param: `id` es DNI del empleado
-- Respuesta: objeto Empleado.
+- Path param:
+  - `id`: DNI del empleado.
+- Respuesta: `EmpleadoResponse`.
 
 ### PUT /api/empleados/update-empleado/{id}
 
-- Path param: `id` es DNI del empleado
+- Path param:
+  - `id`: DNI del empleado.
 - Body:
 ```json
 {
-  "dni": 12345678,
-  "nombre_apellido": "María Gómez",
+  "dni": 87654321,
+  "nombre_apellido": "María López",
   "mail": "maria@ejemplo.com",
   "genero": "femenino",
   "estado": "alta",
-  "rol": "empleado"
+  "rol": "empleado",
+  "motivo_eliminacion": null
 }
 ```
-- Respuesta: objeto Empleado actualizado.
+- Respuesta: `EmpleadoResponse` actualizado.
 
 ### DELETE /api/empleados/delete-empleado/{id}
 
 - Path param:
-  - `id`: DNI del empleado
+  - `id`: DNI del empleado.
 - Body:
 ```json
 {
-  "dni": 12345678,
-  "estado": "baja",
-  "motivo_eliminacion": "empleado eliminado"
+  "dni": 87654321,
+  "estado": "eliminado",
+  "motivo_eliminacion": "motivo"
 }
 ```
 - Respuesta: `200 OK`
-- Nota: el path param `id` existe en la ruta, pero el handler consume el identificador del JSON.
 
 ### GET /api/empleados/get-all
 
-- Respuesta: lista de empleados.
-
-## Reservas
-
-### POST /api/reservas/create
-
-- Body:
-```json
-{
-  "fecha": "2026-06-15",
-  "tipo": "clase",
-  "estado": "alta",
-  "dni_cliente": 12345678,
-  "id_clase": "uuid-clase"
-}
-```
-- Respuesta: objeto Reserva.
-
-### GET /api/reservas/get-reserva/{id}
-
-- Path param: `id` es el ID de la reserva
-- Respuesta: objeto Reserva.
-
-### PUT /api/reservas/update-reserva/{id}
-
-- Path param: `id` es el ID de la reserva
-- Body: mismo esquema que POST `/create`
-- Respuesta: objeto Reserva actualizado.
-
-### DELETE /api/reservas/delete-reserva/{id}
-
-- Path param: `id` es el ID de la reserva
-- Respuesta: `200 OK`
-
-### GET /api/reservas/get-all
-
-- Respuesta: lista de reservas.
-
-## Membresías
-
-### POST /api/membresias/create
-
-- Body:
-```json
-{
-  "id_actividad": "uuid-actividad",
-  "tipo": "premium",
-  "dni_cliente": 12345678,
-  "estado": "alta",
-  "fecha_inicio": "2026-06-15",
-  "fecha_fin": "2026-12-15"
-}
-```
-- Respuesta: objeto Membresía.
-
-### GET /api/membresias/get-membresia-dni/{id}
-
-- Path param: `id` es DNI del cliente
-- Respuesta: lista de Membresías.
-
-### GET /api/membresias/get-membresia-id/{id}
-
-- Path param: `id` es ID de la membresía
-- Respuesta: objeto Membresía.
-
-### PUT /api/membresias/update-membresia/{id}
-
-- Path param: `id` es ID de la membresía
-- Body: mismo esquema que POST `/create`
-- Respuesta: objeto Membresía actualizado.
-
-### DELETE /api/membresias/delete-membresia/{id}
-
-- Path param: `id` es ID de la membresía
-- Respuesta: `200 OK`
-
-### GET /api/membresias/get-all
-
-- Respuesta: lista de membresías.
-
-## Pagos
-
-### POST /api/pagos/create
-
-- Body:
-```json
-{
-  "titulo": "Pago mensual",
-  "monto": 1500.0,
-  "fecha": "2026-06-15",
-  "hora": "10:30",
-  "sena": true,
-  "id_membresia": "uuid-membresia",
-  "reserva_paga": "uuid-reserva"
-}
-```
-- Respuesta:
-```json
-{
-  "init_point": "https://...",
-  "sandbox_init_point": "https://..."
-}
-```
-- Errores posibles:
-  - `422 Unprocessable Entity`
-    ```json
-    {
-      "error": "errores de validación",
-      "details": [
-        { "field": "monto", "message": "El monto debe ser mayor a 0" }
-      ]
-    }
-    ```
-  - `500 Internal Server Error`
-    ```json
-    { "error": "error interno del servidor" }
-    ```
-
-## Clases
-
-### POST /api/clase/create
-
-- Body:
-```json
-{
-  "dia": "2026-06-15",
-  "horario": "10:00-11:00",
-  "cupo_base": 15,
-  "estado": "alta",
-  "id_actividad": "uuid-actividad",
-  "id_sala": "uuid-sala",
-  "dni_profesor": 12345678,
-  "descripcion": "Clase de yoga"
-}
-```
-- Respuesta: objeto Clase.
-
-### GET /api/clase/get-clase/{id}
-
-- Path param: `id` es ID de la clase
-- Respuesta: objeto Clase.
-
-### PUT /api/clase/update-clase/{id}
-
-- Path param: `id` es ID de la clase
-- Body: mismo esquema que POST `/create`
-- Respuesta: objeto Clase actualizado.
-
-### DELETE /api/clase/delete-clase/{id}
-
-- Path param: `id` es ID de la clase
-- Respuesta: `200 OK`
-
-### GET /api/clase/get-all
-
-- Respuesta: lista de clases.
-
-## Asistencias
-
-### POST /api/asistencia/create
-
-- Body:
-```json
-{
-  "fecha": "2026-06-15",
-  "metodo": "presencial",
-  "id_reserva": "uuid-reserva"
-}
-```
-- Respuesta: objeto Asistencia.
-
-### GET /api/asistencia/get-asistencia/{id}
-
-- Path param: `id` es ID de la asistencia
-- Respuesta: objeto Asistencia.
-
-### PUT /api/asistencia/update-asistencia/{id}
-
-- Path param: `id` es ID de la asistencia
-- Body: mismo esquema que POST `/create`
-- Respuesta: objeto Asistencia actualizado.
-
-### DELETE /api/asistencia/delete-asistencia/{id}
-
-- Path param: `id` es ID de la asistencia
-- Respuesta: `200 OK`
+- Respuesta: arreglo de `EmpleadoResponse`.
 
 ## Profesores
 
@@ -562,33 +298,44 @@ Ejemplo de lista de errores de validación:
 - Body:
 ```json
 {
-  "dni": 12345678,
-  "nombre_completo": "Lucía Díaz",
-  "genero": "femenino",
+  "dni": 11223344,
+  "nombre_completo": "Carlos Díaz",
+  "genero": "masculino",
   "estado": "alta"
 }
 ```
-- Respuesta: objeto Profesor.
+- Respuesta: `ProfesorResponse`.
 
 ### GET /api/profesores/get-profesor/{dni}
 
-- Path param: `dni` es DNI del profesor
-- Respuesta: objeto Profesor.
-
-### PUT /api/profesores/update-profesor/{dni}
-
-- Path param: `dni` es DNI del profesor
-- Body: mismo esquema que POST `/create-profesor`
-- Respuesta: objeto Profesor actualizado.
-
-### DELETE /api/profesores/delete-profesor/{dni}
-
-- Path param: `dni` es DNI del profesor
-- Respuesta: `200 OK`
+- Path param:
+  - `dni`: DNI del profesor.
+- Respuesta: `ProfesorResponse`.
 
 ### GET /api/profesores/get-all
 
-- Respuesta: lista de profesores.
+- Respuesta: arreglo de `ProfesorResponse`.
+
+### PUT /api/profesores/update-profesor/{dni}
+
+- Path param:
+  - `dni`: DNI del profesor.
+- Body: mismo esquema que `CreateProfesorRequest`.
+- Respuesta: `ProfesorResponse` actualizado.
+
+### DELETE /api/profesores/delete-profesor/{dni}
+
+- Path param:
+  - `dni`: DNI del profesor.
+- Body:
+```json
+{
+  "profesor_dni": 11223344,
+  "estado": "eliminado",
+  "motivo_eliminacion": "motivo"
+}
+```
+- Respuesta: `{}`
 
 ## Salas
 
@@ -601,16 +348,17 @@ Ejemplo de lista de errores de validación:
   "capacidad_maxima": 30
 }
 ```
-- Respuesta: objeto Sala.
+- Respuesta: `SalaResponse`.
 
 ### GET /api/salas/get-all/
 
-- Respuesta: lista de salas.
+- Respuesta: arreglo de `SalaResponse`.
 
 ### GET /api/salas/get-sala/{id}
 
-- Path param: `id` es ID de la sala
-- Respuesta: objeto Sala.
+- Path param:
+  - `id`: ID de la sala.
+- Respuesta: `SalaResponse`.
 
 ## Actividades
 
@@ -619,51 +367,371 @@ Ejemplo de lista de errores de validación:
 - Body:
 ```json
 {
-  "nombre": "Yoga",
-  "descripcion": "Clase de yoga suave"
+  "nombre": "Pilates",
+  "descripcion": "Entrenamiento de cuerpo completo"
 }
 ```
-- Respuesta: objeto Actividad.
-- Status: `201 Created`
+- Respuesta: `ActividadResponse`.
 
 ### GET /api/actividades/get-actividad/{id}
 
-- Path param: `id` es ID de la actividad
-- Respuesta: objeto Actividad.
+- Path param:
+  - `id`: ID de la actividad.
+- Respuesta: `ActividadResponse`.
 
 ### GET /api/actividades/get-actividades
 
-- Respuesta: lista de actividades.
-
-### PUT /api/actividades/update/{id}
-
-- Path param: `id` es ID de la actividad
-- Body: mismo esquema que POST `/create`
-- Respuesta: objeto Actividad actualizado.
+- Respuesta: arreglo de `ActividadResponse`.
 
 ### DELETE /api/actividades/delete/{id}
 
-- Path param: `id` es ID de la actividad
+- Path param:
+  - `id`: ID de la actividad.
 - Respuesta: `200 OK`
 
-## Notificaciones
+### PUT /api/actividades/update/{id}
 
-### POST /api/notificaciones/
+- Path param:
+  - `id`: ID de la actividad.
+- Body: mismo esquema que `CreateActividadRequest`.
+- Respuesta: `ActividadResponse` actualizado.
+
+## Clases
+
+### POST /api/clase/create
 
 - Body:
 ```json
 {
-  "mail": "usuario@ejemplo.com",
-  "motivo": "Recordatorio",
-  "cuerpo": "Este es el cuerpo del correo"
+  "dia": "2026-07-01",
+  "horario": "18:00",
+  "cupo_base": 20,
+  "estado": "alta",
+  "id_actividad": "<uuid-actividad>",
+  "id_sala": "<uuid-sala>",
+  "dni_profesor": 11223344,
+  "descripcion": "Clase de pilates"
+}
+```
+- Respuesta: `ClaseResponse`.
+
+### GET /api/clase/get-clase/{id}
+
+- Path param:
+  - `id`: ID de la clase.
+- Respuesta: `ClaseResponse`.
+
+### PUT /api/clase/update-clase/{id}
+
+- Path param:
+  - `id`: ID de la clase.
+- Body:
+```json
+{
+  "id_clase": "<uuid-clase>",
+  "dni_profesor": 11223344,
+  "estado": "sin_cupo"
+}
+```
+- Respuesta: `ClaseResponse` actualizado.
+
+### DELETE /api/clase/delete-clase/{id}
+
+- Path param:
+  - `id`: ID de la clase.
+- Respuesta: `200 OK`
+
+### GET /api/clase/get-all
+
+- Respuesta: arreglo de `ClaseResponse`.
+
+## Reservas
+
+### POST /api/reservas/create
+
+- Body:
+```json
+{
+  "fecha": "2026-07-10",
+  "tipo": "presencial",
+  "estado": "confirmada",
+  "dni_cliente": 12345678,
+  "id_clase": "<uuid-clase>"
+}
+```
+- Respuesta: `ReservaResponse`.
+
+### GET /api/reservas/get-reserva/{id}
+
+- Path param:
+  - `id`: ID de la reserva.
+- Respuesta: `ReservaResponse`.
+
+### PUT /api/reservas/update-reserva/{id}
+
+- Path param:
+  - `id`: ID de la reserva.
+- Body: mismo esquema que `CreateReservaRequest`.
+- Respuesta: `ReservaResponse` actualizado.
+
+### DELETE /api/reservas/delete-reserva/{id}
+
+- Path param:
+  - `id`: ID de la reserva.
+- Respuesta: `200 OK`
+
+### GET /api/reservas/get-all
+
+- Respuesta: arreglo de `ReservaResponse`.
+
+## Asistencia
+
+### POST /api/asistencia/create
+
+- Body:
+```json
+{
+  "fecha": "2026-07-10",
+  "metodo": "presencial",
+  "id_reserva": "<uuid-reserva>"
+}
+```
+- Respuesta: `AsistenciaResponse`.
+
+### GET /api/asistencia/get-asistencia/{id}
+
+- Path param:
+  - `id`: ID de la asistencia.
+- Respuesta: `AsistenciaResponse`.
+
+### PUT /api/asistencia/update-asistencia/{id}
+
+- Path param:
+  - `id`: ID de la asistencia.
+- Body: mismo esquema que `CreateAsistenciaRequest`.
+- Respuesta: `AsistenciaResponse` actualizado.
+
+### DELETE /api/asistencia/delete-asistencia/{id}
+
+- Path param:
+  - `id`: ID de la asistencia.
+- Respuesta: `200 OK`
+
+### GET /api/asistencia/get-asistencia-by-reserva/{id_reserva}
+
+- Path param:
+  - `id_reserva`: ID de la reserva.
+- Respuesta: `AsistenciaResponse`.
+
+## Membresías
+
+### POST /api/membresias/create
+
+- Body:
+```json
+{
+  "id_actividad": "<uuid-actividad>",
+  "horario": "18:00",
+  "tipo": "mensual",
+  "dni_cliente": 12345678,
+  "estado": "activo",
+  "fecha_inicio": "2026-07-01",
+  "fecha_fin": "2026-07-31",
+  "aceptar_espera": true
+}
+```
+- Respuesta: `MembresiaResponse`.
+
+### GET /api/membresias/get-membresia-dni/{id}
+
+- Path param:
+  - `id`: DNI del cliente.
+- Respuesta: arreglo de `MembresiaResponse`.
+
+### GET /api/membresias/get-membresia-id/{id}
+
+- Path param:
+  - `id`: ID de la membresía.
+- Respuesta: `MembresiaResponse`.
+
+### PUT /api/membresias/update-membresia/{id}
+
+- Path param:
+  - `id`: ID de la membresía.
+- Body: mismo esquema que `CreateMembresiaRequest`.
+- Respuesta: `MembresiaResponse` actualizado.
+
+### DELETE /api/membresias/delete-membresia/{id}
+
+- Path param:
+  - `id`: ID de la membresía.
+- Respuesta: `200 OK`
+
+### GET /api/membresias/get-all
+
+- Respuesta: arreglo de `MembresiaResponse`.
+
+## Pagos
+
+### POST /api/pagos/create
+
+- Body:
+```json
+{
+  "titulo": "Pago de membresía",
+  "monto": 5000.0,
+  "fecha": "2026-07-01",
+  "hora": "14:00",
+  "sena": false,
+  "id_membresia": "<uuid-membresia>",
+  "reserva_paga": "<uuid-reserva>"
+}
+```
+- Respuesta:
+```json
+{
+  "init_point": "https://www.mercadopago.com/checkout/v1/redirect?pref_id=...",
+  "sandbox_init_point": "https://sandbox.mercadopago.com/checkout/v1/redirect?pref_id=..."
+}
+```
+
+## Notificaciones
+
+### POST /api/notificaciones/notify
+
+- Body:
+```json
+{
+  "email": "cliente@ejemplo.com",
+  "motivo": "Recordatorio de clase",
+  "cuerpo": "Tu clase empieza mañana a las 18:00"
 }
 ```
 - Respuesta: `200 OK`
 
-## Notas importantes
+### PUT /api/notificaciones/update-date
 
-- Los valores permitidos para `estado` son: `alta`, `baja`, `sin_cupo`.
-- Los valores permitidos para `rol` son: `profesor`, `empleado`, `cliente`, `duenio`.
-- Los valores permitidos para `genero` son: `masculino`, `femenino`, `otro`.
-- Si un endpoint usa `id` en la ruta, revise si es un DNI (`i64`) o un UUID/ID de texto.
-- La funcionalidad de `lista_espera` no está implementada en las rutas actualmente.
+- Body:
+```json
+{
+  "email": "cliente@ejemplo.com",
+  "fecha": "2026-07-02"
+}
+```
+- Respuesta: `200 OK`
+
+## Lista de espera
+
+### POST /api/lista-espera/create
+
+- Body:
+```json
+{
+  "id_clase": "<uuid-clase>",
+  "tipo": "general"
+}
+```
+- Respuesta: `ListaEsperaResponse`.
+
+### DELETE /api/lista-espera/delete/{id}
+
+- Path param:
+  - `id`: ID de la lista de espera.
+- Respuesta: `200 OK`
+
+### GET /api/lista-espera/get-by-id/{id}
+
+- Path param:
+  - `id`: ID de la lista de espera.
+- Respuesta: `ListaEsperaResponse`.
+
+### GET /api/lista-espera/get-all
+
+- Respuesta: arreglo de `ListaEsperaResponse`.
+
+### POST /api/lista-espera/insert-user/{id_clase}
+
+- Path param:
+  - `id_clase`: ID de la clase.
+- Body:
+```json
+{
+  "id_espera": "<uuid-espera>",
+  "dni_cliente": 12345678,
+  "fecha_ingreso": "2026-07-01"
+}
+```
+- Respuesta: `200 OK`
+
+### GET /api/lista-espera/get-clientes/{id_espera}
+
+- Path param:
+  - `id_espera`: ID de la lista de espera.
+- Respuesta: arreglo de `ClienteListaEsperaResponse`.
+
+### GET /api/lista-espera/get-next/{id_espera}
+
+- Path param:
+  - `id_espera`: ID de la lista de espera.
+- Respuesta: `ClienteListaEsperaResponse`.
+
+### POST /api/lista-espera/delete
+
+- Body:
+```json
+{
+  "id_espera": "<uuid-espera>",
+  "dni_cliente": 12345678
+}
+```
+- Respuesta: `200 OK`
+
+## Estadísticas
+
+### GET /api/estadisticas/get-clase-mas-concurrida
+
+- Query params:
+  - `fecha_desde`: `YYYY-MM-DD`
+  - `fecha_hasta`: `YYYY-MM-DD`
+- Respuesta:
+```json
+{
+  "id_clase": "<uuid-clase>",
+  "descripcion": "Pilates",
+  "cantidad": 25
+}
+```
+
+### GET /api/estadisticas/get-clase-mas-cancelada
+
+- Query params:
+  - `fecha_desde`: `YYYY-MM-DD`
+  - `fecha_hasta`: `YYYY-MM-DD`
+- Respuesta:
+```json
+{
+  "id_clase": "<uuid-clase>",
+  "descripcion": "Yoga",
+  "cantidad": 3
+}
+```
+
+### GET /api/estadisticas/get-recaudacion
+
+- Query params:
+  - `fecha_desde`: `YYYY-MM-DD`
+  - `fecha_hasta`: `YYYY-MM-DD`
+- Respuesta:
+```json
+{
+  "total": 123456.78
+}
+```
+
+## Valores permitidos
+
+- `EstadoUsuario`: `alta`, `baja`, `eliminado`
+- `RolUsuario`: `empleado`, `cliente`, `duenio`
+- `GeneroUsuario`: `masculino`, `femenino`, `otro`
+- `EstadoClase`: `alta`, `sin_cupo`, `extendido`
+- `EstadoMembresia`: `activo`, `cancelado`

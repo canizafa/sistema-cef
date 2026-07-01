@@ -7,7 +7,9 @@ use crate::lista_espera::{
 };
 use crate::usuarios::cliente;
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn create(
     db: &SqlitePool,
     request: CreateClienteListaEsperaRequest,
@@ -32,6 +34,7 @@ pub async fn create(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(
     db: &SqlitePool,
     id_espera: &str,
@@ -41,6 +44,7 @@ pub async fn get_all(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_next(
     db: &SqlitePool,
     id_espera: &str,
@@ -50,6 +54,7 @@ pub async fn get_next(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(
     db: &SqlitePool,
     id_espera: &str,

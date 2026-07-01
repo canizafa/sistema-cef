@@ -1,4 +1,5 @@
 use sqlx::SqlitePool;
+use tracing::instrument;
 
 use crate::{
     app::errors::AppError,
@@ -8,6 +9,7 @@ use crate::{
     reserva,
 };
 
+#[instrument(skip_all, err)]
 pub async fn create(
     db: &SqlitePool,
     request: CreateAsistenciaRequest,
@@ -38,6 +40,7 @@ pub async fn get_by_id(db: &SqlitePool, id_asistencia: &str) -> Result<Asistenci
     Ok(asistencia)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     db: &SqlitePool,
     id_asistencia: &str,
@@ -52,6 +55,7 @@ pub async fn update(
     Ok(asistencia)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(db: &SqlitePool, id_asistencia: &str) -> Result<(), AppError> {
     let existing_asistencia = AsistenciaRepository::get_by_id(db, id_asistencia).await;
     if existing_asistencia.is_err() {

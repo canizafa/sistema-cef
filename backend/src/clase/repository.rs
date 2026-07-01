@@ -1,7 +1,7 @@
 use super::domain::Clase;
 use crate::app::errors::DbError;
 use crate::clase::estado::EstadoClase;
-use chrono::NaiveDate;
+use chrono::{Datelike, Duration, NaiveDate, Utc, Weekday};
 use sqlx::SqlitePool;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -127,6 +127,56 @@ impl ClaseRepository {
 
         Ok(row.into())
     }
+    pub async fn get_by_actividad_horario_dia(
+        pool: &SqlitePool,
+        id_actividad: &str,
+        horario: &str,
+        dia_semana: Weekday,
+    ) -> Result<Vec<Clase>, DbError> {
+        let tomorrow = (Utc::now().date_naive() + Duration::days(1))
+            .format("%Y-%m-%d")
+            .to_string();
+
+        let rows = sqlx::query_as::<_, ClaseRow>(
+            "SELECT
+                id_clase,
+                dia,
+                horario,
+                cupo_base,
+                inscripciones,
+                estado,
+                descripcion,
+                id_actividad,
+                id_sala,
+                dni_profesor
+            FROM clase
+            WHERE id_actividad = ?
+              AND horario = ?
+              AND dia >= ?
+            ORDER BY dia ASC
+            LIMIT 30",
+        )
+        .bind(id_actividad)
+        .bind(horario)
+        .bind(tomorrow)
+        .fetch_all(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        let clases: Vec<Clase> = rows
+            .into_iter()
+            .map(|r| r.into())
+            .filter(|c: &Clase| {
+                NaiveDate::parse_from_str(&c.get_dia().to_string(), "%Y-%m-%d")
+                    .map(|fecha| fecha.weekday() == dia_semana)
+                    .unwrap_or(false)
+            })
+            .take(4)
+            .collect();
+
+        Ok(clases)
+    }
+
     pub async fn update_inscripciones(
         pool: &SqlitePool,
         id: &str,
@@ -137,7 +187,6 @@ impl ClaseRepository {
             "UPDATE clase
             SET
                 inscripciones = ?,
-                estado = ?
             WHERE id_clase = ?
             RETURNING
                 id_clase,

@@ -1,4 +1,5 @@
 use sqlx::SqlitePool;
+use tracing::instrument;
 
 use crate::{
     app::errors::{AppError, FieldError},
@@ -11,6 +12,7 @@ use crate::{
     },
 };
 
+#[instrument(skip_all, err)]
 pub async fn create(
     db: &SqlitePool,
     request: CreateListaEsperaRequest,
@@ -26,22 +28,26 @@ pub async fn create(
     Ok(lista)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<ListaEspera>, AppError> {
     ListaDeEsperaRepository::get_all(db)
         .await
         .map_err(|e| AppError::from(e))
 }
+#[instrument(skip_all, err)]
 pub async fn get_by_clase(db: &SqlitePool, id_clase: &str) -> Result<ListaEspera, AppError> {
     ListaDeEsperaRepository::get_by_clase(db, id_clase)
         .await
         .map_err(AppError::from)
 }
+#[instrument(skip_all, err)]
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<ListaEspera, AppError> {
     ListaDeEsperaRepository::get_by_id(db, id)
         .await
         .map_err(|e| AppError::from(e))
 }
 
+#[instrument(skip_all, err)]
 pub async fn insert_user(
     db: &SqlitePool,
     request: CreateClienteListaEsperaRequest,
@@ -61,6 +67,7 @@ pub async fn insert_user(
     Ok(())
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ListaDeEsperaRepository::delete(db, id)
         .await
