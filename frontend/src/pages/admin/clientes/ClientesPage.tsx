@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Search, CalendarDays } from 'lucide-react' // <--- Traemos un icono lindo para programar
+import { Search, CalendarDays, X } from 'lucide-react'
 import { ClienteCard } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 import { clienteService, type ClienteResponse } from '@/services/cliente.service'
@@ -31,6 +31,11 @@ export function ClientesPage() {
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
   const [, setLoadingToggle] = useState<number | null>(null)
+
+  // Estados para controlar el Modal de días de gracia
+  const [modalProgAbierto, setModalProgAbierto] = useState(false)
+  const [diasNotif, setDiasNotif] = useState<number>(5)
+  const [enviandoProg, setEnviandoProg] = useState(false)
 
   useEffect(() => {
     clienteService.getClientes()
@@ -106,9 +111,21 @@ export function ClientesPage() {
     setClienteAEliminar(null)
   }
 
-  // Manejador para el nuevo botón global
-  const handleProgramarNotificaciones = () => {
-    toast.info("Apertura de programación de notificaciones")
+  const guardarProgramacionNotificaciones = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setEnviandoProg(true)
+    const toastId = toast.loading("Guardando días de gracia...")
+
+    try {
+      await clienteService.programarNotificaciones(diasNotif)
+      toast.success("Configuración guardada correctamente", { id: toastId })
+      setModalProgAbierto(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Error al guardar la configuración", { id: toastId })
+    } finally {
+      setEnviandoProg(false)
+    }
   }
 
   const clientesFiltrados = clientes.filter((c) => {
@@ -137,15 +154,14 @@ export function ClientesPage() {
 
   return (
     <main className="p-4 md:p-8 bg-background min-h-screen">
-      {/* SECCIÓN SUPERIOR: Título y Botón alineado a la derecha */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-primary">Gestión de Clientes</h1>
           <p className="text-sm mt-1">Administrá los clientes del centro</p>
         </div>
-        
+
         <button
-          onClick={handleProgramarNotificaciones}
+          onClick={() => setModalProgAbierto(true)}
           className="flex items-center justify-center gap-2 bg-brand text-white text-sm font-medium h-10 px-4 rounded-lg hover:bg-brand/90 transition-colors self-start sm:self-auto"
         >
           <CalendarDays className="w-4 h-4" />
@@ -206,6 +222,63 @@ export function ClientesPage() {
           />
         ))}
       </div>
+
+      {modalProgAbierto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-background border rounded-xl shadow-lg max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="font-semibold text-primary text-lg flex items-center gap-2">
+                <CalendarDays className="w-5 h-5 text-brand" />
+                Configurar Aviso de Vencimiento
+              </h2>
+              <button
+                onClick={() => setModalProgAbierto(false)}
+                className="p-1 rounded-md hover:bg-muted text-gray-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={guardarProgramacionNotificaciones} className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-primary mb-1">
+                  Días luego del vencimiento:
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={90}
+                  required
+                  value={diasNotif}
+                  onChange={(e) => setDiasNotif(parseInt(e.target.value) || 1)}
+                  className="w-full border-2 border-brand rounded-lg h-10 px-3 bg-background text-primary focus:border-brand outline-none font-bold text-base"
+                  placeholder="Ej: 7"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Configurá cuántos días después del vencimiento de la membresía se le enviará el recordatorio de pago al cliente.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t">
+                <button
+                  type="button"
+                  onClick={() => setModalProgAbierto(false)}
+                  className="px-4 h-10 border rounded-lg text-sm font-medium hover:bg-muted transition-colors text-primary"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={enviandoProg}
+                  className="px-4 h-10 bg-brand text-white text-sm font-medium rounded-lg hover:bg-brand/90 transition-colors disabled:opacity-50"
+                >
+                  {enviandoProg ? 'Guardando...' : 'Guardar configuración'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {clienteAEliminar && (
         <EliminarClienteModal
