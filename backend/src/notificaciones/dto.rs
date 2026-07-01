@@ -1,4 +1,3 @@
-use chrono::NaiveDate;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -10,5 +9,5 @@ pub struct NotificacionRequest {
 
 #[derive(Debug, Deserialize)]
 pub struct NotificacionUpdateRequest {
-    pub fecha: NaiveDate,
+    pub dias: i64,
 }

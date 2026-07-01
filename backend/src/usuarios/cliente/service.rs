@@ -6,27 +6,22 @@ use crate::{
     },
     auth,
     ficha_medica::{self, domain::FichaMedica},
-    reserva,
+    membresia, reserva,
     usuarios::{
         self,
         cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
         empleado,
     },
 };
-use chrono::{NaiveDate, TimeDelta, Utc};
+use chrono::Duration;
 use sqlx::SqlitePool;
 use tracing::instrument;
 
 #[instrument(skip_all, err)]
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
-    ClienteRepository::update_nombre(
-        db,
-        request.dni,
-        &request.nombre_apellido,
-        &request.telefono,
-    )
-    .await
-    .map_err(AppError::from)
+    ClienteRepository::update_nombre(db, request.dni, &request.nombre_apellido, &request.telefono)
+        .await
+        .map_err(AppError::from)
 }
 
 #[instrument(skip_all, err)]
@@ -214,17 +209,22 @@ pub async fn login_cliente(
     Ok(cliente)
 }
 
-pub async fn update_notify_date(db: &SqlitePool, fecha: NaiveDate) -> Result<(), AppError> {
-    let date_now = Utc::now();
-    if date_now.date_naive().signed_duration_since(fecha) <= TimeDelta::zero() {
-        return Err(AppError::Conflict(
-            "No se permite una fecha menor a la actual".to_owned(),
-        ));
-    }
+pub async fn update_notify_date(db: &SqlitePool, dias: i64) -> Result<(), AppError> {
+    // if date_now.date_naive().signed_duration_since(fecha) <= TimeDelta::zero() {
+    //     return Err(AppError::Conflict(
+    //         "No se permite una fecha menor a la actual".to_owned(),
+    //     ));
+    // }
     let clientes = usuarios::cliente::service::get_all(db).await?;
     for mut cliente in clientes {
-        cliente.set_fecha_notificacion(fecha);
-        ClienteRepository::update_notify_date(db, &cliente.get_mail(), fecha).await?;
+        let membresias = membresia::service::get_by_all_by_dni(db, cliente.get_dni()).await?;
+        cliente.set_fecha_notificacion(membresias[0].get_fecha_fin() + Duration::days(dias));
+        ClienteRepository::update_notify_date(
+            db,
+            &cliente.get_mail(),
+            cliente.get_fecha_notificacion().unwrap(),
+        )
+        .await?;
     }
     Ok(())
 }

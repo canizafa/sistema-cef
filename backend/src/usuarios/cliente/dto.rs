@@ -15,6 +15,7 @@ pub struct CreateClienteRequest {
     pub telefono: String,
     pub fecha_nacimiento: NaiveDate,
     pub estado: EstadoUsuario,
+    pub fecha_vencimiento: NaiveDate,
     pub ficha_medica: CreateFichaMedicaRequest,
 }
 
