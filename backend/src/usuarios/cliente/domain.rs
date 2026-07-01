@@ -16,6 +16,7 @@ pub struct Cliente {
     id_ficha: String,
     rol: RolUsuario,
     creditos: i64,
+    fecha_notificacion: Option<NaiveDate>,
     contador_cancelaciones: i64,
 }
 
@@ -46,11 +47,15 @@ impl Cliente {
             id_ficha,
             rol,
             creditos,
+            fecha_notificacion: None,
             contador_cancelaciones,
         }
     }
     pub fn get_dni(&self) -> i64 {
         self.dni
+    }
+    pub fn get_fecha_notificacion(&self) -> Option<NaiveDate> {
+        self.fecha_notificacion
     }
     pub fn get_nombre_apellido(&self) -> String {
         self.nombre_apellido.clone()
@@ -174,6 +179,9 @@ impl Cliente {
         self.contador_cancelaciones = 0;
         self.creditos = 0;
     }
+    pub fn set_fecha_notificacion(&mut self, fecha: NaiveDate) {
+        self.fecha_notificacion = Some(fecha);
+    }
 }
 
 impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
@@ -194,6 +202,7 @@ impl TryFrom<(CreateClienteRequest, String, String)> for Cliente {
             id_ficha,
             rol: RolUsuario::Cliente,
             creditos: 0,
+            fecha_notificacion: None,
             contador_cancelaciones: 0,
         };
         let errors = cliente.validate_cliente();
@@ -219,6 +228,7 @@ impl TryFrom<ClienteRequest> for Cliente {
             id_ficha: request.id_ficha,
             rol: RolUsuario::Cliente,
             creditos: 0,
+            fecha_notificacion: None,
             contador_cancelaciones: 0,
         };
         let errors = cliente.validate_cliente();

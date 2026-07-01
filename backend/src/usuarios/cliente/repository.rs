@@ -105,6 +105,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion,
                 'cliente' AS rol
             FROM cliente c
             "#,
@@ -131,6 +132,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion,
                 'cliente' AS rol
             FROM cliente c
             WHERE c.dni_cliente = ?
@@ -159,6 +161,7 @@ impl ClienteRepository {
                 c.id_ficha,
                 c.creditos,
                 c.contador_cancelaciones,
+                c.fecha_notificacion,
                 'cliente' AS rol
             FROM cliente c
             WHERE c.email = ?
@@ -235,6 +238,7 @@ impl ClienteRepository {
                     id_ficha,
                     creditos,
                     contador_cancelaciones,
+                    fecha_notificacion,
                     'cliente' AS rol
                 "#,
         )
@@ -271,6 +275,7 @@ impl ClienteRepository {
                     id_ficha,
                     creditos,
                     contador_cancelaciones,
+                    fecha_notificacion,
                     'cliente' AS rol
                 "#,
         )
@@ -324,6 +329,7 @@ impl ClienteRepository {
                 id_ficha,
                 creditos,
                 contador_cancelaciones,
+                fecha_notificacion,
                 'cliente' AS rol
             "#,
         )
@@ -335,5 +341,24 @@ impl ClienteRepository {
         .map_err(DbError::from)?;
 
         Ok(row.into())
+    }
+    pub async fn update_notify_date(
+        db: &SqlitePool,
+        email: &str,
+        date: NaiveDate,
+    ) -> Result<(), DbError> {
+        let _ = sqlx::query!(
+            "
+            UPDATE cliente
+            SET fecha_notificacion = ?
+            WHERE email = ?
+            ",
+            date,
+            email
+        )
+        .fetch_one(db)
+        .await
+        .map_err(DbError::from)?;
+        Ok(())
     }
 }

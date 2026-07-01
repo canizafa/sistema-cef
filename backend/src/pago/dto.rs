@@ -8,6 +8,7 @@ pub struct CreatePagoRequest {
     pub hora: String,
     pub sena: bool,
     pub id_membresia: String,
+    pub dni: i64,
     pub reserva_paga: String,
 }
 

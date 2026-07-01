@@ -32,3 +32,13 @@ impl From<Asistencia> for AsistenciaResponse {
         }
     }
 }
+
+impl From<Asistencia> for CreateAsistenciaRequest {
+    fn from(asistencia: Asistencia) -> Self {
+        Self {
+            fecha: asistencia.get_fecha().clone(),
+            metodo: asistencia.get_metodo().to_string(),
+            id_reserva: asistencia.get_id_reserva().to_string(),
+        }
+    }
+}

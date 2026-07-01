@@ -54,8 +54,23 @@ export const clienteService = {
         return response.data;
     },
 
+    async toggleEstado(cliente: ClienteResponse): Promise<ClienteResponse> {
+        const nuevoEstado = cliente.estado === 'alta' ? 'baja' : 'alta';
+        const response = await api.put<ClienteResponse>('/clientes/update-cliente', {
+            dni: cliente.dni,
+            nombre_apellido: cliente.nombre_apellido,
+            email: cliente.email,
+            telefono: cliente.telefono,
+            fecha_nacimiento: cliente.fecha_nacimiento,
+            motivo_eliminacion: cliente.motivo_eliminacion,
+            estado: nuevoEstado,
+            id_ficha: cliente.id_ficha,
+        });
+        return response.data;
+    },
+
     async eliminarCliente(dni: number, motivo: string): Promise<void> {
-        await api.delete(`/clientes/delete-cliente/${dni}`, {
+        await api.delete(`/clientes/delete-cliente`, {
             data: {
                 dni: dni,
                 estado: 'baja',

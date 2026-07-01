@@ -46,6 +46,7 @@ pub async fn delete_reserva_handler(
     Path(id): Path<String>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     reserva::service::delete_reserva(&state.db, &id).await?;
+
     Ok(StatusCode::OK)
 }
 

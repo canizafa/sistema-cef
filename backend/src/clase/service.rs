@@ -1,3 +1,4 @@
+use chrono::{Duration, Utc};
 use sqlx::SqlitePool;
 
 use crate::{
@@ -52,6 +53,12 @@ pub async fn create(
 
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Clase>, AppError> {
     let clases = ClaseRepository::get_all(db).await?;
+    let yesterday = Utc::now().date_naive() - Duration::days(1);
+
+    let clases = clases
+        .into_iter()
+        .filter(|c| c.get_dia() >= yesterday)
+        .collect();
     Ok(clases)
 }
 
@@ -85,13 +92,15 @@ pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), App
         ));
     }
     clase.aumentar_inscripciones(sala.get_capacidad_maxima());
-    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
+    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones(), clase.get_estado())
+        .await?;
     Ok(())
 }
 
 pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     clase.decrementar_inscripciones();
-    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones()).await?;
+    ClaseRepository::update_inscripciones(db, id, clase.get_inscripciones(), clase.get_estado())
+        .await?;
     Ok(())
 }

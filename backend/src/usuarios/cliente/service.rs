@@ -8,10 +8,12 @@ use crate::{
     ficha_medica::{self, domain::FichaMedica},
     reserva,
     usuarios::{
+        self,
         cliente::dto::{ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest},
         empleado,
     },
 };
+use chrono::{NaiveDate, TimeDelta, Utc};
 use sqlx::SqlitePool;
 
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
@@ -199,4 +201,19 @@ pub async fn login_cliente(
         return Err(AppError::InvalidCredentials);
     }
     Ok(cliente)
+}
+
+pub async fn update_notify_date(db: &SqlitePool, fecha: NaiveDate) -> Result<(), AppError> {
+    let date_now = Utc::now();
+    if date_now.date_naive().signed_duration_since(fecha) <= TimeDelta::zero() {
+        return Err(AppError::Conflict(
+            "No se permite una fecha menor a la actual".to_owned(),
+        ));
+    }
+    let clientes = usuarios::cliente::service::get_all(db).await?;
+    for mut cliente in clientes {
+        cliente.set_fecha_notificacion(fecha);
+        ClienteRepository::update_notify_date(db, &cliente.get_mail(), fecha).await?;
+    }
+    Ok(())
 }
