@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    SELECT\n                        id_membresia as \"id_membresia!\",\n                        tipo as \"tipo!\",\n                        dni_cliente as \"dni_cliente!\",\n                        estado as \"estado!\",\n                        id_actividad as \"id_actividad!\",\n                        fecha_inicio as \"fecha_inicio!\",\n                        fecha_fin as \"fecha_fin!\",\n                        horario as \"horario!\"\n                    FROM membresias\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id_membresia!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "tipo!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "dni_cliente!",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "estado!",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "id_actividad!",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_inicio!",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "fecha_fin!",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "horario!",
+        "ordinal": 7,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "4729d15b59914cf8d75f595d4d9b8ae4554df38223d1a53c9ad05a9e2b34b8e2"
+}
