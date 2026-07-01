@@ -4,6 +4,7 @@ export interface Profesor {
     dni: number;
     nombre_completo: string;
     estado: string;
+    genero?: string;
     motivo_eliminacion?: string | null;
 }
 export interface CreateProfesor {
@@ -32,21 +33,26 @@ export const profesorService = {
         await api.put(`/profesores/update-profesor/${dni}`, { dni, ...data });
     },
 
+    // SOLUCIÓN REAL: Forzamos la persistencia en Rust usando su struct de cambio de estado
+    // pero mandando el motivo vacío para que tu front lo deje en la lista de Inactivos.
     async desactivarProfesor(profesor: Profesor): Promise<void> {
-        await api.put(`/profesores/update-profesor/${profesor.dni}`, {
-            dni: profesor.dni,
-            nombre_completo: profesor.nombre_completo,
-            genero: 'otro',
-            estado: 'baja',
+        await api.delete(`/profesores/delete-profesor/${profesor.dni}`, {
+            data: {
+                profesor_dni: profesor.dni,
+                estado: 'baja', 
+                motivo_eliminacion: '', // Mandamos texto vacío para engañar al filtro del front
+            }
         });
     },
 
     async activarProfesor(profesor: Profesor): Promise<void> {
-        await api.put(`/profesores/update-profesor/${profesor.dni}`, {
-            dni: profesor.dni,
-            nombre_completo: profesor.nombre_completo,
-            genero: 'otro',
-            estado: 'alta',
+        // Para volver a activarlo pasamos por el mismo canal indicando estado 'alta'
+        await api.delete(`/profesores/delete-profesor/${profesor.dni}`, {
+            data: {
+                profesor_dni: profesor.dni,
+                estado: 'alta', 
+                motivo_eliminacion: '', 
+            }
         });
     },
 
@@ -55,7 +61,7 @@ export const profesorService = {
             data: {
                 profesor_dni: dni,
                 estado: 'baja',
-                motivo_eliminacion: motivo,
+                motivo_eliminacion: motivo, // Acá sí mandamos el motivo real para que se oculte
             }
         });
     },
