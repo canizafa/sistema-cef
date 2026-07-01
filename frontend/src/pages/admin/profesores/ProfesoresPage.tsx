@@ -29,18 +29,25 @@ export function ProfesoresPage() {
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [profesorAEliminar, setProfesorAEliminar] = useState<Profesor | null>(null)
 
+  // Carga inicial desde el backend
+  async function cargarProfesores() {
+    try {
+      const data = await profesorService.getProfesores()
+      setProfesores(data.map((p: any) => ({
+        dni: p.dni,
+        nombreCompleto: p.nombre_completo,
+        estado: p.motivo_eliminacion ? 'eliminado' : p.estado,
+        motivoEliminacion: p.motivo_eliminacion ?? null,
+      })))
+    } catch {
+      setError('No se pudieron cargar los profesores')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    profesorService.getProfesores()
-      .then((data) => {
-        setProfesores(data.map((p: any) => ({
-          dni: p.dni,
-          nombreCompleto: p.nombre_completo,
-          estado: p.motivo_eliminacion ? 'eliminado' : p.estado,
-          motivoEliminacion: p.motivo_eliminacion ?? null,
-        })))
-      })
-      .catch(() => setError('No se pudieron cargar los profesores'))
-      .finally(() => setLoading(false))
+    cargarProfesores()
   }, [])
 
   const handleEditar = (dni: number) => {
@@ -56,17 +63,22 @@ export function ProfesoresPage() {
         toast.error('No se puede desactivar un profesor con clases asociadas')
         return
       }
+
+      // 1. Mandamos el cambio al servidor con el nuevo estado 'baja'
       await profesorService.desactivarProfesor({
         dni: profesor.dni,
         nombre_completo: profesor.nombreCompleto,
-        estado: profesor.estado,
+        estado: 'baja', 
       })
+
+      // 2. Cambiamos el estado local en React al instante para actualizar la UI
       setProfesores((prev) =>
-        prev.map((p) => p.dni === dni ? { ...p, estado: 'baja' as EstadoProfesor } : p)
+        prev.map((p) => p.dni === dni ? { ...p, estado: 'baja' } : p)
       )
+
       toast.success('Profesor desactivado correctamente')
     } catch {
-      setError('No se pudo desactivar el profesor')
+      toast.error('No se pudo desactivar el profesor')
     }
   }
 
@@ -74,17 +86,21 @@ export function ProfesoresPage() {
     const profesor = profesores.find((p) => p.dni === dni)
     if (!profesor) return
     try {
+      // 1. Mandamos el cambio al servidor con el nuevo estado 'alta'
       await profesorService.activarProfesor({
         dni: profesor.dni,
         nombre_completo: profesor.nombreCompleto,
-        estado: profesor.estado,
+        estado: 'alta',
       })
+
+      // 2. Cambiamos el estado local en React al instante para actualizar la UI
       setProfesores((prev) =>
-        prev.map((p) => p.dni === dni ? { ...p, estado: 'alta' as EstadoProfesor } : p)
+        prev.map((p) => p.dni === dni ? { ...p, estado: 'alta' } : p)
       )
+
       toast.success('Profesor activado correctamente')
     } catch {
-      setError('No se pudo activar el profesor')
+      toast.error('No se pudo activar el profesor')
     }
   }
 
@@ -105,15 +121,9 @@ export function ProfesoresPage() {
   }
 
   const handleEliminarConfirmado = () => {
-    if (!profesorAEliminar) return
-    setProfesores((prev) =>
-      prev.map((p) =>
-        p.dni === profesorAEliminar.dni
-          ? { ...p, estado: 'eliminado' as EstadoProfesor }
-          : p
-      )
-    )
+    setModalEliminarAbierto(false)
     setProfesorAEliminar(null)
+    cargarProfesores() // Post-eliminación refrescamos directo desde la API
   }
 
   const profesoresFiltrados = profesores.filter((p) => {
