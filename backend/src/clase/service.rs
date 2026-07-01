@@ -1,4 +1,4 @@
-use std::time::Duration;
+use chrono::Duration;
 
 use chrono::Utc;
 use sqlx::SqlitePool;
@@ -13,7 +13,9 @@ use crate::{
     },
     sala,
 };
-
+use chrono::{Days, Utc, Weekday};
+use sqlx::SqlitePool;
+use uuid::Uuid;
 pub async fn create(
     db: &SqlitePool,
     request: CreateClaseRequest,
@@ -21,13 +23,11 @@ pub async fn create(
 ) -> Result<Clase, AppError> {
     //Verificar si existe la sala
     let sala = sala::service::get_by_id(db, &request.id_sala).await?;
-
     //Verificar si existe por id
     let existing_clase = ClaseRepository::get_by_id(db, id).await;
     if existing_clase.is_ok() {
         return Err(AppError::Conflict("Clase ya existe".to_string()));
     }
-
     //Verificar si existe la sala
     let mut clase = Clase::from(request);
     let errors: Vec<FieldError> = clase
@@ -38,7 +38,6 @@ pub async fn create(
     if !errors.is_empty() {
         return Err(AppError::Validation(errors));
     }
-
     //Verificar si no existe otra clase en el mismo dia y horario
     let clases = ClaseRepository::get_all(db).await?;
     let errors: Vec<FieldError> = clase
@@ -49,34 +48,34 @@ pub async fn create(
     if !errors.is_empty() {
         return Err(AppError::Validation(errors));
     }
-
     ClaseRepository::create(db, &clase).await?;
-
     for _ in 0..3 {
-        clase.cambiar_fecha(clase.get_dia() + Duration::days(7));
+        let nueva_fecha = clase
+            .get_dia()
+            .checked_add_days(Days::new(7))
+            .ok_or_else(|| AppError::Conflict("Fecha inválida al sumar 7 días".to_string()))?;
+        clase.cambiar_fecha(nueva_fecha);
         clase.cambiar_id(Uuid::new_v4().to_string());
         ClaseRepository::create(db, &clase).await?;
     }
-
     Ok(clase)
 }
-
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Clase>, AppError> {
     let clases = ClaseRepository::get_all(db).await?;
-    let yesterday = Utc::now().date_naive() - Duration::days(1);
-
+    let yesterday = Utc::now()
+        .date_naive()
+        .checked_sub_days(Days::new(1))
+        .ok_or_else(|| AppError::Conflict("Fecha inválida al restar 1 día".to_string()))?;
     let clases = clases
         .into_iter()
         .filter(|c| c.get_dia() >= yesterday)
         .collect();
     Ok(clases)
 }
-
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Clase, AppError> {
     let clase = ClaseRepository::get_by_id(db, id).await?;
     Ok(clase)
 }
-
 pub async fn update(
     db: &SqlitePool,
     id: &str,
@@ -106,7 +105,6 @@ pub async fn aumentar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), App
         .await?;
     Ok(())
 }
-
 pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     let mut clase = ClaseRepository::get_by_id(db, id).await?;
     clase.decrementar_inscripciones();
@@ -114,7 +112,6 @@ pub async fn decrementar_inscripciones(db: &SqlitePool, id: &str) -> Result<(), 
         .await?;
     Ok(())
 }
-
 pub async fn get_all_by_actividad_horario(
     db: &SqlitePool,
     id_actividad: &str,
@@ -124,7 +121,6 @@ pub async fn get_all_by_actividad_horario(
     let clases = ClaseRepository::get_by_actividad_horario_dia(db, id_actividad, horario, dia)
         .await
         .map_err(AppError::from)?;
-
     let clases: Vec<Clase> = clases.into_iter().take(4).collect();
     Ok(clases)
 }
