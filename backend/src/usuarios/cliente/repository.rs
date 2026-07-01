@@ -218,11 +218,13 @@ impl ClienteRepository {
         pool: &SqlitePool,
         id: i64,
         nombre_apellido: &str,
+        telefono: &str,
     ) -> Result<Cliente, DbError> {
         let row = sqlx::query_as::<_, ClienteRow>(
             r#"
                 UPDATE cliente
-                SET nombre_completo = ?
+                SET nombre_completo = ?,
+                    telefono = ?
                 WHERE dni_cliente = ?
                 RETURNING
                     dni_cliente AS dni,
@@ -241,6 +243,7 @@ impl ClienteRepository {
                 "#,
         )
         .bind(nombre_apellido)
+        .bind(telefono)
         .bind(id)
         .fetch_one(pool)
         .await

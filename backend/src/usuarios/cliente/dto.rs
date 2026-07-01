@@ -43,6 +43,11 @@ pub struct EliminarClienteRequest {
     pub estado: EstadoUsuario,
     pub motivo_eliminacion: Option<String>,
 }
+#[derive(Debug, Deserialize)]
+pub struct UsarCreditosRequest {
+    pub dni: i64,
+    pub monto: i64,
+}
 
 #[derive(Debug, Serialize)]
 pub struct ClienteResponse {
