@@ -2,6 +2,10 @@ use crate::{
     clase::estado::EstadoClase,
     clase::{dto::CreateClaseRequest, errors::ClaseDomainError},
 };
+
+
+use std::str::FromStr;
+
 use chrono::{Datelike, NaiveDate, NaiveTime, Utc, Weekday};
 use uuid::Uuid;
 

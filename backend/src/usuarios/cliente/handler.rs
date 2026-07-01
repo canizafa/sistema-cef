@@ -2,6 +2,7 @@ use super::dto::{ClienteResponse, CreateClienteRequest};
 use crate::app::{errors::AppError, state::AppState};
 use crate::ficha_medica::dto::FichaMedicaResponse;
 use crate::usuarios::cliente;
+use crate::usuarios::cliente::dto::UsarCreditosRequest;
 use crate::usuarios::cliente::dto::{
     ClienteRequest, EliminarClienteRequest, UpdatePasswordRequest,
 };
@@ -110,4 +111,14 @@ pub async fn update_cliente_handler(
         .await
         .map_err(AppError::from)?;
     Ok(Json(ClienteResponse::from(cliente)))
+}
+#[instrument(name = "cliente.usar_creditos", skip(state), fields(dni = request.dni), err)]
+pub async fn usar_creditos_handler(
+    State(state): State<AppState>,
+    Json(request): Json<UsarCreditosRequest>,
+) -> Result<impl IntoResponse, AppError> {
+    let (mut cliente, _) = cliente::service::get_by_dni(&state.db, request.dni).await?;
+    cliente.consumir_creditos(request.monto);
+    cliente::service::update_creditos_y_cancelaciones(&state.db, &cliente).await?;
+    Ok(StatusCode::OK)
 }
