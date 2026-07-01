@@ -85,21 +85,7 @@ export const clienteService = {
         await api.post('/clientes/usar-creditos', { dni, monto });
     },
 
-
-
-    async programarNotificaciones(fecha: string): Promise<void> {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/update-date`, { // O la URL base que usen
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        // Si usan token de autenticación lo agregás acá:
-        // 'Authorization': `Bearer ${localStorage.getItem('token')}` 
-      },
-      body: JSON.stringify({ fecha }), // Coincide con NotificacionUpdateRequest { fecha }
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al programar la fecha');
-    }
-  }
+    async programarNotificaciones(dias: number): Promise<void> {
+        await api.put('/notificaciones/update-date', { dias });
+    },
 };

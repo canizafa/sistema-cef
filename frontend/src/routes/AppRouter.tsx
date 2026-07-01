@@ -23,7 +23,7 @@ import { PagoPendientePage } from '@/pages/cliente/PagoPendientePage';
 // Admin - Layout
 import { AdminLayout } from '@/components/layout/AdminLayout';
 
-// Admin - Clases
+// Admin - Clases (CORREGIDO AQUÍ)
 import AdminClasesPage from '@/pages/admin/clases/ClasesPage';
 import { NuevaClasePage } from '@/pages/admin/clases/NuevaClasePage';
 import { EditarClasePage } from '@/pages/admin/clases/EditarClasePage';
@@ -71,7 +71,7 @@ export const AppRouter = () => {
                     <AdminLayout />
                 </ProtectedRoute>
             }>
-                {/* Clases */}
+                {/* Clases (CORREGIDO AQUÍ usando el alias AdminClasesPage) */}
                 <Route path="clases" element={<AdminClasesPage />} />
                 <Route path="clases/nueva" element={<NuevaClasePage />} />
                 <Route path="clases/:id/editar" element={<EditarClasePage />} />
