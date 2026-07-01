@@ -87,28 +87,33 @@ export function ClasesPage() {
           dni_cliente: user.dni,
           id_clase: claseSeleccionada.id_clase,
         })
-        await clienteService.usarCreditos(user.dni, PRECIO_CLASE)
-        await refrescarCreditos()
         setReservadas((prev) => new Set(prev).add(claseSeleccionada.id_clase))
         handleCancelarModal()
-        toast.success(`Clase reservada. Se usaron $${PRECIO_CLASE} en créditos.`)
+        try {
+          await clienteService.usarCreditos(user.dni, PRECIO_CLASE)
+          await refrescarCreditos()
+          toast.success(`Clase reservada. Se usaron $${PRECIO_CLASE} en créditos.`)
+        } catch {
+          toast.warning('Clase reservada, pero no se pudo descontar el crédito automáticamente.')
+        }
       } else {
         // Caso 2 (créditos parciales) y Caso 3 (sin créditos): MercadoPago
-        const montoPago = PRECIO_CLASE - creditos
+        // El backend descuenta los créditos del monto total internamente (crear_pago_handler),
+        // por eso se manda el precio completo y no el ya descontado.
         const data = await pagosService.crearPago({
           titulo: `Reserva: ${claseSeleccionada.descripcion}`,
-          monto: montoPago,
+          monto: PRECIO_CLASE,
           fecha: new Date().toISOString().split('T')[0],
           hora: claseSeleccionada.horario,
           sena: false,
           id_membresia: '',
+          dni: user.dni,
           reserva_paga: '',
         })
         localStorage.setItem('pending_reserva', JSON.stringify({
           dni: user.dni,
           idClase: claseSeleccionada.id_clase,
           fecha: claseSeleccionada.dia,
-          creditosUsados: creditos > 0 ? creditos : 0,
         }))
         window.location.href = data.sandbox_init_point
       }

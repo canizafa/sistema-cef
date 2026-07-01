@@ -4,7 +4,6 @@ import { Header } from '@/components/layout/Header';
 import { membresiaService, PRECIO_MEMBRESIA } from '@/services/membresia.service';
 import { pagosService } from '@/services/pagos.service';
 import { reservasService, listaEsperaService } from '@/services/clases.service';
-import { clienteService } from '@/services/cliente.service';
 import { useAuth } from '@/context/AuthContext';
 import { useCreditos } from '@/context/CreditosContext';
 
@@ -29,11 +28,10 @@ export function PagoExitoPage() {
         if (rawReserva) {
             yaProcesado.current = true;
             try {
-                const { dni, idClase, fecha, creditosUsados } = JSON.parse(rawReserva) as {
+                const { dni, idClase, fecha } = JSON.parse(rawReserva) as {
                     dni: number;
                     idClase: string;
                     fecha: string;
-                    creditosUsados?: number;
                 };
                 const dniEfectivo = dni ?? user?.dni;
                 if (dniEfectivo) {
@@ -45,19 +43,8 @@ export function PagoExitoPage() {
                             dni_cliente: dniEfectivo,
                             id_clase: idClase,
                         })
+                        .then(() => refrescarCreditos())
                         .catch(() => setErrorReserva(true));
-                    if (creditosUsados && creditosUsados > 0) {
-                        clienteService.usarCreditos(dniEfectivo, creditosUsados)
-                            .then(() => refrescarCreditos())
-                            .catch(() => {});
-                    }
-                    pagosService
-                        .confirmarPago({
-                            monto: 5000 - (creditosUsados ?? 0),
-                            tipo: 'abono',
-                            fecha: new Date().toLocaleDateString('en-CA'),
-                        })
-                        .catch(() => {});
                 }
             } finally {
                 localStorage.removeItem('pending_reserva');

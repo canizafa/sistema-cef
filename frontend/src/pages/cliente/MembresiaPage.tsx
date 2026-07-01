@@ -75,6 +75,7 @@ export function MembresiaPage() {
                 hora: '00:00',
                 sena: false,
                 id_membresia: '',
+                dni: user.dni,
                 reserva_paga: '',
             })
             .then((pago) => {
