@@ -24,6 +24,6 @@ pub async fn update_notify_date_client(
     State(state): State<AppState>,
     Json(request): Json<NotificacionUpdateRequest>,
 ) -> Result<(), AppError> {
-    cliente::service::update_notify_date(&state.db, request.fecha).await?;
+    cliente::service::update_notify_date(&state.db, request.dias).await?;
     Ok(())
 }
