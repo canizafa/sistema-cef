@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS membresias (
     estado VARCHAR(30) NOT NULL,
     fecha_inicio TEXT NOT NULL,
     fecha_fin TEXT,
+    horario TEXT NOT NULL,
     FOREIGN KEY (dni_cliente) REFERENCES cliente(dni_cliente),
     FOREIGN KEY (id_actividad) REFERENCES actividad(id_actividad)
 )

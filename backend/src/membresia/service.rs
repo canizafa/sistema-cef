@@ -1,11 +1,16 @@
+use chrono::Datelike;
 use sqlx::SqlitePool;
+use tracing::instrument;
 
 use crate::{
     app::errors::{AppError, FieldError},
+    clase,
     membresia::{domain::Membresia, dto::CreateMembresiaRequest, repository::MembresiaRepository},
+    reserva,
     usuarios::cliente_service,
 };
 
+#[instrument(skip_all, err)]
 pub async fn create(
     db: &SqlitePool,
     request: CreateMembresiaRequest,
@@ -37,13 +42,38 @@ pub async fn create(
             "Ya existe una membresia para este cliente".to_string(),
         ));
     }
+
     // Si no creamos la membresia
     MembresiaRepository::create(db, &membresia)
         .await
         .map_err(AppError::from)?;
+
+    // Bajar cupo de las clases
+    let clases = clase::service::get_all_by_actividad_horario(
+        db,
+        &membresia.get_id_actividad(),
+        membresia.get_horario(),
+        membresia.get_fecha_inicio().weekday(),
+    )
+    .await?;
+
+    for clase in clases {
+        clase::service::aumentar_inscripciones(db, clase.get_id()).await?;
+        // Crear reservas de las clases
+        reserva::service::generar_reserva(
+            db,
+            "membresia".to_owned(),
+            clase.get_dia(),
+            membresia.get_dni_cliente(),
+            clase.get_id(),
+        )
+        .await?;
+    }
+
     Ok(membresia)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_all_by_dni(db: &SqlitePool, dni: i64) -> Result<Vec<Membresia>, AppError> {
     let membresias = MembresiaRepository::get_by_dni(db, dni)
         .await
@@ -51,6 +81,7 @@ pub async fn get_by_all_by_dni(db: &SqlitePool, dni: i64) -> Result<Vec<Membresi
     Ok(membresias)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Membresia>, AppError> {
     let membresias = MembresiaRepository::get_all(db)
         .await
@@ -58,6 +89,7 @@ pub async fn get_all(db: &SqlitePool) -> Result<Vec<Membresia>, AppError> {
     Ok(membresias)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Membresia, AppError> {
     let membresia = MembresiaRepository::get_by_id(db, id)
         .await
@@ -65,6 +97,7 @@ pub async fn get_by_id(db: &SqlitePool, id: &str) -> Result<Membresia, AppError>
     Ok(membresia)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     db: &SqlitePool,
     id: &str,
@@ -77,6 +110,7 @@ pub async fn update(
     Ok(membresia)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete_by_id(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     MembresiaRepository::delete(db, id)
         .await

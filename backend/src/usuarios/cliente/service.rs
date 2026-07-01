@@ -15,7 +15,9 @@ use crate::{
 };
 use chrono::{NaiveDate, TimeDelta, Utc};
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
     ClienteRepository::update_nombre(
         db,
@@ -27,6 +29,7 @@ pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<
     .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cliente, AppError> {
     //Verificamos si ya existe
     let existe = ClienteRepository::get_by_email(db, &request.email)
@@ -65,6 +68,7 @@ pub async fn create(db: &SqlitePool, request: CreateClienteRequest) -> Result<Cl
     Ok(cliente)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<(Cliente, FichaMedica), AppError> {
     let cliente = ClienteRepository::get_by_dni(db, dni)
         .await
@@ -75,22 +79,26 @@ pub async fn get_by_dni(db: &SqlitePool, dni: i64) -> Result<(Cliente, FichaMedi
     Ok((cliente, ficha))
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_email(db: &SqlitePool, email: &str) -> Result<Cliente, AppError> {
     ClienteRepository::get_by_email(db, email)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(db: &SqlitePool) -> Result<Vec<Cliente>, AppError> {
     ClienteRepository::get_all(db).await.map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update_nombre(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
     ClienteRepository::update_nombre(db, request.dni, &request.nombre_apellido, &request.telefono)
         .await
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn change_password(
     db: &SqlitePool,
     dni: i64,
@@ -115,6 +123,7 @@ pub async fn change_password(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update_password(
     db: &SqlitePool,
     request: UpdatePasswordRequest,
@@ -142,6 +151,7 @@ pub async fn update_password(
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Result<(), AppError> {
     let random_password = auth::password::generate_random_password();
     let new_hashed_password = auth::password::hash_password(&random_password)?;
@@ -153,6 +163,7 @@ pub async fn reset_password(db: &SqlitePool, email: &str, mailer: &Mailer) -> Re
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
     let cliente = Cliente::try_from(request)?;
     ClienteRepository::update_estado(
@@ -164,6 +175,8 @@ pub async fn update_estado(db: &SqlitePool, request: ClienteRequest) -> Result<C
     .await
     .map_err(AppError::from)
 }
+
+#[instrument(skip_all, err)]
 pub async fn update_creditos_y_cancelaciones(
     db: &SqlitePool,
     cliente: &Cliente,
@@ -178,6 +191,7 @@ pub async fn update_creditos_y_cancelaciones(
     .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<(), AppError> {
     reserva::service::delete_all_by_client(db, request.dni).await?;
     ClienteRepository::delete(db, request.dni, request.estado, request.motivo_eliminacion)
@@ -185,6 +199,7 @@ pub async fn delete(db: &SqlitePool, request: EliminarClienteRequest) -> Result<
         .map_err(AppError::from)
 }
 
+#[instrument(skip_all, err)]
 pub async fn login_cliente(
     db: &SqlitePool,
     email: &str,

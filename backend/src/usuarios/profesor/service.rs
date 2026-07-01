@@ -7,7 +7,9 @@ use crate::{
     },
 };
 use sqlx::SqlitePool;
+use tracing::instrument;
 
+#[instrument(skip_all, err)]
 pub async fn create(
     pool: &SqlitePool,
     request: CreateProfesorRequest,
@@ -33,6 +35,7 @@ pub async fn create(
     Ok(profesor)
 }
 
+#[instrument(skip_all, err)]
 pub async fn update(
     pool: &SqlitePool,
     request: CreateProfesorRequest,
@@ -46,16 +49,19 @@ pub async fn update(
     Ok(profesor)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_by_dni(pool: &SqlitePool, dni: i64) -> Result<Profesor, AppError> {
     let profesor = ProfesorRepository::get_by_dni(pool, dni).await?;
     Ok(profesor)
 }
 
+#[instrument(skip_all, err)]
 pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Profesor>, AppError> {
     let profesores = ProfesorRepository::get_all(pool).await?;
     Ok(profesores)
 }
 
+#[instrument(skip_all, err)]
 pub async fn delete(pool: &SqlitePool, request: EliminarProfesorRequest) -> Result<(), AppError> {
     ProfesorRepository::delete(
         pool,
