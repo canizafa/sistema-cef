@@ -9,6 +9,8 @@ export type ClaseDTO = {
     horario: string;
     estado: EstadoClase;
     lleno: boolean;
+    cupo_base: number;
+    inscripciones: number;
     descripcion: string;
     id_actividad: string;
     id_sala: string;

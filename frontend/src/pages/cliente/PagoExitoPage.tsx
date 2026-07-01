@@ -5,6 +5,7 @@ import { membresiaService, PRECIO_MEMBRESIA } from '@/services/membresia.service
 import { pagosService } from '@/services/pagos.service';
 import { reservasService, listaEsperaService } from '@/services/clases.service';
 import { useAuth } from '@/context/AuthContext';
+import { useCreditos } from '@/context/CreditosContext';
 
 function formatFechaCorta(fecha: string): string {
     const [anio, mes, dia] = fecha.slice(0, 10).split('-');
@@ -13,6 +14,7 @@ function formatFechaCorta(fecha: string): string {
 
 export function PagoExitoPage() {
     const { user } = useAuth();
+    const { refrescarCreditos } = useCreditos();
     const [esMembresía, setEsMembresia] = useState(false);
     const [avisosClases, setAvisosClases] = useState<string[]>([]);
     const [errorMembresia, setErrorMembresia] = useState(false);
@@ -41,14 +43,8 @@ export function PagoExitoPage() {
                             dni_cliente: dniEfectivo,
                             id_clase: idClase,
                         })
+                        .then(() => refrescarCreditos())
                         .catch(() => setErrorReserva(true));
-                    pagosService
-                        .confirmarPago({
-                            monto: 5000,
-                            tipo: 'abono',
-                            fecha: new Date().toLocaleDateString('en-CA'),
-                        })
-                        .catch(() => {});
                 }
             } finally {
                 localStorage.removeItem('pending_reserva');

@@ -1,7 +1,8 @@
-import { Mail, IdCard, X, Check, Trash2 } from 'lucide-react'
+import { Mail, IdCard, X, Check, Trash2, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from 'sonner' // <--- Importamos sonner
 
 export type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 
@@ -36,6 +37,12 @@ export function ClienteCard({
   onEliminar,
 }: ClienteCardProps) {
   const activo = estadoCuenta === 'alta'
+
+  // Manejador del click
+  const handleEnviarNotificacion = () => {
+    // Si más adelante necesitás llamar a un servicio backend, lo metés acá con un try/catch
+    toast.success("Notificación enviada con éxito")
+  }
 
   return (
     <Card className="bg-surface border-border">
@@ -88,6 +95,18 @@ export function ClienteCard({
               Activar
             </Button>
           )}
+
+          {/* BOTÓN: Siempre activo y lanza el Toast de Sonner */}
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full"
+            onClick={handleEnviarNotificacion}
+          >
+            <Bell className="w-4 h-4 mr-2" />
+            Enviar notificación
+          </Button>
+
           <Button
             variant="destructive"
             size="sm"

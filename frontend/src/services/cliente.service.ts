@@ -10,6 +10,7 @@ export interface ClienteResponse {
     rol: string;
     id_ficha: string;
     motivo_eliminacion: string | null;
+    creditos: number;
 }
 
 export interface FichaMedicaResponse {
@@ -79,4 +80,26 @@ export const clienteService = {
             headers: { 'Content-Type': 'application/json' }
         });
     },
+
+    async usarCreditos(dni: number, monto: number): Promise<void> {
+        await api.post('/clientes/usar-creditos', { dni, monto });
+    },
+
+
+
+    async programarNotificaciones(fecha: string): Promise<void> {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/update-date`, { // O la URL base que usen
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        // Si usan token de autenticación lo agregás acá:
+        // 'Authorization': `Bearer ${localStorage.getItem('token')}` 
+      },
+      body: JSON.stringify({ fecha }), // Coincide con NotificacionUpdateRequest { fecha }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al programar la fecha');
+    }
+  }
 };

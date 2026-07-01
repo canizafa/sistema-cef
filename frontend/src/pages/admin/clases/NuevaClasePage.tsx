@@ -75,6 +75,15 @@ export function NuevaClasePage() {
             return;
         }
 
+        const [horas, minutos] = form.horario.split(':').map(Number);
+        const minutosDesdeMedianoche = horas * 60 + minutos;
+        const apertura = 7 * 60;   // 07:00
+        const cierre = 21 * 60;    // 21:00 (la clase puede arrancar hasta esa hora; el gym cierra a las 22)
+        if (minutosDesdeMedianoche < apertura || minutosDesdeMedianoche > cierre) {
+            setError('El horario de la clase debe estar entre las 07:00 y las 21:00 hs');
+            return;
+        }
+
         const salaSeleccionada = salas.find((s) => String(s.id) === form.id_sala);
         if (salaSeleccionada) {
             if (Number(form.cupo_base) > salaSeleccionada.capacidad_maxima) {

@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/context/AuthContext';
+import { useCreditos } from '@/context/CreditosContext';
 import { reservasService, clasesService, type ReservaResponse, type ClaseDTO } from '@/services/clases.service';
+import { clienteService } from '@/services/cliente.service';
 
 const DURACION_QR_SEGUNDOS = 15 * 60;
 
 export function ReservasPage() {
     const { user } = useAuth();
+    const { creditos, refrescarCreditos } = useCreditos();
 
     const [reservas, setReservas] = useState<ReservaResponse[]>([]);
     const [clases, setClases] = useState<ClaseDTO[]>([]);
@@ -51,13 +55,32 @@ export function ReservasPage() {
         setReservaParaQr(null);
     }
 
-    async function handleCancelar(idReserva: string) {
-        setCancelandoId(idReserva);
+    async function handleCancelar(reserva: ReservaResponse) {
+        if (!user) return;
+        setCancelandoId(reserva.id_reserva);
         try {
-            await reservasService.cancelarReserva(idReserva);
-            setReservas((prev) => prev.filter((r) => r.id_reserva !== idReserva));
+            const creditosAntes = creditos;
+            await reservasService.cancelarReserva(reserva.id_reserva);
+            setReservas((prev) => prev.filter((r) => r.id_reserva !== reserva.id_reserva));
+
+            // Opción A: re-fetcheamos créditos y comparamos para saber qué mensaje mostrar
+            if (reserva.tipo === 'abono') {
+                const perfilActualizado = await clienteService.getPerfil(user.dni);
+                const creditosNuevos = perfilActualizado.cliente.creditos ?? 0;
+                await refrescarCreditos();
+
+                if (creditosNuevos === 0 && creditosAntes > 0) {
+                    toast.error('Reserva cancelada, créditos disponibles eliminados por penalización de tercera cancelación.');
+                } else if (creditosNuevos > creditosAntes) {
+                    toast.success('Reserva cancelada, crédito disponible para futuras reservas.');
+                } else {
+                    toast.success('Reserva cancelada.');
+                }
+            } else {
+                toast.success('Reserva cancelada.');
+            }
         } catch {
-            setError('No se pudo cancelar la reserva.');
+            toast.error('No se pudo cancelar la reserva.');
         } finally {
             setCancelandoId(null);
         }
@@ -119,7 +142,7 @@ export function ReservasPage() {
                             {reserva.estado === 'confirmada' && (
                                 <button
                                     type="button"
-                                    onClick={() => handleCancelar(reserva.id_reserva)}
+                                    onClick={() => handleCancelar(reserva)}
                                     disabled={cancelandoId === reserva.id_reserva}
                                     className="w-full border border-red-300 text-red-600 rounded-md h-8 text-xs font-medium hover:bg-red-50 disabled:opacity-50"
                                 >
