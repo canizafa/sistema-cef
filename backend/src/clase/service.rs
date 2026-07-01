@@ -1,4 +1,6 @@
-use chrono::{Duration, Utc, Weekday};
+use std::time::Duration;
+
+use chrono::Utc;
 use sqlx::SqlitePool;
 use uuid::Uuid;
 

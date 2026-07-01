@@ -19,9 +19,14 @@ use tracing::instrument;
 
 #[instrument(skip_all, err)]
 pub async fn update_cliente(db: &SqlitePool, request: ClienteRequest) -> Result<Cliente, AppError> {
-    ClienteRepository::update_nombre(db, request.dni, &request.nombre_apellido, &request.telefono)
-        .await
-        .map_err(AppError::from)
+    ClienteRepository::update_nombre(
+        db,
+        request.dni,
+        &request.nombre_apellido,
+        &request.telefono,
+    )
+    .await
+    .map_err(AppError::from)
 }
 
 #[instrument(skip_all, err)]

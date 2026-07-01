@@ -11,7 +11,8 @@ interface ClaseCardClienteProps {
   diaSemana: string
   horario: string
   descripcion: string
-  lleno: boolean
+  cupoBase: number
+  inscripciones: number
   estadoReserva: EstadoReserva
   idActividad: string
   idSala: string
@@ -38,7 +39,8 @@ export function ClaseCardCliente({
   diaSemana,
   horario,
   descripcion,
-  lleno,
+  cupoBase,
+  inscripciones,
   estadoReserva,
   idActividad,
   idSala,
@@ -78,8 +80,8 @@ export function ClaseCardCliente({
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Users className="w-4 h-4 text-destructive" />
-          <span className="font-medium text-destructive">Disponibilidad:</span>
-          <span className="text-gray-700">{lleno ? 'Sin lugares' : 'Con lugares'}</span>
+          <span className="font-medium text-destructive">Lugares ocupados:</span>
+          <span className="text-gray-700">{inscripciones}/{cupoBase}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Dumbbell className="w-4 h-4 text-destructive" />

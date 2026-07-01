@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
+import { useCreditos } from '@/context/CreditosContext'
 import { ClaseCardCliente, type EstadoReserva } from '@/components/clases/ClaseCardCliente'
 import { ReservaModal } from '@/components/clases/ReservaModal'
 import { Header } from '@/components/layout/Header'
@@ -8,9 +9,13 @@ import { clasesService, reservasService, listaEsperaService, type ClaseDTO } fro
 import { actividadService, type Actividad } from '@/services/actividad.service'
 import { profesorService, type Profesor } from '@/services/profesor.service'
 import { pagosService } from '@/services/pagos.service'
+import { clienteService } from '@/services/cliente.service'
+
+const PRECIO_CLASE = 5000
 
 export function ClasesPage() {
   const { user } = useAuth()
+  const { creditos, refrescarCreditos } = useCreditos()
   const [clases, setClases] = useState<ClaseDTO[]>([])
   const [actividades, setActividades] = useState<Actividad[]>([])
   const [profesores, setProfesores] = useState<Profesor[]>([])
@@ -60,7 +65,7 @@ export function ClasesPage() {
 
   function getEstadoReserva(clase: ClaseDTO): EstadoReserva {
     if (reservadas.has(clase.id_clase)) return 'reservada'
-    if (clase.lleno) return 'sin-cupo'
+    if (clase.inscripciones >= clase.cupo_base) return 'sin-cupo'
     return 'disponible'
   }
 
@@ -73,23 +78,47 @@ export function ClasesPage() {
     if (!claseSeleccionada || !user) return
     setLoadingPago(true)
     try {
-      const data = await pagosService.crearPago({
-        titulo: `Reserva: ${claseSeleccionada.descripcion}`,
-        monto: 5000,
-        fecha: new Date().toISOString().split('T')[0],
-        hora: claseSeleccionada.horario,
-        sena: false,
-        id_membresia: '',
-        reserva_paga: '',
-      })
-      localStorage.setItem('pending_reserva', JSON.stringify({
-        dni: user.dni,
-        idClase: claseSeleccionada.id_clase,
-        fecha: claseSeleccionada.dia,
-      }))
-      window.location.href = data.sandbox_init_point
+      if (creditos >= PRECIO_CLASE) {
+        // Caso 1: créditos cubren el total — sin MercadoPago
+        await reservasService.crearReserva({
+          fecha: claseSeleccionada.dia,
+          tipo: 'abono',
+          estado: 'confirmada',
+          dni_cliente: user.dni,
+          id_clase: claseSeleccionada.id_clase,
+        })
+        setReservadas((prev) => new Set(prev).add(claseSeleccionada.id_clase))
+        handleCancelarModal()
+        try {
+          await clienteService.usarCreditos(user.dni, PRECIO_CLASE)
+          await refrescarCreditos()
+          toast.success(`Clase reservada. Se usaron $${PRECIO_CLASE} en créditos.`)
+        } catch {
+          toast.warning('Clase reservada, pero no se pudo descontar el crédito automáticamente.')
+        }
+      } else {
+        // Caso 2 (créditos parciales) y Caso 3 (sin créditos): MercadoPago
+        // El backend descuenta los créditos del monto total internamente (crear_pago_handler),
+        // por eso se manda el precio completo y no el ya descontado.
+        const data = await pagosService.crearPago({
+          titulo: `Reserva: ${claseSeleccionada.descripcion}`,
+          monto: PRECIO_CLASE,
+          fecha: new Date().toISOString().split('T')[0],
+          hora: claseSeleccionada.horario,
+          sena: false,
+          id_membresia: '',
+          dni: user.dni,
+          reserva_paga: '',
+        })
+        localStorage.setItem('pending_reserva', JSON.stringify({
+          dni: user.dni,
+          idClase: claseSeleccionada.id_clase,
+          fecha: claseSeleccionada.dia,
+        }))
+        window.location.href = data.sandbox_init_point
+      }
     } catch {
-      // TODO: mostrar error en el modal
+      toast.error('No se pudo procesar el pago. Intentá de nuevo.')
     } finally {
       setLoadingPago(false)
     }
@@ -153,7 +182,8 @@ export function ClasesPage() {
                       diaSemana={clase.dia_semana}
                       horario={clase.horario}
                       descripcion={clase.descripcion}
-                      lleno={clase.lleno}
+                      cupoBase={clase.cupo_base}
+                      inscripciones={clase.inscripciones}
                       estadoReserva={getEstadoReserva(clase)}
                       idActividad={getNombreActividad(clase.id_actividad)}
                       idSala={clase.id_sala}
@@ -176,6 +206,7 @@ export function ClasesPage() {
           onCancelar={handleCancelarModal}
           onConfirmar={handleConfirmar}
           loading={loadingPago}
+          creditos={creditos}
         />
       </main>
     </div>
