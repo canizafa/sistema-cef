@@ -7,6 +7,7 @@ interface CreatePagoRequest {
     hora: string;
     sena: boolean;
     id_membresia: string;
+    dni: number;
     reserva_paga: string;
 }
 
