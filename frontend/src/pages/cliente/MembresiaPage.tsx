@@ -29,10 +29,10 @@ export function MembresiaPage() {
                 setMembresias(mems);
                 setActividades(acts);
                 setClases(cls);
-                const reservasConfirmadas = reservas.filter(
-                    (r) => String(r.dni_cliente) === String(user.dni) && r.estado === 'confirmada'
+                const reservasActivas = reservas.filter(
+                    (r) => String(r.dni_cliente) === String(user.dni) && r.estado !== 'cancelada'
                 );
-                setClasesYaReservadas(new Set(reservasConfirmadas.map((r) => r.id_clase)));
+                setClasesYaReservadas(new Set(reservasActivas.map((r) => r.id_clase)));
             })
             .catch(() => setError('No se pudo cargar la información.'))
             .finally(() => setLoading(false));
@@ -112,7 +112,7 @@ export function MembresiaPage() {
         if (!user) return;
         setProcesandoId(membresia.id_membresia);
         try {
-            await membresiaService.darBajaMembresia(membresia, user.dni);
+            await membresiaService.darBajaMembresia(membresia);
 
             const idsClaseActividad = new Set(
                 clases.filter((c) => c.id_actividad === idActividad).map((c) => c.id_clase)

@@ -125,11 +125,17 @@ export function ReservasPage() {
                             </p>
                             <div className="flex items-center justify-between">
                                 <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
-                                    reserva.estado === 'confirmada'
+                                    reserva.estado === 'pendiente'
                                         ? 'bg-green-100 text-green-700'
+                                        : reserva.estado === 'confirmada'
+                                        ? 'bg-blue-100 text-blue-700'
                                         : 'bg-gray-100 text-gray-500'
                                 }`}>
-                                    {reserva.estado === 'confirmada' ? 'Activa' : reserva.estado}
+                                    {reserva.estado === 'pendiente'
+                                        ? 'Próxima'
+                                        : reserva.estado === 'confirmada'
+                                        ? 'Asistida'
+                                        : reserva.estado}
                                 </span>
                                 <button
                                     type="button"
@@ -139,7 +145,7 @@ export function ReservasPage() {
                                     Ver QR
                                 </button>
                             </div>
-                            {reserva.estado === 'confirmada' && (
+                            {reserva.estado === 'pendiente' && (
                                 <button
                                     type="button"
                                     onClick={() => handleCancelar(reserva)}
