@@ -112,6 +112,8 @@ pub async fn update(
 
 #[instrument(skip_all, err)]
 pub async fn delete_by_id(db: &SqlitePool, id: &str) -> Result<(), AppError> {
+    let membresia = MembresiaRepository::get_by_id(db, id).await?;
+    reserva::service::delete_all_by_client(db, membresia.get_dni_cliente()).await?;
     MembresiaRepository::delete(db, id)
         .await
         .map_err(AppError::from)?;
