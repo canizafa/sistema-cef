@@ -55,8 +55,10 @@ export const clienteService = {
         return response.data;
     },
 
+    // CORREGIDO: Toma el estado actual que viene de la UI e invierte el string de forma segura
     async toggleEstado(cliente: ClienteResponse): Promise<ClienteResponse> {
         const nuevoEstado = cliente.estado === 'alta' ? 'baja' : 'alta';
+        
         const response = await api.put<ClienteResponse>('/clientes/update-cliente', {
             dni: cliente.dni,
             nombre_apellido: cliente.nombre_apellido,
@@ -64,7 +66,7 @@ export const clienteService = {
             telefono: cliente.telefono,
             fecha_nacimiento: cliente.fecha_nacimiento,
             motivo_eliminacion: cliente.motivo_eliminacion,
-            estado: nuevoEstado,
+            estado: nuevoEstado, 
             id_ficha: cliente.id_ficha,
         });
         return response.data;
