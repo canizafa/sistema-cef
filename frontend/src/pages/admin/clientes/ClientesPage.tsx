@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Search, CalendarDays, X } from 'lucide-react'
-import { ClienteCard } from '@/components/clientes/ClienteCard'
+import { ClienteCard, type EstadoCuenta, type EstadoMembresia } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 import { clienteService, type ClienteResponse } from '@/services/cliente.service'
+import { membresiaService } from '@/services/membresia.service'
 import { toast } from 'sonner'
 
-type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 type FiltroCliente = 'todos' | 'alta' | 'baja' | 'eliminado'
 
 interface Cliente {
@@ -24,32 +24,60 @@ const normalizar = (texto: string) =>
 
 export function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
+  const [estadosMembresia, setEstadosMembresia] = useState<Record<number, EstadoMembresia>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<FiltroCliente>('todos')
   const [busquedaNombre, setBusquedaNombre] = useState('')
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
-  const [, setLoadingToggle] = useState<number | null>(null)
+  const [loadingToggle, setLoadingToggle] = useState<number | null>(null)
 
-  // Estados para controlar el Modal de días de gracia
   const [modalProgAbierto, setModalProgAbierto] = useState(false)
   const [diasNotif, setDiasNotif] = useState<number>(5)
   const [enviandoProg, setEnviandoProg] = useState(false)
 
-  async function cargarClientes() {
+  async function cargarClientesYEstados() {
     try {
+      setLoading(true)
       const data = await clienteService.getClientes()
-      setClientes(data.map((c) => ({
+      
+      const clientesMapeados = data.map((c) => ({
         dni: c.dni,
-        nombreApellido: c.nombre_apellido,
+        nombreApellido: c.nombre_apellido || '',
         email: c.email,
         telefono: c.telefono,
         fechaNacimiento: c.fecha_nacimiento,
         idFicha: c.id_ficha,
-        estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
+        estadoCuenta: c.motivo_eliminacion ? 'eliminado' : (c.estado as EstadoCuenta),
         motivoEliminacion: c.motivo_eliminacion,
-      })))
+      }))
+      
+      setClientes(clientesMapeados)
+
+      const mapaEstados: Record<number, EstadoMembresia> = {}
+      const hoy = new Date().toISOString().split('T')[0]
+
+      await Promise.all(
+        clientesMapeados.map(async (cliente) => {
+          try {
+            const mData = await membresiaService.getMembresiasPorDni(cliente.dni)
+            const mActiva = mData.find((m) => m.estado !== 'cancelado')
+
+            if (!mActiva) {
+              mapaEstados[cliente.dni] = 'sin-membresia'
+            } else if (!mActiva.fecha_fin) {
+              mapaEstados[cliente.dni] = 'activa'
+            } else {
+              mapaEstados[cliente.dni] = mActiva.fecha_fin.slice(0, 10) >= hoy ? 'activa' : 'vencida'
+            }
+          } catch {
+            mapaEstados[cliente.dni] = 'sin-membresia'
+          }
+        })
+      )
+
+      setEstadosMembresia(mapaEstados)
     } catch {
       setError('No se pudieron cargar los clientes')
     } finally {
@@ -58,27 +86,25 @@ export function ClientesPage() {
   }
 
   useEffect(() => {
-    cargarClientes()
+    cargarClientesYEstados()
   }, [])
 
   const handleToggleEstado = async (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
-    if (!cliente) return
+    if (!cliente || loadingToggle === dni) return
     setLoadingToggle(dni)
-    
-    // Guardamos el estado opuesto para la UI instantánea
+
     const estadoUIAnterior = cliente.estadoCuenta
     const proximoEstado: EstadoCuenta = estadoUIAnterior === 'alta' ? 'baja' : 'alta'
 
     try {
-      // Mandamos los campos en snake_case tal cual requiere la interfaz ClienteResponse
       const clienteRaw: ClienteResponse = {
         dni: cliente.dni,
         nombre_apellido: cliente.nombreApellido,
         email: cliente.email,
         telefono: cliente.telefono,
         fecha_nacimiento: cliente.fechaNacimiento,
-        estado: estadoUIAnterior, // Mandamos su estado actual, el service se encarga de cambiarlo
+        estado: estadoUIAnterior,
         rol: 'cliente',
         id_ficha: cliente.idFicha,
         motivo_eliminacion: cliente.motivoEliminacion,
@@ -87,7 +113,6 @@ export function ClientesPage() {
 
       await clienteService.toggleEstado(clienteRaw)
 
-      // Actualizamos React localmente de inmediato
       setClientes((prev) =>
         prev.map((c) =>
           c.dni === dni
@@ -118,7 +143,7 @@ export function ClientesPage() {
   const handleEliminarConfirmado = () => {
     setModalEliminarAbierto(false)
     setClienteAEliminar(null)
-    cargarClientes() // Refrescamos la lista post-eliminación lógica del modal
+    cargarClientesYEstados()
   }
 
   const guardarProgramacionNotificaciones = async (e: React.FormEvent) => {
@@ -140,8 +165,9 @@ export function ClientesPage() {
 
   const clientesFiltrados = clientes.filter((c) => {
     if (busquedaNombre.trim() !== '') {
-      return normalizar(c.nombreApellido)
-        .startsWith(normalizar(busquedaNombre.trim()))
+      return c.nombreApellido
+        ? normalizar(c.nombreApellido).startsWith(normalizar(busquedaNombre.trim()))
+        : false
     }
     if (filtro === 'alta') return c.estadoCuenta === 'alta'
     if (filtro === 'baja') return c.estadoCuenta === 'baja'
@@ -182,6 +208,8 @@ export function ClientesPage() {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-500" />
         <input
+          id="busquedaNombre"
+          name="busquedaNombre"
           type="text"
           placeholder="Buscar cliente por nombre y apellido"
           value={busquedaNombre}
@@ -226,6 +254,7 @@ export function ClientesPage() {
             nombreApellido={c.nombreApellido}
             email={c.email}
             estadoCuenta={c.estadoCuenta}
+            estadoMembresia={estadosMembresia[c.dni] || 'sin-membresia'}
             motivoEliminacion={c.motivoEliminacion}
             onToggleEstado={() => handleToggleEstado(c.dni)}
             onEliminar={() => handleEliminar(c.dni)}
@@ -251,10 +280,12 @@ export function ClientesPage() {
 
             <form onSubmit={guardarProgramacionNotificaciones} className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-primary mb-1">
+                <label htmlFor="diasNotif" className="block text-sm font-medium text-primary mb-1">
                   Días luego del vencimiento:
                 </label>
                 <input
+                  id="diasNotif"
+                  name="diasNotif"
                   type="number"
                   min={1}
                   max={90}

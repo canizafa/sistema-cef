@@ -10,6 +10,7 @@ export function EditarClasePage() {
 
   const [clase, setClase] = useState<ClaseDTO | null>(null)
   const [profesores, setProfesores] = useState<Profesor[]>([])
+  const [dnisOcupados, setDnisOcupados] = useState<Set<number>>(new Set())
   const [dniProfesorSeleccionado, setDniProfesorSeleccionado] = useState<number | ''>('')
   const [loading, setLoading] = useState(true)
   const [guardando, setGuardando] = useState(false)
@@ -19,18 +20,30 @@ export function EditarClasePage() {
     if (!id) return
     async function cargar() {
       try {
-        const [dataClase, dataProfesores] = await Promise.all([
+        const [dataClase, dataProfesores, dataClases] = await Promise.all([
           clasesService.getClase(id!),
           profesorService.getProfesores(),
+          clasesService.getClases(),
         ])
         setClase(dataClase)
         setDniProfesorSeleccionado(dataClase.dni_profesor)
 
-        // Filtramos: solo profesores activos pueden ser asignados a una clase.
-        // Si el profesor actualmente asignado está de baja, lo dejamos igual
-        // en la lista para que no rompa el <select>, pero no debería poder re-guardarse sin cambiarlo.
+        // Solo profesores activos pueden ser asignados a una clase.
         const activos = dataProfesores.filter((p) => p.estado === 'alta')
         setProfesores(activos)
+
+        // Detectamos qué profesores ya tienen otra clase en el mismo día y horario
+        // (excluyendo la propia clase que estamos editando)
+        const ocupados = new Set(
+          dataClases
+            .filter((c) =>
+              c.id_clase !== dataClase.id_clase &&
+              c.dia === dataClase.dia &&
+              c.horario === dataClase.horario
+            )
+            .map((c) => c.dni_profesor)
+        )
+        setDnisOcupados(ocupados)
       } catch {
         setError('No se pudo cargar la clase.')
       } finally {
@@ -40,9 +53,26 @@ export function EditarClasePage() {
     cargar()
   }, [id])
 
+  function handleSeleccionarProfesor(e: React.ChangeEvent<HTMLSelectElement>) {
+    const dni = Number(e.target.value)
+    setDniProfesorSeleccionado(dni)
+
+    if (dnisOcupados.has(dni)) {
+      const profesor = profesores.find((p) => p.dni === dni)
+      toast.warning(
+        `${profesor?.nombre_completo ?? 'El profesor'} ya tiene una clase asignada en ese mismo día y horario.`
+      )
+    }
+  }
+
   async function handleGuardar(e: React.FormEvent) {
     e.preventDefault()
     if (!id || !clase || dniProfesorSeleccionado === '') return
+
+    if (dnisOcupados.has(Number(dniProfesorSeleccionado))) {
+      toast.error('No se puede guardar: el profesor ya tiene una clase asignada en ese día y horario.')
+      return
+    }
 
     setGuardando(true)
     try {
@@ -85,17 +115,21 @@ export function EditarClasePage() {
             <select
               id="profesor"
               value={dniProfesorSeleccionado}
-              onChange={(e) => setDniProfesorSeleccionado(Number(e.target.value))}
+              onChange={handleSeleccionarProfesor}
               required
               className="flex h-9 w-full rounded-md border-2 border-[#C8102E] bg-background px-3 py-2 text-sm"
             >
               <option value="" disabled>Seleccioná un profesor</option>
               {profesores.map((p) => (
-                <option key={p.dni} value={p.dni}>{p.nombre_completo}</option>
+                <option key={p.dni} value={p.dni}>
+                  {p.nombre_completo}
+                </option>
               ))}
             </select>
-            {profesores.length === 0 && (
-              <p className="text-xs text-red-500 mt-1">No hay profesores activos disponibles.</p>
+            {dniProfesorSeleccionado !== '' && dnisOcupados.has(Number(dniProfesorSeleccionado)) && (
+              <p className="text-xs text-red-500 mt-1">
+                Este profesor ya tiene una clase asignada en ese día y horario.
+              </p>
             )}
           </div>
 
