@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id_reserva as \"id_reserva!\",\n                estado as \"estado!\",\n                tipo as \"tipo!\",\n                fecha_reserva as \"fecha_reserva!\",\n                dni_cliente as \"dni_cliente!\",\n                id_clase as \"id_clase!\"\n            FROM reserva\n            WHERE id_reserva = ?\n            ",
+  "query": "\n            SELECT\n                id_reserva as \"id_reserva!\",\n                estado as \"estado!\",\n                tipo as \"tipo!\",\n                fecha_reserva as \"fecha_reserva!\",\n                dni_cliente as \"dni_cliente!\",\n                id_clase as \"id_clase!\",\n                horario as \"horario!\"\n            FROM reserva\n            WHERE id_reserva = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -32,6 +32,11 @@
         "name": "id_clase!",
         "ordinal": 5,
         "type_info": "Text"
+      },
+      {
+        "name": "horario!",
+        "ordinal": 6,
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -43,8 +48,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "a578380a7b40a5121ea704e714118c619f5696ae691bb80702138ec7a103a460"
+  "hash": "efd261dd2697b65af1418c5f0eed41e6dc83982142b21e8e149d743c397c73d7"
 }

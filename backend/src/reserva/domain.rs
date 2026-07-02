@@ -12,6 +12,7 @@ pub struct Reserva {
     fecha_reserva: NaiveDate,
     dni_cliente: i64,
     id_clase: String,
+    horario: String,
 }
 
 impl Reserva {
@@ -22,6 +23,7 @@ impl Reserva {
         fecha_reserva: NaiveDate,
         dni_cliente: i64,
         id_clase: String,
+        horario: String,
     ) -> Self {
         Self {
             id_reserva,
@@ -30,11 +32,16 @@ impl Reserva {
             fecha_reserva,
             dni_cliente,
             id_clase,
+            horario,
         }
     }
 
     pub fn get_id(&self) -> &str {
         &self.id_reserva
+    }
+
+    pub fn get_horario(&self) -> &str {
+        &self.horario
     }
 
     pub fn get_estado(&self) -> EstadoReserva {
@@ -89,6 +96,7 @@ impl From<CreateReservaRequest> for Reserva {
             fecha_reserva: request.fecha,
             dni_cliente: request.dni_cliente,
             id_clase: request.id_clase,
+            horario: request.horario,
         }
     }
 }

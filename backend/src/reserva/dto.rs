@@ -9,6 +9,7 @@ pub struct CreateReservaRequest {
     pub estado: EstadoReserva,
     pub dni_cliente: i64,
     pub id_clase: String,
+    pub horario: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -19,6 +20,7 @@ pub struct ReservaResponse {
     pub estado: EstadoReserva,
     pub dni_cliente: i64,
     pub id_clase: String,
+    pub horario: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -35,6 +37,7 @@ impl From<Reserva> for ReservaResponse {
             estado: reserva.get_estado(),
             dni_cliente: reserva.get_dni_cliente(),
             id_clase: reserva.get_id_clase(),
+            horario: reserva.get_horario().to_owned(),
         }
     }
 }
@@ -47,6 +50,7 @@ impl From<Reserva> for CreateReservaRequest {
             estado: reserva.get_estado(),
             dni_cliente: reserva.get_dni_cliente(),
             id_clase: reserva.get_id_clase(),
+            horario: reserva.get_horario().to_owned(),
         }
     }
 }
