@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                   INSERT INTO membresias (\n                       id_membresia,\n                       tipo,\n                       dni_cliente,\n                       estado,\n                       id_actividad,\n                       fecha_inicio,\n                       fecha_fin,\n                       horario\n                   )\n                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n                   ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "3455065ada8a349cfd66c6de350df74905bd00a63d41752bdd2c15d5f159feac"
+}
