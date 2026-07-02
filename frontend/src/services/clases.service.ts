@@ -1,3 +1,6 @@
+// Servicio de reservas.
+// Expone crearReserva() y getMisReservas() para interactuar con el backend.
+// Existe para separar la lógica de reservas de la UI y centralizar el manejo de errores (membresía vencida, sin cupo).
 import api from './api';
 
 export type EstadoClase = 'alta' | 'baja';
@@ -35,6 +38,7 @@ export type NuevaReservaData = {
     estado: string;
     dni_cliente: number;
     id_clase: string;
+    horario: string; // <-- Agregado para cuando envías la reserva
 };
 
 export type ReservaResponse = {
@@ -44,6 +48,7 @@ export type ReservaResponse = {
     estado: string;
     dni_cliente: string;
     id_clase: string;
+    horario: string; // <-- Agregado para cuando lees la reserva
 };
 
 export type ListaEsperaResponse = {

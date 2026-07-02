@@ -115,11 +115,12 @@ export function ReservasPage() {
                             <p className="text-sm font-semibold text-gray-800">
                                 {clase ? clase.descripcion || clase.id_actividad : reserva.id_clase}
                             </p>
-                            {clase && (
-                                <p className="text-xs text-gray-500">
-                                    {clase.dia_semana} — {clase.horario}
-                                </p>
-                            )}
+                            
+                            {/* Se integró reserva.horario en caso de que la clase no esté cargada en el estado */}
+                            <p className="text-xs text-gray-500">
+                                {clase ? `${clase.dia_semana} — ${clase.horario}` : `Horario: ${reserva.horario}`}
+                            </p>
+                            
                             <p className="text-xs text-gray-500">
                                 Fecha: {reserva.fecha.slice(0, 10).split('-').reverse().join('/')}
                             </p>
@@ -171,8 +172,13 @@ export function ReservasPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-lg font-semibold">QR de la clase</h2>
+                        
+                        {/* Se integró el horario de la reserva también en el detalle del modal QR */}
                         <p className="text-xs text-gray-500 text-center">
-                            {claseDelQr ? `${claseDelQr.descripcion || claseDelQr.id_actividad} — ${claseDelQr.dia_semana} ${claseDelQr.horario}` : reservaParaQr.id_clase}
+                            {claseDelQr 
+                                ? `${claseDelQr.descripcion || claseDelQr.id_actividad} — ${claseDelQr.dia_semana} ${claseDelQr.horario}` 
+                                : `Clase: ${reservaParaQr.id_clase} — Horario: ${reservaParaQr.horario}`
+                            }
                         </p>
 
                         {qrExpirado ? (
