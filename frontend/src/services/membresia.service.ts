@@ -41,27 +41,31 @@ export const membresiaService = {
         }
     },
 
-    async crearMembresia(tipo: string, dni: number, idActividad: string): Promise<void> {
+    async crearMembresia(tipo: string, dni: number, idActividad: string, horario: string): Promise<void> {
         const { hoy, fin } = fechaFinA30Dias();
         await api.post('/membresias/create', {
             tipo,
             id_actividad: idActividad,
+            horario,
             estado: 'activo',
             fecha_inicio: hoy,
             fecha_fin: fin,
             dni_cliente: dni,
+            aceptar_espera: false,
         });
     },
 
-    async renovarMembresia(idMembresia: string, tipo: string, dni: number, idActividad: string): Promise<void> {
+    async renovarMembresia(idMembresia: string, tipo: string, dni: number, idActividad: string, horario: string): Promise<void> {
         const { hoy, fin } = fechaFinA30Dias();
         await api.put(`/membresias/update-membresia/${idMembresia}`, {
             tipo,
             id_actividad: idActividad,
+            horario,
             estado: 'activo',
             fecha_inicio: hoy,
             fecha_fin: fin,
             dni_cliente: dni,
+            aceptar_espera: false,
         });
     },
 

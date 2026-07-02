@@ -42,6 +42,7 @@ impl MembresiaRepository {
         let fecha_inicio = membresia.get_fecha_inicio().format("%Y-%m-%d").to_string();
         let fecha_fin = membresia.get_fecha_fin().format("%Y-%m-%d").to_string();
 
+        let horario = membresia.get_horario();
         sqlx::query!(
             r#"
                    INSERT INTO membresias (
@@ -51,9 +52,10 @@ impl MembresiaRepository {
                        estado,
                        id_actividad,
                        fecha_inicio,
-                       fecha_fin
+                       fecha_fin,
+                       horario
                    )
-                   VALUES (?, ?, ?, ?, ?, ?, ?)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                    "#,
             id,
             tipo,
@@ -61,7 +63,8 @@ impl MembresiaRepository {
             estado,
             id_actividad,
             fecha_inicio,
-            fecha_fin
+            fecha_fin,
+            horario
         )
         .execute(pool)
         .await
@@ -79,7 +82,8 @@ impl MembresiaRepository {
                         estado,
                         id_actividad,
                         fecha_inicio,
-                        fecha_fin
+                        fecha_fin,
+                        horario
                     FROM membresias
                     WHERE dni_cliente = ?
                     "#,
