@@ -24,7 +24,8 @@ const normalizar = (texto: string) =>
 
 export function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
-  const [membresias, setMembresias] = useState<MembresiaResponse[]>([])
+  // Ahora guardamos un mapa de estados de membresía indexados por el DNI del cliente
+  const [estadosMembresia, setEstadosMembresia] = useState<Record<number, EstadoMembresia>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filtro, setFiltro] = useState<FiltroCliente>('todos')
@@ -37,10 +38,12 @@ export function ClientesPage() {
   const [diasNotif, setDiasNotif] = useState<number>(5)
   const [enviandoProg, setEnviandoProg] = useState(false)
 
-  async function cargarClientes() {
+  async function cargarClientesYEstados() {
     try {
+      setLoading(true)
       const data = await clienteService.getClientes()
-      setClientes(data.map((c) => ({
+      
+      const clientesMapeados = data.map((c) => ({
         dni: c.dni,
         nombreApellido: c.nombre_apellido || '',
         email: c.email,
@@ -49,7 +52,35 @@ export function ClientesPage() {
         idFicha: c.id_ficha,
         estadoCuenta: c.motivo_eliminacion ? 'eliminado' : (c.estado as EstadoCuenta),
         motivoEliminacion: c.motivo_eliminacion,
-      })))
+      }))
+      
+      setClientes(clientesMapeados)
+
+      // Consultamos las membresías por DNI en paralelo para cada cliente usando tu servicio actual
+      const mapaEstados: Record<number, EstadoMembresia> = {}
+      const hoy = new Date().toISOString().split('T')[0]
+
+      await Promise.all(
+        clientesMapeados.map(async (cliente) => {
+          try {
+            const mData = await membresiaService.getMembresiasPorDni(cliente.dni)
+            // Buscamos la primera membresía que no esté cancelada
+            const mActiva = mData.find((m) => m.estado !== 'cancelado')
+
+            if (!mActiva) {
+              mapaEstados[cliente.dni] = 'sin-membresia'
+            } else if (!mActiva.fecha_fin) {
+              mapaEstados[cliente.dni] = 'activa'
+            } else {
+              mapaEstados[cliente.dni] = mActiva.fecha_fin.slice(0, 10) >= hoy ? 'activa' : 'vencida'
+            }
+          } catch {
+            mapaEstados[cliente.dni] = 'sin-membresia'
+          }
+        })
+      )
+
+      setEstadosMembresia(mapaEstados)
     } catch {
       setError('No se pudieron cargar los clientes')
     } finally {
@@ -57,27 +88,9 @@ export function ClientesPage() {
     }
   }
 
-  async function cargarMembresias() {
-    try {
-      const data = await membresiaService.getMembresias()
-      setMembresias(data)
-    } catch {
-      // Si falla, no bloquea el resto de la página
-    }
-  }
-
   useEffect(() => {
-    cargarClientes()
-    cargarMembresias()
+    cargarClientesYEstados()
   }, [])
-
-  function getEstadoMembresia(dni: number): EstadoMembresia {
-    const membresiaCliente = membresias.find((m) => m.dni_cliente === dni)
-    if (!membresiaCliente) return 'sin-membresia'
-
-    const hoy = new Date().toISOString().split('T')[0]
-    return membresiaCliente.fecha_fin >= hoy ? 'activa' : 'vencida'
-  }
 
   const handleToggleEstado = async (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
@@ -133,7 +146,7 @@ export function ClientesPage() {
   const handleEliminarConfirmado = () => {
     setModalEliminarAbierto(false)
     setClienteAEliminar(null)
-    cargarClientes()
+    cargarClientesYEstados()
   }
 
   const guardarProgramacionNotificaciones = async (e: React.FormEvent) => {
@@ -242,7 +255,7 @@ export function ClientesPage() {
             nombreApellido={c.nombreApellido}
             email={c.email}
             estadoCuenta={c.estadoCuenta}
-            estadoMembresia={getEstadoMembresia(c.dni)}
+            estadoMembresia={estadosMembresia[c.dni] || 'sin-membresia'}
             motivoEliminacion={c.motivoEliminacion}
             onToggleEstado={() => handleToggleEstado(c.dni)}
             onEliminar={() => handleEliminar(c.dni)}
