@@ -75,12 +75,16 @@ export function NuevaClasePage() {
             return;
         }
 
+        const esDomingo = fechaSeleccionada.getDay() === 0; // 0 = domingo en JS
+
         const [horas, minutos] = form.horario.split(':').map(Number);
         const minutosDesdeMedianoche = horas * 60 + minutos;
         const apertura = 7 * 60;   // 07:00
         const cierre = 21 * 60;    // 21:00 (la clase puede arrancar hasta esa hora; el gym cierra a las 22)
-        if (minutosDesdeMedianoche < apertura || minutosDesdeMedianoche > cierre) {
-            setError('El horario de la clase debe estar entre las 07:00 y las 21:00 hs');
+        const fueraDeHorario = minutosDesdeMedianoche < apertura || minutosDesdeMedianoche > cierre;
+
+        if (esDomingo || fueraDeHorario) {
+            setError('Clase fuera de horario o día permitido.');
             return;
         }
 

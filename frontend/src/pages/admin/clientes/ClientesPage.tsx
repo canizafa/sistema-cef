@@ -37,51 +37,67 @@ export function ClientesPage() {
   const [diasNotif, setDiasNotif] = useState<number>(5)
   const [enviandoProg, setEnviandoProg] = useState(false)
 
+  async function cargarClientes() {
+    try {
+      const data = await clienteService.getClientes()
+      setClientes(data.map((c) => ({
+        dni: c.dni,
+        nombreApellido: c.nombre_apellido,
+        email: c.email,
+        telefono: c.telefono,
+        fechaNacimiento: c.fecha_nacimiento,
+        idFicha: c.id_ficha,
+        estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
+        motivoEliminacion: c.motivo_eliminacion,
+      })))
+    } catch {
+      setError('No se pudieron cargar los clientes')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    clienteService.getClientes()
-      .then((data) => {
-        setClientes(data.map((c) => ({
-          dni: c.dni,
-          nombreApellido: c.nombre_apellido,
-          email: c.email,
-          telefono: c.telefono,
-          fechaNacimiento: c.fecha_nacimiento,
-          idFicha: c.id_ficha,
-          estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
-          motivoEliminacion: c.motivo_eliminacion,
-        })))
-      })
-      .catch(() => setError('No se pudieron cargar los clientes'))
-      .finally(() => setLoading(false))
+    cargarClientes()
   }, [])
 
   const handleToggleEstado = async (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
     if (!cliente) return
     setLoadingToggle(dni)
+    
+    // Guardamos el estado opuesto para la UI instantánea
+    const estadoUIAnterior = cliente.estadoCuenta
+    const proximoEstado: EstadoCuenta = estadoUIAnterior === 'alta' ? 'baja' : 'alta'
+
     try {
+      // Mandamos los campos en snake_case tal cual requiere la interfaz ClienteResponse
       const clienteRaw: ClienteResponse = {
         dni: cliente.dni,
         nombre_apellido: cliente.nombreApellido,
         email: cliente.email,
         telefono: cliente.telefono,
         fecha_nacimiento: cliente.fechaNacimiento,
-        estado: cliente.estadoCuenta,
+        estado: estadoUIAnterior, // Mandamos su estado actual, el service se encarga de cambiarlo
         rol: 'cliente',
         id_ficha: cliente.idFicha,
         motivo_eliminacion: cliente.motivoEliminacion,
         creditos: 0
       }
+
       await clienteService.toggleEstado(clienteRaw)
+
+      // Actualizamos React localmente de inmediato
       setClientes((prev) =>
         prev.map((c) =>
           c.dni === dni
-            ? { ...c, estadoCuenta: c.estadoCuenta === 'alta' ? 'baja' : 'alta' }
+            ? { ...c, estadoCuenta: proximoEstado }
             : c
         )
       )
+
       toast.success(
-        cliente.estadoCuenta === 'alta'
+        proximoEstado === 'baja'
           ? 'Cliente desactivado correctamente'
           : 'Cliente activado correctamente'
       )
@@ -100,15 +116,9 @@ export function ClientesPage() {
   }
 
   const handleEliminarConfirmado = () => {
-    if (!clienteAEliminar) return
-    setClientes((prev) =>
-      prev.map((c) =>
-        c.dni === clienteAEliminar.dni
-          ? { ...c, estadoCuenta: 'eliminado' as EstadoCuenta }
-          : c
-      )
-    )
+    setModalEliminarAbierto(false)
     setClienteAEliminar(null)
+    cargarClientes() // Refrescamos la lista post-eliminación lógica del modal
   }
 
   const guardarProgramacionNotificaciones = async (e: React.FormEvent) => {
