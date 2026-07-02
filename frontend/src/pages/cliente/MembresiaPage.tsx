@@ -85,6 +85,7 @@ export function MembresiaPage() {
                     idActividad: actividad.id,
                     idMembresia,
                     horario: grupo.clases[0]?.horario ?? '00:00',
+                    diaInicio: grupo.clases[0]?.dia ?? new Date().toLocaleDateString('en-CA'),
                     clases: grupo.clases.map((c) => ({
                         id_clase: c.id_clase,
                         fecha: c.dia,

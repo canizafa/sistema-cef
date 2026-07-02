@@ -24,11 +24,14 @@ export const actividadService = {
     },
 };
 
-function fechaFinA30Dias(): { hoy: string; fin: string } {
-    const hoy = new Date().toLocaleDateString('en-CA');
-    const fechaFinDate = new Date();
-    fechaFinDate.setDate(fechaFinDate.getDate() + 30);
-    return { hoy, fin: fechaFinDate.toLocaleDateString('en-CA') };
+function calcularFechas(diaInicio: string): { inicio: string; fin: string } {
+    const fechaInicio = new Date(diaInicio + 'T00:00:00');
+    const fechaFin = new Date(fechaInicio);
+    fechaFin.setDate(fechaFin.getDate() + 30);
+    return {
+        inicio: diaInicio,
+        fin: fechaFin.toLocaleDateString('en-CA'),
+    };
 }
 
 export const membresiaService = {
@@ -41,28 +44,28 @@ export const membresiaService = {
         }
     },
 
-    async crearMembresia(tipo: string, dni: number, idActividad: string, horario: string): Promise<void> {
-        const { hoy, fin } = fechaFinA30Dias();
+    async crearMembresia(tipo: string, dni: number, idActividad: string, horario: string, diaInicio: string): Promise<void> {
+        const { inicio, fin } = calcularFechas(diaInicio);
         await api.post('/membresias/create', {
             tipo,
             id_actividad: idActividad,
             horario,
             estado: 'activo',
-            fecha_inicio: hoy,
+            fecha_inicio: inicio,
             fecha_fin: fin,
             dni_cliente: dni,
             aceptar_espera: false,
         });
     },
 
-    async renovarMembresia(idMembresia: string, tipo: string, dni: number, idActividad: string, horario: string): Promise<void> {
-        const { hoy, fin } = fechaFinA30Dias();
+    async renovarMembresia(idMembresia: string, tipo: string, dni: number, idActividad: string, horario: string, diaInicio: string): Promise<void> {
+        const { inicio, fin } = calcularFechas(diaInicio);
         await api.put(`/membresias/update-membresia/${idMembresia}`, {
             tipo,
             id_actividad: idActividad,
             horario,
             estado: 'activo',
-            fecha_inicio: hoy,
+            fecha_inicio: inicio,
             fecha_fin: fin,
             dni_cliente: dni,
             aceptar_espera: false,

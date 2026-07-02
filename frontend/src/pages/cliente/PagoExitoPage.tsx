@@ -51,20 +51,22 @@ export function PagoExitoPage() {
         if (!raw) return;
         yaProcesado.current = true;
         try {
-            const { tipo, dni, idActividad, idMembresia, horario, clases } = JSON.parse(raw) as {
+            const { tipo, dni, idActividad, idMembresia, horario, diaInicio, clases } = JSON.parse(raw) as {
                 tipo: string;
                 dni: number;
                 idActividad: string;
                 idMembresia?: string;
                 horario?: string;
+                diaInicio?: string;
                 clases?: unknown[];
             };
             const dniEfectivo = dni ?? user?.dni;
             if (!dniEfectivo) return;
             const horarioEfectivo = horario ?? '00:00';
+            const diaInicioEfectivo = diaInicio ?? new Date().toLocaleDateString('en-CA');
             const promesa = idMembresia
-                ? membresiaService.renovarMembresia(idMembresia, tipo, dniEfectivo, idActividad, horarioEfectivo)
-                : membresiaService.crearMembresia(tipo, dniEfectivo, idActividad, horarioEfectivo);
+                ? membresiaService.renovarMembresia(idMembresia, tipo, dniEfectivo, idActividad, horarioEfectivo, diaInicioEfectivo)
+                : membresiaService.crearMembresia(tipo, dniEfectivo, idActividad, horarioEfectivo, diaInicioEfectivo);
             promesa
                 .then(() => {
                     if (clases && clases.length > 0) {
