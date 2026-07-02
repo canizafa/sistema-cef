@@ -36,6 +36,12 @@ export interface UpdateClienteRequest {
     id_ficha: string;
 }
 
+export interface NotificacionRequest {
+    email: string;
+    motivo: string;
+    cuerpo: string;
+}
+
 export const clienteService = {
     async getClientes(): Promise<ClienteResponse[]> {
         const response = await api.get<ClienteResponse[]>('/clientes/get-all');
@@ -89,5 +95,10 @@ export const clienteService = {
 
     async programarNotificaciones(dias: number): Promise<void> {
         await api.put('/notificaciones/update-date', { dias });
+    },
+
+    // ➡️ CORREGIDO: Se eliminó la palabra "function", quedando estructurado como método válido de objeto TypeScript.
+    async enviarNotificacionDirecta(data: NotificacionRequest): Promise<void> {
+        await api.post('/api/notificaciones/notify', data);
     },
 };

@@ -22,6 +22,8 @@ interface Cliente {
 const normalizar = (texto: string) =>
   texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
+const DIAS_NOTIF_KEY = 'cef_dias_notif'
+
 export function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [estadosMembresia, setEstadosMembresia] = useState<Record<number, EstadoMembresia>>({})
@@ -34,7 +36,10 @@ export function ClientesPage() {
   const [loadingToggle, setLoadingToggle] = useState<number | null>(null)
 
   const [modalProgAbierto, setModalProgAbierto] = useState(false)
-  const [diasNotif, setDiasNotif] = useState<number>(5)
+  const [diasNotif, setDiasNotif] = useState<number>(() => {
+    const guardado = localStorage.getItem(DIAS_NOTIF_KEY)
+    return guardado ? parseInt(guardado, 10) : 5
+  })
   const [enviandoProg, setEnviandoProg] = useState(false)
 
   async function cargarClientesYEstados() {
@@ -153,6 +158,7 @@ export function ClientesPage() {
 
     try {
       await clienteService.programarNotificaciones(diasNotif)
+      localStorage.setItem(DIAS_NOTIF_KEY, String(diasNotif))
       toast.success("Configuración guardada correctamente", { id: toastId })
       setModalProgAbierto(false)
     } catch (err) {

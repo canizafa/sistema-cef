@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Mail, IdCard, X, Check, Trash2, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { clienteService } from '@/services/cliente.service'
 
 export type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 export type EstadoMembresia = 'activa' | 'vencida' | 'sin-membresia'
@@ -53,9 +55,26 @@ export function ClienteCard({
   onEliminar,
 }: ClienteCardProps) {
   const activo = estadoCuenta === 'alta'
+  
+  // Estado para controlar la carga del loader de simulación
+  const [enviando, setEnviando] = useState(false)
 
-  const handleEnviarNotificacion = () => {
-    toast.success("Notificación enviada con éxito")
+  // Disparador manual directo hacia la API de Rust
+  const handleEnviarNotificacion = async () => {
+    setEnviando(true)
+    try {
+      await clienteService.enviarNotificacionDirecta({
+        email: email,
+        motivo: 'Simulación del Sistema: Estado de Membresía',
+        cuerpo: `Hola ${nombreApellido},\n\nTe enviamos este correo como parte de una prueba de simulación de notificaciones automatizadas de nuestro centro de entrenamiento.\n\nActualmente el estado de tu membresía figura como: "${estadoMembresia || 'Sin especificar'}". Si crees que se trata de un error, por favor comunícate con el área de recepción.\n\n¡Muchas gracias!`,
+      })
+      toast.success(`Notificación simulada enviada correctamente a ${email}`)
+    } catch (error) {
+      console.error(error)
+      toast.error('No se pudo procesar la simulación de notificación con el servidor')
+    } finally {
+      setEnviando(false)
+    }
   }
 
   return (
@@ -115,14 +134,16 @@ export function ClienteCard({
             </Button>
           )}
 
+          {/* Botón dinámico de simulación */}
           <Button
             variant="default"
             size="sm"
             className="w-full"
             onClick={handleEnviarNotificacion}
+            disabled={enviando}
           >
             <Bell className="w-4 h-4 mr-2" />
-            Enviar notificación
+            {enviando ? 'Enviando...' : 'Enviar notificación'}
           </Button>
 
           <Button
