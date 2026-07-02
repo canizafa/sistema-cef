@@ -69,14 +69,7 @@ export const membresiaService = {
         });
     },
 
-    async darBajaMembresia(membresia: MembresiaResponse, dni: number): Promise<void> {
-        await api.put(`/membresias/update-membresia/${membresia.id_membresia}`, {
-            tipo: membresia.tipo,
-            id_actividad: membresia.id_actividad,
-            estado: 'cancelado',
-            fecha_inicio: membresia.fecha_inicio.slice(0, 10),
-            fecha_fin: membresia.fecha_fin,
-            dni_cliente: dni,
-        });
+    async darBajaMembresia(membresia: MembresiaResponse): Promise<void> {
+        await api.delete(`/membresias/delete-membresia/${membresia.id_membresia}`);
     },
 };

@@ -3,14 +3,9 @@ import { Link } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { membresiaService, PRECIO_MEMBRESIA } from '@/services/membresia.service';
 import { pagosService } from '@/services/pagos.service';
-import { reservasService, listaEsperaService } from '@/services/clases.service';
+import { reservasService } from '@/services/clases.service';
 import { useAuth } from '@/context/AuthContext';
 import { useCreditos } from '@/context/CreditosContext';
-
-function formatFechaCorta(fecha: string): string {
-    const [anio, mes, dia] = fecha.slice(0, 10).split('-');
-    return `${dia}-${mes}-${anio.slice(2)}`;
-}
 
 export function PagoExitoPage() {
     const { user } = useAuth();
@@ -62,14 +57,7 @@ export function PagoExitoPage() {
                 idActividad: string;
                 idMembresia?: string;
                 horario?: string;
-                clases?: {
-                    id_clase: string;
-                    fecha: string;
-                    lleno: boolean;
-                    diaSemana: string;
-                    nombreActividad: string;
-                    yaReservada: boolean;
-                }[];
+                clases?: unknown[];
             };
             const dniEfectivo = dni ?? user?.dni;
             if (!dniEfectivo) return;
@@ -78,43 +66,12 @@ export function PagoExitoPage() {
                 ? membresiaService.renovarMembresia(idMembresia, tipo, dniEfectivo, idActividad, horarioEfectivo)
                 : membresiaService.crearMembresia(tipo, dniEfectivo, idActividad, horarioEfectivo);
             promesa
-                .then(async () => {
-                    if (!clases || clases.length === 0) return;
-                    const yaReservadas = clases.filter((c) => c.yaReservada);
-                    const llenas = clases.filter((c) => !c.yaReservada && c.lleno);
-                    const disponibles = clases.filter((c) => !c.yaReservada && !c.lleno);
-
-                    const descripcion = (c: (typeof clases)[number]) =>
-                        `${c.nombreActividad} ${c.diaSemana} ${formatFechaCorta(c.fecha)}`;
-                    setAvisosClases([
-                        ...yaReservadas.map(
-                            (c) => `Clase ${descripcion(c)} ya tenías una reserva individual, no se duplicó.`
-                        ),
-                        ...llenas.map(
-                            (c) => `Clase ${descripcion(c)} se encuentra llena, te anotamos en la lista de espera.`
-                        ),
-                    ]);
-
-                    await Promise.allSettled(
-                        disponibles.map((c) =>
-                            reservasService.crearReserva({
-                                fecha: c.fecha,
-                                tipo: 'membresia',
-                                estado: 'confirmada',
-                                dni_cliente: dniEfectivo,
-                                id_clase: c.id_clase,
-                            })
-                        )
-                    );
-                    await Promise.allSettled(
-                        llenas.map(async (c) => {
-                            const listas = await listaEsperaService.getAll();
-                            const lista =
-                                listas.find((l) => l.id_clase === c.id_clase) ??
-                                (await listaEsperaService.crearLista(c.id_clase, c.nombreActividad));
-                            await listaEsperaService.anotarse(c.id_clase, lista.id_espera, dniEfectivo);
-                        })
-                    );
+                .then(() => {
+                    if (clases && clases.length > 0) {
+                        setAvisosClases([
+                            `Se reservaron ${clases.length} clases automáticamente para el próximo mes.`,
+                        ]);
+                    }
                 })
                 .catch(() => {
                     setErrorMembresia(true);

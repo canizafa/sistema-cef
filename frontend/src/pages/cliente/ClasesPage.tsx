@@ -41,10 +41,10 @@ export function ClasesPage() {
         setProfesores(dataProfesores)
 
         if (user) {
-          const reservasConfirmadas = dataReservas.filter(
-            (r) => String(r.dni_cliente) === String(user.dni) && r.estado === 'confirmada'
+          const reservasActivas = dataReservas.filter(
+            (r) => String(r.dni_cliente) === String(user.dni) && r.estado !== 'cancelada'
           )
-          setReservadas(new Set(reservasConfirmadas.map((r) => r.id_clase)))
+          setReservadas(new Set(reservasActivas.map((r) => r.id_clase)))
         }
       } catch {
         setError('No se pudieron cargar las clases.')
