@@ -26,11 +26,14 @@ pub async fn create(db: &SqlitePool, request: CreateReservaRequest) -> Result<Re
         .await
         .map_err(AppError::from)?;
     if reservas_existentes.iter().any(|r| {
-        r.get_id_clase() == reserva.get_id_clase()
-            && r.get_dni_cliente() == reserva.get_dni_cliente()
+        (r.get_id_clase() == reserva.get_id_clase()
+            && r.get_dni_cliente() == reserva.get_dni_cliente())
+            || (r.get_dni_cliente() == reserva.get_dni_cliente()
+                && r.get_fecha_reserva().eq(&reserva.get_fecha_reserva())
+                && se_solapan(r.get_horario(), reserva.get_horario(), 60))
     }) {
         return Err(AppError::Conflict(
-            "Ya existe una reserva para esta actividad y cliente".to_string(),
+            "Ya existe una reserva para esta actividad y cliente, o el cliente ya tiene otra reserva en ese horario".to_string(),
         ));
     }
     //Descontar cupo de la clase
@@ -101,6 +104,10 @@ async fn liberar_cupo_y_lista_espera(db: &SqlitePool, id_clase: &str) -> Result<
                 estado: EstadoReserva::Pendiente,
                 dni_cliente: cliente.get_dni_cliente(),
                 id_clase: id_clase.to_string(),
+                horario: clase::service::get_by_id(db, id_clase)
+                    .await?
+                    .get_horario()
+                    .to_owned(),
             };
 
             create(db, request).await?;
@@ -245,6 +252,10 @@ pub async fn generar_reserva(
         fecha_reserva,
         dni_cliente,
         id_clase.to_owned(),
+        clase::service::get_by_id(db, id_clase)
+            .await?
+            .get_horario()
+            .to_owned(),
     );
     //Validar si no existe una reserva para la misma actividad para ese mismo cliente
     let errors: Vec<FieldError> = reserva
@@ -268,4 +279,20 @@ pub async fn generar_reserva(
     }
     ReservaRepository::create(db, &reserva).await?;
     Ok(())
+}
+
+fn se_solapan(horario_a: &str, horario_b: &str, duracion_minutos: i64) -> bool {
+    let (inicio_a, inicio_b) = match (
+        NaiveTime::parse_from_str(horario_a, "%H:%M"),
+        NaiveTime::parse_from_str(horario_b, "%H:%M"),
+    ) {
+        (Ok(a), Ok(b)) => (a, b),
+        _ => return false, // si algún horario es inválido, no lo consideramos choque
+    };
+
+    let fin_a = inicio_a + chrono::Duration::minutes(duracion_minutos);
+    let fin_b = inicio_b + chrono::Duration::minutes(duracion_minutos);
+
+    // se solapan si el inicio de una es antes del fin de la otra, y viceversa
+    inicio_a < fin_b && inicio_b < fin_a
 }
