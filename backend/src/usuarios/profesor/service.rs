@@ -40,9 +40,13 @@ pub async fn update(
     pool: &SqlitePool,
     request: CreateProfesorRequest,
 ) -> Result<Profesor, AppError> {
-    // Convertir
+    // Armamos el profesor con los datos NUEVOS que llegaron del form
     let profesor = Profesor::from(request);
-    let profesor = ProfesorRepository::get_by_dni(pool, profesor.get_dni()).await?;
+
+    // Solo verificamos que exista en la base (sin pisar los datos nuevos)
+    ProfesorRepository::get_by_dni(pool, profesor.get_dni()).await?;
+
+    // Persistimos los datos nuevos
     let profesor = ProfesorRepository::update(pool, profesor.get_dni(), &profesor)
         .await
         .map_err(AppError::from)?;
