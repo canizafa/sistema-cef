@@ -251,6 +251,49 @@ impl ClienteRepository {
 
         Ok(row.into())
     }
+    pub async fn update_datos_completos(
+        pool: &SqlitePool,
+        id: i64,
+        nombre_apellido: &str,
+        telefono: &str,
+        estado: EstadoUsuario,
+        motivo_eliminacion: Option<String>,
+    ) -> Result<Cliente, DbError> {
+        let row = sqlx::query_as::<_, ClienteRow>(
+            r#"
+                UPDATE cliente
+                SET nombre_completo = ?,
+                    telefono = ?,
+                    estado = ?,
+                    motivo_eliminacion = ?
+                WHERE dni_cliente = ?
+                RETURNING
+                    dni_cliente AS dni,
+                    nombre_completo AS nombre,
+                    email,
+                    telefono,
+                    fecha_nacimiento,
+                    estado,
+                    motivo_eliminacion,
+                    password,
+                    id_ficha,
+                    creditos,
+                    contador_cancelaciones,
+                    fecha_notificacion,
+                    'cliente' AS rol
+                "#,
+        )
+        .bind(nombre_apellido)
+        .bind(telefono)
+        .bind(estado)
+        .bind(motivo_eliminacion)
+        .bind(id)
+        .fetch_one(pool)
+        .await
+        .map_err(DbError::from)?;
+
+        Ok(row.into())
+    }
     pub async fn update_estado(
         pool: &SqlitePool,
         id: i64,

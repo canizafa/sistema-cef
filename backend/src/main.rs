@@ -39,6 +39,7 @@ async fn main() -> Result<(), AppError> {
         db,
         jwt_secret: config.jwt_secret,
         mailer: Arc::new(mailer),
+        dias_gracia: Arc::new(std::sync::Mutex::new(5)),
     };
 
     sqlx::migrate!("./migrations")

@@ -4,7 +4,6 @@ use crate::{
         self,
         dto::{NotificacionRequest, NotificacionUpdateRequest},
     },
-    usuarios::cliente,
 };
 use axum::{Json, extract::State};
 use tracing::instrument;
@@ -24,6 +23,12 @@ pub async fn update_notify_date_client(
     State(state): State<AppState>,
     Json(request): Json<NotificacionUpdateRequest>,
 ) -> Result<(), AppError> {
-    cliente::service::update_notify_date(&state.db, request.dias).await?;
+    if request.dias < 0 || request.dias > 90 {
+        return Err(AppError::Conflict(
+            "Los días deben estar entre 0 y 90".to_string(),
+        ));
+    }
+    let mut dias = state.dias_gracia.lock().unwrap();
+    *dias = request.dias;
     Ok(())
 }
