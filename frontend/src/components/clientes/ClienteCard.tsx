@@ -2,15 +2,17 @@ import { Mail, IdCard, X, Check, Trash2, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner' // <--- Importamos sonner
+import { toast } from 'sonner'
 
 export type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
+export type EstadoMembresia = 'activa' | 'vencida' | 'sin-membresia'
 
 interface ClienteCardProps {
   dni: number
   nombreApellido: string
   email: string
   estadoCuenta: EstadoCuenta
+  estadoMembresia?: EstadoMembresia
   motivoEliminacion?: string | null
   onToggleEstado?: () => void
   onEliminar?: () => void
@@ -27,20 +29,32 @@ function getBadgeCuenta(estado: EstadoCuenta) {
   }
 }
 
+function getBadgeMembresia(estado?: EstadoMembresia) {
+  switch (estado) {
+    case 'activa':
+      return <Badge className="bg-success text-white">Membresía al día</Badge>
+    case 'vencida':
+      return <Badge className="bg-red-700 text-white">Membresía vencida</Badge>
+    case 'sin-membresia':
+      return <Badge className="bg-gray-400 text-white">Sin membresía</Badge>
+    default:
+      return null
+  }
+}
+
 export function ClienteCard({
   dni,
   nombreApellido,
   email,
   estadoCuenta,
+  estadoMembresia,
   motivoEliminacion,
   onToggleEstado,
   onEliminar,
 }: ClienteCardProps) {
   const activo = estadoCuenta === 'alta'
 
-  // Manejador del click
   const handleEnviarNotificacion = () => {
-    // Si más adelante necesitás llamar a un servicio backend, lo metés acá con un try/catch
     toast.success("Notificación enviada con éxito")
   }
 
@@ -51,6 +65,11 @@ export function ClienteCard({
           <CardTitle className="text-base font-semibold text-primary">{nombreApellido}</CardTitle>
           {getBadgeCuenta(estadoCuenta)}
         </div>
+        {estadoMembresia && (
+          <div className="pt-1">
+            {getBadgeMembresia(estadoMembresia)}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-1 pb-3">
@@ -96,7 +115,6 @@ export function ClienteCard({
             </Button>
           )}
 
-          {/* BOTÓN: Siempre activo y lanza el Toast de Sonner */}
           <Button
             variant="default"
             size="sm"
