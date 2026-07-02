@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Search, CalendarDays, X } from 'lucide-react'
-import { ClienteCard } from '@/components/clientes/ClienteCard'
+import { ClienteCard, type EstadoCuenta, type EstadoMembresia } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 import { clienteService, type ClienteResponse } from '@/services/cliente.service'
 import { membresiaService, type MembresiaResponse } from '@/services/membresia.service'
 import { toast } from 'sonner'
 
-type EstadoCuenta = 'alta' | 'baja' | 'eliminado'
 type FiltroCliente = 'todos' | 'alta' | 'baja' | 'eliminado'
 
 interface Cliente {
@@ -32,7 +31,7 @@ export function ClientesPage() {
   const [busquedaNombre, setBusquedaNombre] = useState('')
   const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false)
   const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null)
-  const [, setLoadingToggle] = useState<number | null>(null)
+  const [loadingToggle, setLoadingToggle] = useState<number | null>(null)
 
   const [modalProgAbierto, setModalProgAbierto] = useState(false)
   const [diasNotif, setDiasNotif] = useState<number>(5)
@@ -43,12 +42,12 @@ export function ClientesPage() {
       const data = await clienteService.getClientes()
       setClientes(data.map((c) => ({
         dni: c.dni,
-        nombreApellido: c.nombre_apellido,
+        nombreApellido: c.nombre_apellido || '',
         email: c.email,
         telefono: c.telefono,
         fechaNacimiento: c.fecha_nacimiento,
         idFicha: c.id_ficha,
-        estadoCuenta: c.motivo_eliminacion ? 'eliminado' : c.estado as EstadoCuenta,
+        estadoCuenta: c.motivo_eliminacion ? 'eliminado' : (c.estado as EstadoCuenta),
         motivoEliminacion: c.motivo_eliminacion,
       })))
     } catch {
@@ -63,7 +62,7 @@ export function ClientesPage() {
       const data = await membresiaService.getMembresias()
       setMembresias(data)
     } catch {
-      // Si falla, simplemente no mostramos el badge de membresía; no bloquea el resto de la página
+      // Si falla, no bloquea el resto de la página
     }
   }
 
@@ -72,8 +71,7 @@ export function ClientesPage() {
     cargarMembresias()
   }, [])
 
-  // Busca la membresía del cliente y devuelve si está activa, vencida, o si no tiene ninguna
-  function getEstadoMembresia(dni: number): 'activa' | 'vencida' | 'sin-membresia' {
+  function getEstadoMembresia(dni: number): EstadoMembresia {
     const membresiaCliente = membresias.find((m) => m.dni_cliente === dni)
     if (!membresiaCliente) return 'sin-membresia'
 
@@ -83,7 +81,7 @@ export function ClientesPage() {
 
   const handleToggleEstado = async (dni: number) => {
     const cliente = clientes.find((c) => c.dni === dni)
-    if (!cliente) return
+    if (!cliente || loadingToggle === dni) return
     setLoadingToggle(dni)
 
     const estadoUIAnterior = cliente.estadoCuenta
@@ -157,8 +155,9 @@ export function ClientesPage() {
 
   const clientesFiltrados = clientes.filter((c) => {
     if (busquedaNombre.trim() !== '') {
-      return normalizar(c.nombreApellido)
-        .startsWith(normalizar(busquedaNombre.trim()))
+      return c.nombreApellido
+        ? normalizar(c.nombreApellido).startsWith(normalizar(busquedaNombre.trim()))
+        : false
     }
     if (filtro === 'alta') return c.estadoCuenta === 'alta'
     if (filtro === 'baja') return c.estadoCuenta === 'baja'
