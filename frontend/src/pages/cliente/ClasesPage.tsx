@@ -80,13 +80,14 @@ export function ClasesPage() {
     try {
       if (creditos >= PRECIO_CLASE) {
         // Caso 1: créditos cubren el total — sin MercadoPago
-        await reservasService.crearReserva({
-          fecha: claseSeleccionada.dia,
-          tipo: 'abono',
-          estado: 'confirmada',
-          dni_cliente: user.dni,
-          id_clase: claseSeleccionada.id_clase,
-        })
+       await reservasService.crearReserva({
+  fecha: claseSeleccionada.dia,
+  tipo: 'abono',
+  estado: 'confirmada',
+  dni_cliente: user.dni,
+  id_clase: claseSeleccionada.id_clase,
+  horario: claseSeleccionada.horario,
+})
         setReservadas((prev) => new Set(prev).add(claseSeleccionada.id_clase))
         handleCancelarModal()
         try {
