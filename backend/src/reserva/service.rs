@@ -153,13 +153,7 @@ async fn delete(db: &SqlitePool, id: &str) -> Result<(), AppError> {
     ReservaRepository::delete(db, id)
         .await
         .map_err(AppError::from)?;
-    if let Err(error) = liberar_cupo_y_lista_espera(db, &id_clase).await {
-        tracing::error!(
-            "Error al procesar lista de espera para clase {}: {:?}",
-            id_clase,
-            error
-        );
-    }
+    liberar_cupo_y_lista_espera(db, &id_clase).await?;
     Ok(())
 }
 

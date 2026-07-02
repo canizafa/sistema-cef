@@ -15,16 +15,16 @@ impl ReservaRepository {
         let id_clase = reserva.get_id_clase();
         sqlx::query!(
             r#"
-                INSERT INTO reserva (
-                    id_reserva,
-                    estado,
-                    tipo,
-                    fecha_reserva,
-                    dni_cliente,
-                    id_clase
-                )
-                VALUES (?, ?, ?, ?, ?, ?)
-                "#,
+                    INSERT INTO reserva (
+                        id_reserva,
+                        estado,
+                        tipo,
+                        fecha_reserva,
+                        dni_cliente,
+                        id_clase
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    "#,
             id,
             estado,
             tipo,
@@ -41,15 +41,15 @@ impl ReservaRepository {
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Reserva>, DbError> {
         let rows = sqlx::query!(
             r#"
-            SELECT
-                id_reserva as "id_reserva!",
-                estado as "estado!",
-                tipo as "tipo!",
-                fecha_reserva as "fecha_reserva!",
-                dni_cliente as "dni_cliente!",
-                id_clase as "id_clase!"
-            FROM reserva
-            "#
+                SELECT
+                    id_reserva as "id_reserva!",
+                    estado as "estado!",
+                    tipo as "tipo!",
+                    fecha_reserva as "fecha_reserva!",
+                    dni_cliente as "dni_cliente!",
+                    id_clase as "id_clase!"
+                FROM reserva
+                "#
         )
         .fetch_all(pool)
         .await
@@ -75,16 +75,16 @@ impl ReservaRepository {
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Reserva, DbError> {
         let row = sqlx::query!(
             r#"
-            SELECT
-                id_reserva as "id_reserva!",
-                estado as "estado!",
-                tipo as "tipo!",
-                fecha_reserva as "fecha_reserva!",
-                dni_cliente as "dni_cliente!",
-                id_clase as "id_clase!"
-            FROM reserva
-            WHERE id_reserva = ?
-            "#,
+                SELECT
+                    id_reserva as "id_reserva!",
+                    estado as "estado!",
+                    tipo as "tipo!",
+                    fecha_reserva as "fecha_reserva!",
+                    dni_cliente as "dni_cliente!",
+                    id_clase as "id_clase!"
+                FROM reserva
+                WHERE id_reserva = ?
+                "#,
             id
         )
         .fetch_one(pool)
@@ -114,15 +114,15 @@ impl ReservaRepository {
 
         sqlx::query!(
             r#"
-            UPDATE reserva
-            SET
-                estado = ?,
-                tipo = ?,
-                fecha_reserva = ?,
-                dni_cliente = ?,
-                id_clase = ?
-            WHERE id_reserva = ?
-            "#,
+                UPDATE reserva
+                SET
+                    estado = ?,
+                    tipo = ?,
+                    fecha_reserva = ?,
+                    dni_cliente = ?,
+                    id_clase = ?
+                WHERE id_reserva = ?
+                "#,
             estado,
             tipo,
             fecha,
@@ -139,9 +139,9 @@ impl ReservaRepository {
     pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), DbError> {
         sqlx::query!(
             r#"
-                DELETE FROM reserva
-                WHERE id_reserva = ?
-                "#,
+                    DELETE FROM reserva
+                    WHERE id_reserva = ?
+                    "#,
             id
         )
         .execute(pool)
