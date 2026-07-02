@@ -3,7 +3,7 @@ import { Search, CalendarDays, X } from 'lucide-react'
 import { ClienteCard, type EstadoCuenta, type EstadoMembresia } from '@/components/clientes/ClienteCard'
 import { EliminarClienteModal } from '@/components/clientes/EliminarClienteModal'
 import { clienteService, type ClienteResponse } from '@/services/cliente.service'
-import { membresiaService, type MembresiaResponse } from '@/services/membresia.service'
+import { membresiaService } from '@/services/membresia.service'
 import { toast } from 'sonner'
 
 type FiltroCliente = 'todos' | 'alta' | 'baja' | 'eliminado'
@@ -24,7 +24,6 @@ const normalizar = (texto: string) =>
 
 export function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
-  // Ahora guardamos un mapa de estados de membresía indexados por el DNI del cliente
   const [estadosMembresia, setEstadosMembresia] = useState<Record<number, EstadoMembresia>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +55,6 @@ export function ClientesPage() {
       
       setClientes(clientesMapeados)
 
-      // Consultamos las membresías por DNI en paralelo para cada cliente usando tu servicio actual
       const mapaEstados: Record<number, EstadoMembresia> = {}
       const hoy = new Date().toISOString().split('T')[0]
 
@@ -64,7 +62,6 @@ export function ClientesPage() {
         clientesMapeados.map(async (cliente) => {
           try {
             const mData = await membresiaService.getMembresiasPorDni(cliente.dni)
-            // Buscamos la primera membresía que no esté cancelada
             const mActiva = mData.find((m) => m.estado !== 'cancelado')
 
             if (!mActiva) {
@@ -211,6 +208,8 @@ export function ClientesPage() {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-500" />
         <input
+          id="busquedaNombre"
+          name="busquedaNombre"
           type="text"
           placeholder="Buscar cliente por nombre y apellido"
           value={busquedaNombre}
@@ -281,10 +280,12 @@ export function ClientesPage() {
 
             <form onSubmit={guardarProgramacionNotificaciones} className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-primary mb-1">
+                <label htmlFor="diasNotif" className="block text-sm font-medium text-primary mb-1">
                   Días luego del vencimiento:
                 </label>
                 <input
+                  id="diasNotif"
+                  name="diasNotif"
                   type="number"
                   min={1}
                   max={90}
