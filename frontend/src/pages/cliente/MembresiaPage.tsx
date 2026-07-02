@@ -84,6 +84,7 @@ export function MembresiaPage() {
                     dni: user.dni,
                     idActividad: actividad.id,
                     idMembresia,
+                    horario: grupo.clases[0]?.horario ?? '00:00',
                     clases: grupo.clases.map((c) => ({
                         id_clase: c.id_clase,
                         fecha: c.dia,
